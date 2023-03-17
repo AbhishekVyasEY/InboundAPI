@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\EquitasInboundAPI.csproj": {}
+    "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\EquitasInboundAPI.csproj": {}
   },
   "projects": {
-    "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\EquitasInboundAPI.csproj": {
+    "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\EquitasInboundAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
+        "projectUniqueName": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
         "projectName": "EquitasInboundAPI",
-        "projectPath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
+        "projectPath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
         "packagesPath": "C:\\Users\\EW195XS\\.nuget\\packages\\",
-        "outputPath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\obj\\",
+        "outputPath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\EW195XS\\AppData\\Roaming\\NuGet\\NuGet.Config",

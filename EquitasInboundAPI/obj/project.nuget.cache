@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QG5BDsRhe44MU822ONohq6+XyJiaCRoKgXrRuXiDKkWwN9lyR3SLQZWiuO/uw166PJCb6kIg779mUu8ecXhDjg==",
+  "dgSpecHash": "TihUA3u3uGuyBPK14bcrwsfuY2EAbJV5RCAiYoGt/KJL8qxi+hxvU/V/SgSfLkbdLh6p99pmG/wl7iqEo9f3EQ==",
   "success": true,
-  "projectFilePath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\msdservices\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
+  "projectFilePath": "C:\\Program D\\Projects\\Equitas\\EquitasInboundAPI\\CreateLead\\EquitasInboundAPI\\EquitasInboundAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\EW195XS\\.nuget\\packages\\microsoft.applicationinsights\\2.21.0\\microsoft.applicationinsights.2.21.0.nupkg.sha512",
     "C:\\Users\\EW195XS\\.nuget\\packages\\microsoft.aspnet.webapi.client\\5.2.6\\microsoft.aspnet.webapi.client.5.2.6.nupkg.sha512",
