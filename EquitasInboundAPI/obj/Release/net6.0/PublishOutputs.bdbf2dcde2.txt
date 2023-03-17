@@ -1,0 +1,15 @@
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\EquitasInboundAPI.exe
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\appsettings.Development.json
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\appsettings.json
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\EquitasInboundAPI.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\EquitasInboundAPI.deps.json
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\EquitasInboundAPI.runtimeconfig.json
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\EquitasInboundAPI.pdb
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.Identity.Client.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.IdentityModel.Abstractions.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.OpenApi.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.Bson.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Program D\Projects\Equitas\EquitasInboundAPI\EquitasInboundAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

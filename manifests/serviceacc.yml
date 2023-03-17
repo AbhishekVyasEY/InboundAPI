@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: "2023-02-06T14:19:55Z"
+  name: aksconnection
+  namespace: default
+  resourceVersion: "336"
+  uid: cd3dd3bf-5493-44aa-8053-2cf3c717d578
+secrets:
+ - name: pipeline-secret
+  

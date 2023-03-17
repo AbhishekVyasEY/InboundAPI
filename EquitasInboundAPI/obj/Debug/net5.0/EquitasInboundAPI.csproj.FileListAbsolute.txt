@@ -1,0 +1,7 @@
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.csproj.AssemblyReference.cache
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.AssemblyInfoInputs.cache
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.AssemblyInfo.cs
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.csproj.CoreCompileInputs.cache
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.MvcApplicationPartsAssemblyInfo.cs
+C:\Program D\Projects\Equitas\EquitasInboundAPI\msdservices\EquitasInboundAPI\obj\Debug\net5.0\EquitasInboundAPI.MvcApplicationPartsAssemblyInfo.cache

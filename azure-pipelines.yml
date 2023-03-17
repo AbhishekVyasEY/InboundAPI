@@ -1,0 +1,72 @@
+trigger:
+#- master
+
+resources:
+- repo: self
+
+variables:
+  imageRepo: inboundapi
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        containerRegistry: 'msdacrconnect'
+        repository: '$(imageRepo)'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(tag)
+          latest
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)/s/manifests'
+        artifact: 'manifests'
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy image
+  dependsOn: Build
+  variables:
+    acrsecret: aksacrsecret
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to AKS
+      environment: 'aksclusterenv.default'
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: DownloadPipelineArtifact@2
+              inputs:
+                buildType: 'current'
+                artifactName: 'manifests'
+                targetPath: '$(Pipeline.Workspace)/manifests'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'createSecret'       
+                namespace: 'inboundapiapp'
+                secretType: 'dockerRegistry'
+                secretName: '$(acrsecret)'
+                dockerRegistryEndpoint: 'msdacrconnect'      
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'deploy'            
+                namespace: 'default'
+                manifests: |
+                  $(Pipeline.Workspace)/s/manifests/deployment.yml
+                  $(Pipeline.Workspace)/s/manifests/service.yml
+              
+              
+
