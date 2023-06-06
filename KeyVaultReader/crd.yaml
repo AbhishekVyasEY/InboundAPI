@@ -1,0 +1,57 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: Deployment
+metadata:
+  name: azureassignedidentities.aadpodidentity.k8s.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzureAssignedIdentity
+    plural: azureassignedidentities
+  scope: inboundapis
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: Deployment
+metadata:
+  name: azureidentitybindings.aadpodidentity.k8s.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzureIdentityBinding
+    plural: azureidentitybindings
+  scope: inboundapis
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: Deployment
+metadata:
+  name: azureidentities.aadpodidentity.k8s.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzureIdentity
+    singular: azureidentity
+    plural: azureidentities
+  scope: inboundapis
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: Deployment
+metadata:
+  name: azurepodidentityexceptions.aadpodidentity.k8s.io
+  annotations:
+    "helm.sh/hook": crd-install
+spec:
+  group: aadpodidentity.k8s.io
+  version: v1
+  names:
+    kind: AzurePodIdentityException
+    singular: azurepodidentityexception
+    plural: azurepodidentityexceptions
+  scope: inboundapis

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "DigiLeadTestProject": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61472;http://localhost:61475"
+    }
+  }
+}
