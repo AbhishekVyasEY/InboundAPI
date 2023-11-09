@@ -46,7 +46,7 @@ namespace ManageCaseTestProject
 
             var ftch_Return = _fixture.Create<CaseReturnParam>();
 
-            _CreateCaseExecution.Setup(x => x.ValidateCreateCase(json, "APIKEY")).ReturnsAsync(ftch_Return);
+            _CreateCaseExecution.Setup(x => x.ValidateCreateCase(json)).ReturnsAsync(ftch_Return);
 
             _controller.ControllerContext = controllerContext;
 

@@ -53,7 +53,7 @@ namespace DedupeDigiLeadTestProject
 
             string getNLTRData_JS = "[{\"eqs_passports\":\"eqs_passportnumber\"}]";
             JArray getNLTRData_JA = JsonConvert.DeserializeObject<JArray>(getNLTRData_JS);
-            _commonFunction.Setup(x => x.getNLTRData(It.IsAny<string>())).ReturnsAsync(getNLTRData_JA);
+            _commonFunction.Setup(x => x.getNLTRData(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(getNLTRData_JA);
 
             
             var result = await _controller.getDedupDgLdNLStatus(request_body_Jobj, "NLTR");

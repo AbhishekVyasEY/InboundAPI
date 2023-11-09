@@ -17,9 +17,13 @@ namespace CreateLeads
     public class CommonFunction : ICommonFunction
     {
         public IQueryParser _queryParser;
-        public CommonFunction(IQueryParser queryParser)
+        private ILoggers _logger;
+        public IMemoryCache _cache;
+        public CommonFunction(IMemoryCache cache, ILoggers logger, IQueryParser queryParser)
         {
             this._queryParser = queryParser;
+            this._cache = cache;
+            this._logger = logger;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -111,22 +115,100 @@ namespace CreateLeads
                 return resourceID;
         }
 
-        public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
+        public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
         {
-            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string TableId = await this.getIDFromGetResponce(idfield, responsdtails);
-            return TableId;
+            string resourceID = "";
+            foreach (JObject item in RsponsData)
+            {
+                if (Enum.TryParse(item["responsecode"].ToString(), out HttpStatusCode responseStatus) && responseStatus == HttpStatusCode.OK)
+                {
+                    dynamic responseValue = item["responsebody"];
+                    JArray resArray = new JArray();
+                    string urlMetaData = string.Empty;
+                    if (responseValue?.value != null)
+                    {
+                        resArray = (JArray)responseValue?.value;
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+                    else if (responseValue is JArray)
+                    {
+                        resArray = responseValue;
+
+                    }
+                    else
+                    {
+                        resArray.Add(responseValue);
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+
+                    if (resArray != null && resArray.Any())
+                    {
+
+                        return resArray;
+
+                    }
+                }
+            }
+            return new JArray();
         }
 
-        public async Task<string> getCustomerId(string CustomerCode)
-        {            
-            return await this.getIDfromMSDTable("contacts", "contactid", "ccs_customercode", CustomerCode);
+        public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
+        {
+            try
+            {
+                string Table_Id;
+                string TableId;
+                if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
+                {
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    TableId = await this.getIDFromGetResponce(idfield, responsdtails);
+
+                    this.SetMvalue<string>(tablename + filtervalue, 1400, TableId);
+                }
+                else
+                {
+                    TableId = Table_Id;
+                }
+                return TableId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                throw;
+            }
+
+        }
+
+        public async Task<JArray> getCustomerDetail(string CustomerCode)
+        {
+            try
+            {
+                string query_url = $"contacts()?$select=contactid,eqs_customerid,_eqs_titleid_value,firstname,lastname,eqs_companyname,eqs_companyname2,eqs_companyname3,birthdate,eqs_dateofincorporation,eqs_gender,mobilephone,emailaddress1,_eqs_entitytypeid_value,_eqs_subentitytypeid_value,_eqs_businesstypeid_value&$filter=eqs_customerid eq '{CustomerCode}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var customerDetail = await this.getDataFromResponce(responsdtails);
+                return customerDetail;
+            }            
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCustomerDetail", ex.Message);
+                throw ex;
+            }
         }
 
         public async Task<string> getCityId(string CityCode)
         {           
-            return await this.getIDfromMSDTable("eqs_cities", "eqs_cityid", "eqs_name", CityCode);
+            return await this.getIDfromMSDTable("eqs_cities", "eqs_cityid", "eqs_citycode", CityCode);
+        }
+
+        public async Task<string> getLeadIdByApplicent(string Applicent)
+        {
+            return await this.getIDfromMSDTable("eqs_accountapplicants", "_eqs_leadid_value", "eqs_applicantid", Applicent);
+        }
+
+        public async Task<string> getLeadId(string Lead)
+        {
+            return await this.getIDfromMSDTable("leads", "leadid", "eqs_crmleadid", Lead);
         }
 
         public async Task<string> getBranchId(string BranchCode)
@@ -134,21 +216,40 @@ namespace CreateLeads
             return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchid", "eqs_branchidvalue", BranchCode); 
         }
 
+        public async Task<string> getEntityTypeId(string EntityTypeCode)
+        {
+            return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_entitytypeid", "eqs_entitytypekey", EntityTypeCode);
+        }
+
+        public async Task<string> getSubEntityTypeId(string subEntityTypeCode)
+        {
+            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_subentitytypeid", "eqs_key", subEntityTypeCode);
+        }
+
         public async Task<Dictionary<string,string>> getProductId(string ProductCode)
         {
-            string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}'";
-            var productdtails =  await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string ProductId = await this.getIDFromGetResponce("eqs_productid", productdtails);
-            string businesscategoryid = await this.getIDFromGetResponce("_eqs_businesscategoryid_value", productdtails);
-            string productcategory = await this.getIDFromGetResponce("_eqs_productcategory_value", productdtails);
-            string crmproductcategorycode = await this.getIDFromGetResponce("eqs_crmproductcategorycode", productdtails);
-            Dictionary<string, string> ProductData = new Dictionary<string, string>() { 
-                { "ProductId", ProductId },
-                { "businesscategoryid", businesscategoryid },
-                { "productcategory", productcategory },
-                { "crmproductcategorycode", crmproductcategorycode },
-            };
-            return ProductData; 
+            try
+            {
+                string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}'";
+                var productdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string ProductId = await this.getIDFromGetResponce("eqs_productid", productdtails);
+                string businesscategoryid = await this.getIDFromGetResponce("_eqs_businesscategoryid_value", productdtails);
+                string productcategory = await this.getIDFromGetResponce("_eqs_productcategory_value", productdtails);
+                string crmproductcategorycode = await this.getIDFromGetResponce("eqs_crmproductcategorycode", productdtails);
+                Dictionary<string, string> ProductData = new Dictionary<string, string>() {
+                    { "ProductId", ProductId },
+                    { "businesscategoryid", businesscategoryid },
+                    { "productcategory", productcategory },
+                    { "crmproductcategorycode", crmproductcategorycode }
+                };
+                return ProductData;
+            }            
+            catch (Exception ex)
+            {
+                this._logger.LogError("getProductId", ex.Message);
+                throw ex;
+            }
+
         }
 
         public async Task<string> MeargeJsonString(string json1, string json2)
@@ -156,6 +257,26 @@ namespace CreateLeads
             string first = json1.Remove(json1.Length - 1, 1);
             string second = json2.Substring(1);
             return first + ", " + second;
+        }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname, double timevalid, T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
         }
 
     }

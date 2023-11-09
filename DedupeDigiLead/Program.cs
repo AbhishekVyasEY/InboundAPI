@@ -20,6 +20,7 @@ builder.Services.AddScoped<IQueryParser, QueryParser>();
 builder.Services.AddScoped<ILoggers, Loggers>();
 builder.Services.AddScoped<ICommonFunction, CommonFunction>();
 builder.Services.AddScoped<IDedupDgLdNLExecution, DedupDgLdNLExecution>();
+builder.Services.AddScoped<IDedupDgAccountNLExecution, DedupDgAccountNLExecution>();
 builder.Services.AddSingleton<IMemoryCache,MemoryCache>();
 
 

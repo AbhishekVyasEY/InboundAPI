@@ -46,7 +46,7 @@ namespace DedupeDigiLeadTestProject
 
             var ftch_Return = _fixture.Create<DedupDgLdNLTRReturn>();
 
-            _IDedupDgLdNLExecution.Setup(x => x.ValidateDedupDgLdNL(json, "APIKEY", "NLTR")).ReturnsAsync(ftch_Return);
+            _IDedupDgLdNLExecution.Setup(x => x.ValidateDedupDgLdNL(json, "APIKEY")).ReturnsAsync(ftch_Return);
 
             _controller.ControllerContext = controllerContext;
 

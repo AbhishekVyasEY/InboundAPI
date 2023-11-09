@@ -56,7 +56,7 @@ namespace ManageCaseTestProject
 
             
             _commonFunction.Setup(x => x.getCategoryId(It.IsAny<string>())).ReturnsAsync("C00987");
-            _commonFunction.Setup(x => x.getSubCategoryId(It.IsAny<string>())).ReturnsAsync("C00987");
+            _commonFunction.Setup(x => x.getSubCategoryId(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync("C00987");
             _commonFunction.Setup(x => x.getclassificationId(It.IsAny<string>())).ReturnsAsync("C00987");
             _commonFunction.Setup(x => x.getAccountId(It.IsAny<string>())).ReturnsAsync("BR0003");
             _commonFunction.Setup(x => x.getCustomerId(It.IsAny<string>())).ReturnsAsync("Cus445566");

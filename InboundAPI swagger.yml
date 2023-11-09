@@ -1,0 +1,206 @@
+openapi: 3.0.3
+info:
+  title: Inbound APIs 3.0.1
+  description: |-
+  version: 1.0.11
+
+
+paths:
+  
+  /Lead/CreateLead:
+    post:
+      servers:
+      - url: https://lead-inboundapis.apps.equitascrmdevapp.southindia.aroapp.io/Lead/CreateLead
+      tags:
+        - CreateLead
+      summary: Create a lead in CRM
+      description: |-
+        This method is used to register source application.
+
+        Error code are below:
+
+        CRM-ERROR-101  (like Resource not found, etc)
+
+        CRM-ERROR-102 (like Incorrect input. Mandatory fields are required, etc..)
+
+        CRM-SUCCESS  (like API executed successfully, etc)
+
+       
+      operationId: registerSourceApplication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CreateLead:
+                  $ref: '#/components/schemas/CreateLeadRequest1'
+        required: true
+      responses:
+        '200':
+          description: Response fetch successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLeadResponse'
+        '400':
+          description: Bad Request!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsbErrorResponse'
+        '404':
+          description: Resource Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsbErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsbErrorResponse'
+          
+ 
+
+  
+components:
+  schemas:
+    CreateLeadRequest1:
+      type: object
+      properties:
+        msgHdr:
+          type: object
+          properties:
+            channelID:
+              type: string
+              example: 12
+            transactionType:
+              type: string
+              example: 
+            transactionSubType:
+              type: string
+              example: 
+            conversationID:
+              type: string
+              example: CreateLead1684402315
+            externalReferenceId:
+              type: string
+              example:
+            isAsync:
+              type: boolean
+              example: false
+            authInfo:
+              type: object
+              properties:
+                branchID:
+                  type: string
+                  example:
+                userID:
+                  type: string
+                  example:
+                token:
+                  type: string
+                  example: Y62RxQDpPW
+        msgBdy:
+          $ref: '#/components/schemas/CreateLeadRequest'
+        
+            
+              
+    
+          
+  
+    CreateLeadRequest:
+      type: object
+      properties:
+        ChannelType:
+          type: string
+          example: ESFB Website
+        CustomerID:
+          type: string
+          example: CU001265
+        FirstName:
+          type: string
+          example: Raja
+        MiddleName:
+          type: string
+          example: Kumsr
+        LastName:
+          type: string
+          example: Roy
+        MobileNumber:
+          type: string
+          example: 6655874534
+        Pincode:
+          type: string
+          example: 675643
+        CityCode:
+          type: string
+          example: 160066
+        Transcript:
+          type: string
+          example: My Transcript Text
+        Email:
+          type: string
+          example: abcd@gmail.com
+        EmailBody:
+          type: string
+          example: My Email text
+        ProductCode:
+          type: string
+          description: Order Status
+          example: 1745
+        BranchCode:
+          type: string
+          description: Order Status
+          example: B0234
+         
+    
+    CreateLeadResponse:
+      type: object
+      properties:
+        LeadID:
+          type: string
+          example: 10000577
+        ReturnCode:
+          type: string
+          example: CRM - SUCCESS
+        Message:
+          type: string
+          example: API executed successfully
+        TransactionID:
+          type: string
+          example: CreateLead1684402315
+        ExecutionTime:
+          type: string
+          example: 2655 ms
+         
+    
+        
+        
+    ErrorDetails:
+      type: object
+      properties:
+        code:
+          type: string
+        reason:
+          type: string
+    ResponseMessageHeader:
+      type: object
+      properties:
+        result:
+          type: string
+        error:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetails'
+    EsbErrorResponse:
+      type: object
+      properties:
+        msgHdr:
+          $ref: '#/components/schemas/ResponseMessageHeader'
+    
+   
+        
+  

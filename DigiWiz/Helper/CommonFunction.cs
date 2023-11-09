@@ -20,10 +20,12 @@ using System.Diagnostics.Metrics;
     {
         public IQueryParser _queryParser;
         private ILoggers _logger;
-        public CommonFunction(ILoggers logger, IQueryParser queryParser)
+        public IMemoryCache _cache;
+        public CommonFunction(IMemoryCache cache, ILoggers logger, IQueryParser queryParser)
         {
             this._queryParser = queryParser;
             this._logger = logger;
+            this._cache = cache;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -154,10 +156,30 @@ using System.Diagnostics.Metrics;
 
         public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
         {
-            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string TableId = await this.getIDFromGetResponce(idfield, responsdtails);
-            return TableId;
+            try
+            {
+                string Table_Id;
+                string TableId;
+                if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
+                {
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    TableId = await this.getIDFromGetResponce(idfield, responsdtails);
+
+                    this.SetMvalue<string>(tablename + filtervalue, 1400, TableId);
+                }
+                else
+                {
+                    TableId = Table_Id;
+                }
+                return TableId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                throw;
+            }
+
         }
 
         public async Task<string> getProductCatName(string product_Cat_Id)
@@ -165,39 +187,76 @@ using System.Diagnostics.Metrics;
             return await this.getIDfromMSDTable("eqs_productcategories", "eqs_name", "eqs_productcategoryid", product_Cat_Id);
         }
         
-        public async Task<string> getPurposeOfCreation(string PurposeOfCreatioId)
+        public async Task<string> getEntityType(string EntityId)
         {            
-            return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", PurposeOfCreatioId);
+            return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_flagtype", "eqs_entitytypeid", EntityId);
+        }
+
+        public async Task<string> getSubEntityType(string sunEntityId)
+        {
+            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_flagtype", "eqs_subentitytypeid", sunEntityId);
         }
 
         public async Task<JArray> getAccountData(string AccountNumber)
         {
             try
             {
-                string query_url = $"eqs_accounts()?$filter=eqs_accountno eq '{AccountNumber}'";
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-                var Account_dtails = await this.getDataFromResponce(Accountdtails);
+                JArray Account_dtails, Account_dtails1;
+
+                if (!this.GetMvalue<JArray>("AC" + AccountNumber, out Account_dtails1))
+                {
+                    string query_url = $"eqs_accounts()?$filter=eqs_accountno eq '{AccountNumber}'";
+                    var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    Account_dtails = await this.getDataFromResponce(Accountdtails);
+
+                    this.SetMvalue<JArray>("AC" + AccountNumber, 5, Account_dtails);                   
+                }
+                else
+                {
+                    Account_dtails = Account_dtails1;
+                }
+
                 return Account_dtails;
+
             }
             catch (Exception ex)
             {
-                this._logger.LogError("getLeadData", ex.Message);
+                this._logger.LogError("getAccountData", ex.Message);
                 throw ex;
             }
+        }
+
+
+        public async Task<JArray> getAllCustomers(string accountid)
+        {
+            string query_url = $"eqs_accountrelationships()?$select=_eqs_customeridvalue_value&$filter=_eqs_accountid_value eq '{accountid}'";
+            var Customerdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var contact_dtails = await this.getDataFromResponce(Customerdtails);
+            return contact_dtails;
         }
 
         public async Task<JArray> getContactData(string contact_id)
         {
             try
             {
-                string query_url = $"contacts({contact_id})?$select=createdon,eqs_entityflag,eqs_subentitytypeid,mobilephone,eqs_customerid";
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-                var Account_dtails = await this.getDataFromResponce(Accountdtails);
-                return Account_dtails;
+                JArray contact_dtails, contact_dtails1;
+                if (!this.GetMvalue<JArray>("CO" + contact_id, out contact_dtails1))
+                {
+                    string query_url = $"contacts({contact_id})?$select=createdon,_eqs_entitytypeid_value,_eqs_subentitytypeid_value,mobilephone,eqs_customerid";
+                    var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    contact_dtails = await this.getDataFromResponce(Accountdtails);
+                    this.SetMvalue<JArray>("CO" + contact_id, 5, contact_dtails);
+                }
+                else
+                {
+                    contact_dtails = contact_dtails1;
+                }
+
+                return contact_dtails;
             }
             catch (Exception ex)
             {
-                this._logger.LogError("getLeadData", ex.Message);
+                this._logger.LogError("getContactData", ex.Message);
                 throw ex;
             }
         }
@@ -207,6 +266,26 @@ using System.Diagnostics.Metrics;
             string first = json1.Remove(json1.Length - 1, 1);
             string second = json2.Substring(1);
             return first + ", " + second;
+        }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname, double timevalid, T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
         }
 
     }

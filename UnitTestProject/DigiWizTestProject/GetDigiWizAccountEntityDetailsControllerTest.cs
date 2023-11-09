@@ -46,7 +46,7 @@ namespace DigiWizTestProject
 
             var ftch_Return = _fixture.Create<WizAcEntyReturn>();
 
-            _getDigiWizAcEntyDetlsExecution.Setup(x => x.ValidateWizAcEntyDetls(json, "APIKEY")).ReturnsAsync(ftch_Return);
+            _getDigiWizAcEntyDetlsExecution.Setup(x => x.ValidateWizAcEntyDetls(json)).ReturnsAsync(ftch_Return);
 
             _controller.ControllerContext = controllerContext;
 

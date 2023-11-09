@@ -19,9 +19,14 @@ using System.Diagnostics.Metrics;
     public class CommonFunction : ICommonFunction
     {
         public IQueryParser _queryParser;
-        public CommonFunction(IQueryParser queryParser)
+        private ILoggers _logger;
+        public IMemoryCache _cache;
+
+        public CommonFunction(IMemoryCache cache, ILoggers logger, IQueryParser queryParser)
         {
             this._queryParser = queryParser;
+            this._logger = logger;
+            this._cache = cache;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -152,17 +157,52 @@ using System.Diagnostics.Metrics;
 
         public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
         {
-            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string TableId = await this.getIDFromGetResponce(idfield, responsdtails);
-            return TableId;
+            try
+            {
+                string Table_Id;
+                string TableId;
+                if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
+                {
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    TableId = await this.getIDFromGetResponce(idfield, responsdtails);
+
+                    this.SetMvalue<string>(tablename + filtervalue, 1400, TableId);
+                }
+                else
+                {
+                    TableId = Table_Id;
+                }
+                return TableId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                throw;
+            }
+
+        }
+
+        public async Task<string> getLeadType(string EntityTypeId)
+        {
+            return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_name", "eqs_entitytypeid", EntityTypeId);
         }
 
         public async Task<string> getTitle(string TitleId)
         {            
             return await this.getIDfromMSDTable("eqs_titles", "eqs_name", "eqs_titleid", TitleId);
         }
-        
+
+        public async Task<string> getEntityType(string EntityTypeId)
+        {
+            return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_name", "eqs_entitytypeid", EntityTypeId);
+        }
+
+        public async Task<string> getSubEntityType(string SubEntityTypeId)
+        {
+            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_name", "eqs_subentitytypeid", SubEntityTypeId);
+        }
+
         public async Task<string> getPurposeOfCreation(string PurposeOfCreatioId)
         {            
             return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", PurposeOfCreatioId);
@@ -176,6 +216,27 @@ using System.Diagnostics.Metrics;
             string second = json2.Substring(1);
             return first + ", " + second;
         }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname, double timevalid, T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
+        }
+
 
     }
 }

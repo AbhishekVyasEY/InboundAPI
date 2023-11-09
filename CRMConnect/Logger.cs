@@ -21,7 +21,7 @@ namespace CRMConnect
             this.teleClient = new TelemetryClient();
             this.teleClient.Context.InstrumentationKey = _keyVaultService.ReadSecret("appinsinstrumentationkey");
         }
-        public void LogInformation(string FunctionName, string InfoMessage)
+        public void LogInformation(string FunctionName, string InfoMessage, string Additionalinfo = "")
         {
             Dictionary<string, object> message = new Dictionary<string, object>();
             message["API"] = this.API_Name;
@@ -30,6 +30,8 @@ namespace CRMConnect
             message["InputPayload"] = this.Input_payload;
             message["ChannelID"] = Channel_ID;
             message["TransactionID"] = Transaction_ID;
+            message["Additionalinfo"] = Additionalinfo;
+            message["Severity"] = "Medium";
 
             var eventTrigger = new EventTelemetry("Validation Error");
             foreach (var d in message)
@@ -39,7 +41,7 @@ namespace CRMConnect
             teleClient.TrackEvent(eventTrigger);
         }
 
-        public void LogError(string FunctionName, string? ErrorMessage)
+        public void LogError(string FunctionName, string? ErrorMessage, string Additionalinfo = "")
         {
             Dictionary<string, object> message = new Dictionary<string, object>();
             message["API"] = this.API_Name;
@@ -48,13 +50,15 @@ namespace CRMConnect
             message["InputPayload"] = this.Input_payload;
             message["ChannelID"] = Channel_ID;
             message["TransactionID"] = Transaction_ID;
+            message["Additionalinfo"] = Additionalinfo;
+            message["Severity"] = "High";
 
-            var eventTrigger = new ExceptionTelemetry();
+            var eventTrigger = new EventTelemetry("Application Error");
             foreach (var d in message)
             {
                 eventTrigger.Properties.Add(d.Key, d.Value == null ? "" : d.Value.ToString());
             }
-            teleClient.TrackException(eventTrigger);
+            teleClient.TrackEvent(eventTrigger);
         }
 
         public void requestPerser(HttpRequestMessage request, HttpResponseMessage ResponsMessage)

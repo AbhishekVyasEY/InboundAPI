@@ -18,10 +18,12 @@ namespace DedupeDigiLead
     {
         public IQueryParser _queryParser;
         public ILoggers _loggers;
-        public CommonFunction(IQueryParser queryParser, ILoggers loggers)
+        public IMemoryCache _cache;
+        public CommonFunction(IMemoryCache cache, IQueryParser queryParser, ILoggers loggers)
         {
             this._queryParser = queryParser;
             this._loggers = loggers;
+            this._cache = cache;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -152,15 +154,65 @@ namespace DedupeDigiLead
 
         public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
         {
-            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string TableId = await this.getIDFromGetResponce(idfield, responsdtails);
-            return TableId;
+            try
+            {
+                string Table_Id;
+                string TableId;
+                if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
+                {
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    TableId = await this.getIDFromGetResponce(idfield, responsdtails);
+
+                    this.SetMvalue<string>(tablename + filtervalue, 1400, TableId);
+                }
+                else
+                {
+                    TableId = Table_Id;
+                }
+                return TableId;
+            }
+            catch (Exception ex)
+            {
+                this._loggers.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                throw;
+            }
         }
 
         public async Task<string> getclassificationId(string classification)
         {            
             return await this.getIDfromMSDTable("ccs_classifications", "ccs_classificationid", "ccs_name", classification);
+        }
+
+        public async Task<List<string>> getLeadAccData(string LeadAccId)
+        {
+            try
+            {
+                List<string> Accounts = new List<string>();
+                List<string> Accounts1;
+                if (!this.GetMvalue<List<string>>("LeadAccId" + LeadAccId, out Accounts1))
+                {
+                    string lead_accountid = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", LeadAccId);
+                    string query_url = $"eqs_accountapplicants()?$select=eqs_applicantid&$filter=_eqs_leadaccountid_value eq '{lead_accountid}'";
+                    var AccountDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    var Account_Details = await this.getDataFromResponce(AccountDetails);
+                    foreach (var account in Account_Details)
+                    {
+                        Accounts.Add(account["eqs_applicantid"].ToString());
+                    }
+                    this.SetMvalue<List<string>>("LeadAccId" + LeadAccId, 5, Accounts);
+                }
+                else
+                {
+                    Accounts = Accounts1;
+                }
+                return Accounts;
+            }
+            catch (Exception ex)
+            {
+                this._loggers.LogError("getLeadAccData", ex.Message);
+                throw ex;
+            }
         }
 
         public async Task<JArray> getLeadData(string ApplicantId)
@@ -184,7 +236,7 @@ namespace DedupeDigiLead
             try
             {
                 int filter = 0;
-                string query_url = $"eqs_trnls()?$select=eqs_passports,eqs_pan,eqs_aadhaar,eqs_cin,eqs_dob&$filter=";
+                string query_url = $"eqs_trnls()?$select=eqs_uid,eqs_passports,eqs_pan,eqs_aadhaar,eqs_cin,eqs_dob&$filter=";
                 if (!string.IsNullOrEmpty(Pan))
                 {
                     query_url += $"eqs_pan eq '{Pan}' ";
@@ -240,7 +292,7 @@ namespace DedupeDigiLead
             }
             catch (Exception ex)
             {
-                this._loggers.LogError("getLeadData", ex.Message);
+                this._loggers.LogError("getNLTRData", ex.Message);
                 throw ex;
             }
         }
@@ -250,7 +302,7 @@ namespace DedupeDigiLead
             try
             {
                 int filter = 0;
-                string query_url = $"eqs_nls()?$select=eqs_passport,eqs_pan,eqs_aadhaar,eqs_cin,eqs_doiordob&$filter=";
+                string query_url = $"eqs_nls()?$select=eqs_recordid,eqs_passport,eqs_pan,eqs_aadhaar,eqs_cin,eqs_doiordob&$filter=";
                 if (!string.IsNullOrEmpty(Pan))
                 {
                     query_url += $"eqs_pan eq '{Pan}' ";
@@ -305,7 +357,7 @@ namespace DedupeDigiLead
         }
             catch (Exception ex)
             {
-                this._loggers.LogError("getLeadData", ex.Message);
+                this._loggers.LogError("getNLData", ex.Message);
                 throw ex;
             }
         }
@@ -316,6 +368,26 @@ namespace DedupeDigiLead
             string first = json1.Remove(json1.Length - 1, 1);
             string second = json2.Substring(1);
             return first + ", " + second;
+        }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname, double timevalid, T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
         }
 
     }

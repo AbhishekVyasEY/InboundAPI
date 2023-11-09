@@ -13,15 +13,20 @@ using System.Diagnostics.Metrics;
 using CRMConnect;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Collections.Immutable;
+using System.Timers;
 
 namespace ManageCase
 {
     public class CommonFunction: ICommonFunction
     {
         public IQueryParser _queryParser;
-        public CommonFunction(IQueryParser queryParser)
+        private ILoggers _logger;
+        public IMemoryCache _cache;
+        public CommonFunction(IMemoryCache cache, ILoggers logger, IQueryParser queryParser)
         {
             this._queryParser = queryParser;
+            this._logger = logger;
+            this._cache = cache;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -113,49 +118,34 @@ namespace ManageCase
                 return resourceID;
         }
 
-        public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
-        {
-            string resourceID = "";
-            foreach (JObject item in RsponsData)
-            {
-                if (Enum.TryParse(item["responsecode"].ToString(), out HttpStatusCode responseStatus) && responseStatus == HttpStatusCode.OK)
-                {
-                    dynamic responseValue = item["responsebody"];
-                    JArray resArray = new JArray();
-                    string urlMetaData = string.Empty;
-                    if (responseValue?.value != null)
-                    {
-                        resArray = (JArray)responseValue?.value;
-                        urlMetaData = responseValue["@odata.context"];
-                    }
-                    else if (responseValue is JArray)
-                    {
-                        resArray = responseValue;
-
-                    }
-                    else
-                    {
-                        resArray.Add(responseValue);
-                        urlMetaData = responseValue["@odata.context"];
-                    }
-
-                    if (resArray != null && resArray.Any())
-                    {
-
-                        return resArray;
-
-                    }
-                }
-            }
-            return new JArray();
-        }
+       
 
         public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
         {
-            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string TableId = await this.getIDFromGetResponce(idfield, responsdtails);
-            return TableId;
+            try
+            {
+                string Table_Id;
+                string TableId;
+                if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
+                {
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                    TableId = await this.getIDFromGetResponce(idfield, responsdtails);
+
+                    this.SetMvalue<string>(tablename + filtervalue, 1400, TableId);
+                }
+                else
+                {
+                    TableId = Table_Id;
+                }
+                return TableId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                throw;
+            }
+
         }
 
         public async Task<string> getclassificationId(string classification)
@@ -217,52 +207,119 @@ namespace ManageCase
         {
             return await this.getIDfromMSDTable("ccs_categories", "ccs_name", "ccs_categoryid", CategoryId);
         }
-
-        
-
-        public async Task<string> getSubCategoryId(string subCategoryCode, string CategoryID)
-        {
-            string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            string subCatId = await this.getIDFromGetResponce("ccs_subcategoryid", responsdtails);
-            return subCatId;
-        }
-
         public async Task<string> getSubCategoryName(string SubCategoryId)
         {
             return await this.getIDfromMSDTable("ccs_subcategories", "ccs_name", "ccs_subcategoryid", SubCategoryId);
         }
 
+
+        public async Task<string> getSubCategoryId(string subCategoryCode, string CategoryID)
+        {
+            try
+            {
+                string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string subCatId = await this.getIDFromGetResponce("ccs_subcategoryid", responsdtails);
+                return subCatId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getSubCategoryId", ex.Message);
+                throw ex;
+            }
+
+        }
+
+       
+
         public async Task<JArray> getCaseStatus(string CaseID)
         {
-            string query_url = $"incidents()?$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,prioritycode,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            var inputFields = await this.getDataFromResponce(responsdtails);
-            return inputFields;
+            try
+            {
+                string query_url = $"incidents()?$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseStatus", ex.Message);
+                throw ex;
+            }
+
         }
 
         public async Task<List<MandatoryField>> getMandatoryFields(string subCategoryID)
         {
-            List<MandatoryField> mandatoryFields= new List<MandatoryField>();
-            string query_url = $"eqs_keyvaluerepositories()?$select=eqs_key,eqs_value,eqs_datatype,eqs_referencefield,eqs_entityname,eqs_entityid&$filter=_eqs_subcategory_value eq '{subCategoryID}'";
-            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            var inputFields = await this.getDataFromResponce(responsdtails);
-
-            foreach (var field in inputFields)
+            try
             {
-                mandatoryFields.Add(new MandatoryField()
+                List<MandatoryField> mandatoryFields = new List<MandatoryField>();
+                string query_url = $"eqs_keyvaluerepositories()?$select=eqs_key,eqs_value,eqs_datatype,eqs_referencefield,eqs_entityname,eqs_entityid&$filter=_eqs_subcategory_value eq '{subCategoryID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+
+                foreach (var field in inputFields)
                 {
-                    InputField = field["eqs_key"].ToString(),
-                    CRMField = field["eqs_value"].ToString(),
-                    CRMValue = "",
-                    IDFieldName = field["eqs_entityid"].ToString(),
-                    CRMType = field["eqs_datatype"].ToString(),
-                    CRMTable = field["eqs_entityname"].ToString(),
-                    FilterField = field["eqs_referencefield"].ToString()
-                });
+                    mandatoryFields.Add(new MandatoryField()
+                    {
+                        InputField = field["eqs_key"].ToString(),
+                        CRMField = field["eqs_value"].ToString(),
+                        CRMValue = "",
+                        IDFieldName = field["eqs_entityid"].ToString(),
+                        CRMType = field["eqs_datatype"].ToString(),
+                        CRMTable = field["eqs_entityname"].ToString(),
+                        FilterField = field["eqs_referencefield"].ToString()
+                    });
+                }
+
+                return mandatoryFields;
             }
-            
-            return mandatoryFields;
+            catch (Exception ex)
+            {
+                this._logger.LogError("getMandatoryFields", ex.Message);
+                throw ex;
+            }
+
+        }
+
+        public async Task<bool> checkDuplicate(string UCIC, string Account, string Classification, string Category, string SubCategory)
+        {
+            try
+            {
+                string customerid = await this.getCustomerId(UCIC);
+                string Accountid = "";
+                if (!string.IsNullOrEmpty(Account))
+                {
+                    Accountid = await this.getAccountId(Account);
+                }
+                    
+                string ccs_classification = await this.getclassificationId(Classification);
+                string CategoryId = await this.getCategoryId(Category);
+                string SubCategoryId = await this.getSubCategoryId(SubCategory, CategoryId);
+
+                string query_url = $"incidents()?$select=incidentid,statuscode&$filter=_customerid_value eq '{customerid}' and _ccs_classification_value eq '{ccs_classification}' and _ccs_category_value eq '{CategoryId}' and _ccs_subcategory_value eq '{SubCategoryId}'";
+
+                if (!string.IsNullOrEmpty(Accountid))
+                {
+                    query_url += $" and _eqs_account_value eq '{Accountid}'";
+                }
+                
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var responsedata = await this._queryParser.getDataFromResponce(responsdtails);
+                if (responsedata.Count > 0)
+                {
+                    if (Convert.ToInt64(responsedata[0]["statuscode"].ToString()) < 2)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("checkDuplicate", ex.Message);
+                throw ex;
+            }
         }
 
 
@@ -271,6 +328,26 @@ namespace ManageCase
             string first = json1.Remove(json1.Length - 1, 1);
             string second = json2.Substring(1);
             return first + ", " + second;
+        }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname,double timevalid , T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
         }
 
     }

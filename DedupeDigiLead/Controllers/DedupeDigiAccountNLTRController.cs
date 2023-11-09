@@ -17,22 +17,23 @@ namespace DedupeDigiLead.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class DedupeDigiCustomerNLController : ControllerBase
+    public class DedupeDigiAccountNLTRController : ControllerBase
     {
 
-        private readonly IDedupDgLdNLExecution _dedupDgLdNLExecution;
+        private readonly IDedupDgAccountNLExecution _dedupDgAccountNLExecution;
         private Stopwatch watch;
 
-        public DedupeDigiCustomerNLController(IDedupDgLdNLExecution dedupDgLdNLExecution)
+        public DedupeDigiAccountNLTRController(IDedupDgAccountNLExecution dedupDgAccountNLExecution)
         {
             watch = new System.Diagnostics.Stopwatch();
             watch.Start();
-            this._dedupDgLdNLExecution = dedupDgLdNLExecution;
+            this._dedupDgAccountNLExecution = dedupDgAccountNLExecution;
         }
 
 
 
         [HttpPost]
+        [Produces("application/json")]
         public async Task<IActionResult> Post()
         {
             try
@@ -40,31 +41,20 @@ namespace DedupeDigiLead.Controllers
                 StreamReader requestReader = new StreamReader(Request.Body);
                 dynamic request = JObject.Parse(await requestReader.ReadToEndAsync());
 
-                string Header_Value = string.Empty;
-                if (Request.Headers.TryGetValue("appkey", out var headerValues))
-                {
-                    Header_Value = headerValues;
-                }
-                if (Request.Headers.TryGetValue("ChannelID", out var ChannelID))
-                {
-                    _dedupDgLdNLExecution.Channel_ID = ChannelID;
-                }
 
-                if (Request.Headers.TryGetValue("communicationID", out var communicationID))
-                {
-                    _dedupDgLdNLExecution.Transaction_ID = communicationID;
-                }
-
-                _dedupDgLdNLExecution.API_Name = "DedupeDigiLeadNL";
-                _dedupDgLdNLExecution.Input_payload = request.ToString();
-                DedupDgLdNLReturn Casetatus = await _dedupDgLdNLExecution.ValidateDedupDgLdNL(request, Header_Value,"NL");
+                _dedupDgAccountNLExecution.API_Name = "DedupeDigiAccountNLTR";
+                _dedupDgAccountNLExecution.Input_payload = request.ToString();
+                DedupDgAccNLTRReturn Casetatus = await _dedupDgAccountNLExecution.ValidateDedupDgAccNL(request,"NLTR");
 
                 watch.Stop();
-                Casetatus.TransactionID = this._dedupDgLdNLExecution.Transaction_ID;
+                Casetatus.TransactionID = this._dedupDgAccountNLExecution.Transaction_ID;
                 Casetatus.ExecutionTime = watch.ElapsedMilliseconds.ToString() + " ms";
-                string response = await _dedupDgLdNLExecution.EncriptRespons(JsonConvert.SerializeObject(Casetatus));
+                string response = await _dedupDgAccountNLExecution.EncriptRespons(JsonConvert.SerializeObject(Casetatus));
 
-                return Ok(response);
+                var contentResult = new ContentResult();
+                contentResult.Content = response;
+                contentResult.ContentType = "application/json";
+                return contentResult;
 
 
             }

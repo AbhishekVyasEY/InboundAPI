@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2441810c-2332-49aa-9a04-ef5c4a2809e2</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ref\**" />
+    <Content Remove="ref\**" />
+    <EmbeddedResource Remove="ref\**" />
+    <None Remove="ref\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Helper\HttpInterceptor.cs" />
+    <Compile Remove="Helper\KeyVaultService.cs" />
+    <Compile Remove="Helper\Logger.cs" />
+    <Compile Remove="Helper\QueryParser.cs" />
+    <Compile Remove="Interface\IKeyVaultService.cs" />
+    <Compile Remove="Interface\ILoggers.cs" />
+    <Compile Remove="Interface\IQueryParser.cs" />
+    <Compile Remove="Interface\LoggerExtension.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.1" />
+    <PackageReference Include="Azure.Identity" Version="1.8.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.24" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.46.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CRMConnect\CRMConnect.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -31,7 +31,8 @@ namespace CreateLeads.Controllers
            // this._createLeadExecution._transactionID = "Lead-" + Guid.NewGuid().ToString("N");
         }
 
-        [HttpPost("CreateLead")]        
+        [HttpPost("CreateLead")]
+        [Produces("application/json")]
         public async Task<IActionResult> Post()
         {
             try
@@ -42,31 +43,17 @@ namespace CreateLeads.Controllers
                 string Header_Value = string.Empty;
                
                 
-                if (Request.Headers.TryGetValue("appkey", out var headerValues))
-                {
-                    Header_Value = headerValues;
-                }
-
-                if (Request.Headers.TryGetValue("ChannelID", out var ChannelID))
-                {
-                    _createLeadExecution.Channel_ID = ChannelID;
-                }
-
-                if (Request.Headers.TryGetValue("communicationID", out var communicationID))
-                {
-                    _createLeadExecution.Transaction_ID = communicationID;
-                }
-
+               
                 _createLeadExecution.API_Name = "CreateLead";
                 _createLeadExecution.Input_payload = request.ToString();
 
 
-                LeadReturnParam Leadstatus = await _createLeadExecution.ValidateLeade(request, Header_Value);
+                LeadReturnParam Leadstatus = await _createLeadExecution.ValidateLeade(request);
 
                 watch.Stop();
                 Leadstatus.TransactionID = this._createLeadExecution.Transaction_ID;
                 Leadstatus.ExecutionTime = watch.ElapsedMilliseconds.ToString() + " ms";
-                string response = await _createLeadExecution.EncriptRespons(JsonConvert.SerializeObject(Leadstatus));
+                var response = await _createLeadExecution.EncriptRespons(JsonConvert.SerializeObject(Leadstatus));
 
                 /*
                 CommonFunction commObj = new CommonFunction();
@@ -88,9 +75,12 @@ namespace CreateLeads.Controllers
                 }
                 */
 
+                var contentResult = new ContentResult();
+                contentResult.Content = response;
+                contentResult.ContentType = "application/json";
+                return contentResult;
 
-
-                return Ok(response);
+               // return Content(response);
                 
                     
             }

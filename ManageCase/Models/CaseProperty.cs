@@ -10,7 +10,7 @@ namespace ManageCase
        
         public string eqs_casetype { get; set; }
         public string title { get; set; }
-        public int prioritycode { get; set; }
+        public string eqs_casepriority { get; set; }
         public string description { get; set; }
 
 

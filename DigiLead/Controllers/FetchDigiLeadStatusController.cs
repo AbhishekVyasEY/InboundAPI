@@ -35,6 +35,7 @@
 
 
         [HttpPost]
+        [Produces("application/json")]
         public async Task<IActionResult> Post()
         {
             try
@@ -42,34 +43,22 @@
                 StreamReader requestReader = new StreamReader(Request.Body);
                 dynamic request = JObject.Parse(await requestReader.ReadToEndAsync());
 
-                string Header_Value = string.Empty;
-                if (Request.Headers.TryGetValue("appkey", out var headerValues))
-                {
-                    Header_Value = headerValues;
-                }
-
-                if (Request.Headers.TryGetValue("ChannelID", out var ChannelID))
-                {
-                    _ftchDgLdStsExecution.Channel_ID = ChannelID;
-                }
-
-                if (Request.Headers.TryGetValue("communicationID", out var communicationID))
-                {
-                    _ftchDgLdStsExecution.Transaction_ID = communicationID;
-                }
-
+                
                 _ftchDgLdStsExecution.API_Name = "FetchDigiLeadStatus";
                 _ftchDgLdStsExecution.Input_payload = request.ToString();
-                FtchDgLdStsReturn LeadStatus = await _ftchDgLdStsExecution.ValidateFtchDgLdSts(request, Header_Value);
+                FtchDgLdStsReturn LeadStatus = await _ftchDgLdStsExecution.ValidateFtchDgLdSts(request);
 
                 watch.Stop();
                 LeadStatus.TransactionID = this._ftchDgLdStsExecution.Transaction_ID;
                 LeadStatus.ExecutionTime = watch.ElapsedMilliseconds.ToString() + " ms";
 
                 string response = await _ftchDgLdStsExecution.EncriptRespons(JsonConvert.SerializeObject(LeadStatus));
-                this._ftchDgLdStsExecution.CRMLog(JsonConvert.SerializeObject(request), response, LeadStatus.ReturnCode);
+               
 
-                return Ok(response);
+                var contentResult = new ContentResult();
+                contentResult.Content = response;
+                contentResult.ContentType = "application/json";
+                return contentResult;
 
 
             }

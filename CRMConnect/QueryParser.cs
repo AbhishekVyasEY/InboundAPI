@@ -14,6 +14,12 @@
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Rest.Azure.OData;
+    using System;
+    using System.Xml;
+    using Azure.Core;
+    using System.Reflection.PortableExecutable;
+    using Azure;
 
 
     public class QueryParser : IQueryParser
@@ -42,27 +48,86 @@
 
         public async Task<List<JObject>> HttpApiCall(string odataQuery, HttpMethod httpMethod, string parameterToPost = "")
         {
-            HttpClient httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(this._keyVaultService.ReadSecret("APIUrl"));
-            List<HttpContent> httpcontent = new List<HttpContent>();
-            List<HttpMessageContent> odataRequestforChild = new List<HttpMessageContent>();
-
-            odataQuery = httpClient.BaseAddress + odataQuery;
-
-            if (!string.IsNullOrEmpty(parameterToPost))
+            try
             {
-                odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, 1, parameterToPost));
-            }
-            else
-            {
-                odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log));
-            }
+                HttpClient httpClient = new HttpClient();
+                httpClient.BaseAddress = new Uri(this._keyVaultService.ReadSecret("APIUrl"));                
+                List<HttpContent> httpcontent = new List<HttpContent>();
+                List<HttpMessageContent> odataRequestforChild = new List<HttpMessageContent>();
 
-            odataRequestforChild.ForEach(x =>
-                        httpcontent.Add(x)
-                    );
-            List<JObject> results = await this.SendBatchRequestAsync(httpClient, httpcontent, this._log).ConfigureAwait(true);
-            return results;
+                odataQuery = httpClient.BaseAddress + odataQuery;
+               
+                if (!string.IsNullOrEmpty(parameterToPost))
+                {
+                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, 1, parameterToPost));
+                }
+                else
+                {
+                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log));
+                }
+
+                odataRequestforChild.ForEach(x =>
+                            httpcontent.Add(x)
+                        );
+                List<JObject> results = await this.SendBatchRequestAsync(httpClient, httpcontent, this._log).ConfigureAwait(true);
+                _errorLogger.LogInformation("HttpApiCall",$"URL :- {odataQuery} \n Request Param:- {parameterToPost}", JsonConvert.SerializeObject(results));
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _errorLogger.LogError("HttpApiCall", $"Error from CBS connect: {ex.Message} \n {ex.InnerException!} \n {ex.StackTrace!}", $"Query {odataQuery}  \n  post param {parameterToPost}");
+                throw;
+            }
+        }
+
+        public async Task<string> HttpCBSApiCall(string Token, HttpMethod httpMethod, string APIName, string parameterToPost = "")
+        {
+            string requestUri = this._keyVaultService.ReadSecret(APIName);
+            string responJsonText = "";
+            try
+            {
+                HttpClient httpClient = new HttpClient();               
+
+                HttpRequestMessage requestMessage = new HttpRequestMessage(httpMethod, requestUri);
+                StringContent stringContent = new StringContent(parameterToPost);
+                stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json;type=entry");
+                requestMessage.Content = stringContent;
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+
+                var response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+                responJsonText = await response.Content.ReadAsStringAsync();
+                dynamic responsej = JsonConvert.DeserializeObject(responJsonText);
+                string ret_responJsonText = "";
+                if (responsej.req_root!=null)
+                {
+                    string xmlData = await PayloadDecryption(responsej.req_root.body.payload.ToString(), "FI0060");
+                    _errorLogger.LogInformation("HttpCBSApiCall response", parameterToPost, xmlData);
+                    string xpath = "PIDBlock/payload";
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.LoadXml(xmlData);
+                    var nodes = xmlDoc.SelectSingleNode(xpath);
+                    
+                    foreach (XmlNode childrenNode in nodes)
+                    {
+                        ret_responJsonText = childrenNode.Value.ToString();
+                    }
+                }
+                else
+                {
+                    ret_responJsonText = responJsonText;
+                }
+                
+                //HttpResponseMessage respon = await httpClient.PostAsync(requestUri, new StringContent(parameterToPost, System.Text.Encoding.UTF8, "application/json"));
+                //string responJsonText = await respon.Content.ReadAsStringAsync();
+                return ret_responJsonText;
+            }
+            catch (Exception ex)
+            {
+                
+                _errorLogger.LogError("HttpCBSApiCall", $"Error from CBS connect: {ex.Message} {ex.InnerException!} {ex.StackTrace!}", $"API {requestUri} \n  parameterToPost:-  {parameterToPost} \n responJsonText:- {responJsonText} ");
+                throw;
+            }
+            
         }
 
 
@@ -312,6 +377,59 @@
         }
 
 
+        public async Task<string> getAccessToken()
+        {
+            string Token_Id;
+            string TokenId;
+            try
+            {
+                if (!this.GetMvalue<string>("wso2token", out Token_Id))
+                {
+                    HttpClient httpClient = new HttpClient();
+                    string requestUri = this._keyVaultService.ReadSecret("wso2AuthUrl");
+
+                    string username = this._keyVaultService.ReadSecret("CBSUsername"); 
+                    string password = this._keyVaultService.ReadSecret("CBSPassword"); 
+                    string encoded = System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(username + ":" + password));
+
+                    List<KeyValuePair<string, string>> Data = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                };
+
+                    var content = new FormUrlEncodedContent(Data);
+                    content.Headers.Clear();
+                    content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                    HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                    requestMessage.Headers.Add("Authorization", "Basic " + encoded);
+                    requestMessage.Content = content;
+
+                    var response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+                    string responJsonText = await response.Content.ReadAsStringAsync();
+                    dynamic responsej = JsonConvert.DeserializeObject(responJsonText);
+
+                    TokenId = responsej.access_token.ToString();
+
+
+                    this.SetMvalue<string>("wso2token", 3600, TokenId);
+                }
+                else
+                {
+                    TokenId = Token_Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                _errorLogger.LogError("getAccessToken", $"Error from get wso2Aut access token : {ex.Message}");
+                throw;
+            }
+            
+
+
+            return TokenId;
+        }
+
+
         private HttpResponseMessage DeserializeToResponse(Stream stream, ILogger log)
         {
             try
@@ -334,11 +452,12 @@
 
 
 
-        public async Task<string> PayloadEncryption(string V_requestData, string V_requestedID)
+        public async Task<string> PayloadEncryption(string V_requestData, string V_requestedID, string BankCode)
         {
-            string V_AESSymmetricKey = this._keyVaultService.ReadSecret("VAESSymmetricKey");
-            string V_ChecksumKey = this._keyVaultService.ReadSecret("VChecksumKey");
-            string V_bankcode = this._keyVaultService.ReadSecret("Vbankcode");
+            string V_bankcode = BankCode;   //this._keyVaultService.ReadSecret("Vbankcode");
+            string V_AESSymmetricKey = this._keyVaultService.ReadSecret("VAESSymmetricKey" + "-" + BankCode);
+            string V_ChecksumKey = this._keyVaultService.ReadSecret("VChecksumKey" + "-" + BankCode);
+            
 
             string finalrequestdata = "";
             V_requestData = V_requestData.Replace("\\", "");
@@ -398,14 +517,14 @@
             }
         }
 
-        public async Task<string> PayloadDecryption(string V_requestData)
+        public async Task<string> PayloadDecryption(string V_requestData, string BankCode)
         {
             try
             {
                 string decryptedText = "";
                 // Decrypting code
                 AesManaged des = new AesManaged();
-                string V_AESSymmetricKey = this._keyVaultService.ReadSecret("VAESSymmetricKey");
+                string V_AESSymmetricKey = this._keyVaultService.ReadSecret("VAESSymmetricKey" + "-" + BankCode);
                 //des.Key = Encoding.UTF8.GetBytes(V_AESSymmetricKey);
                 des.Key = Convert.FromBase64String(V_AESSymmetricKey);
                 des.Mode = CipherMode.ECB;
@@ -426,5 +545,200 @@
 
         }
 
+
+        public async Task<string> getOptionSetTextToValue(string tableName, string fieldName, string OptionText)
+        {
+            try
+            {
+                List<Optionsetvlu> optionSet, optionSet1;
+
+                if (!this.GetMvalue<List<Optionsetvlu>>(tableName + "optionsetvalue", out optionSet1))
+                {
+                    string query_url = $"stringmaps()?$select=value,attributevalue,objecttypecode,attributename&$filter=objecttypecode eq '{tableName}'";
+                    var responsdtails = await this.HttpApiCall(query_url, HttpMethod.Get, "");
+                    var Optiondata = await this.getDataFromResponce(responsdtails);
+                    optionSet = new List<Optionsetvlu>();
+                    foreach (var item in Optiondata)
+                    {
+                        Optionsetvlu optionsetvlu = new Optionsetvlu();
+                        optionsetvlu.optionKey = item["value"].ToString();
+                        optionsetvlu.optionValu = item["attributevalue"].ToString();
+                        optionsetvlu.optionTable = item["objecttypecode"].ToString();
+                        optionsetvlu.optionField = item["attributename"].ToString();
+                        optionSet.Add(optionsetvlu);
+                    }
+
+                    this.SetMvalue<List<Optionsetvlu>>(tableName + "optionsetvalue", 10080, optionSet);
+                }
+                else
+                {
+                    optionSet = optionSet1;
+                }
+               
+                string opztionValueId = optionSet.Where(x=>x.optionTable == tableName && x.optionField == fieldName && x.optionKey == OptionText).FirstOrDefault().optionValu;
+
+                return opztionValueId;
+                              
+            }
+            catch(Exception ex)
+            {
+                this._log.LogError("getOptionSetTextToValue", ex.Message,$"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionText}");
+                return "";
+            }
+           
+            
+
+            
+        }
+
+        public async Task<string> getOptionSetValuToText(string tableName, string fieldName, string OptionValue)
+        {
+            try
+            {
+                List<Optionsetvlu> optionSet, optionSet1;
+
+                if (!this.GetMvalue<List<Optionsetvlu>>(tableName + "optionsetvalue", out optionSet1))
+                {
+                    string query_url = $"stringmaps()?$select=value,attributevalue,objecttypecode,attributename&$filter=objecttypecode eq '{tableName}'";
+                    var responsdtails = await this.HttpApiCall(query_url, HttpMethod.Get, "");
+                    var Optiondata = await this.getDataFromResponce(responsdtails);
+                    optionSet = new List<Optionsetvlu>();
+                    foreach (var item in Optiondata)
+                    {
+                        Optionsetvlu optionsetvlu = new Optionsetvlu();
+                        optionsetvlu.optionKey = item["value"].ToString();
+                        optionsetvlu.optionValu = item["attributevalue"].ToString();
+                        optionsetvlu.optionTable = item["objecttypecode"].ToString();
+                        optionsetvlu.optionField = item["attributename"].ToString();
+                        optionSet.Add(optionsetvlu);
+                    }
+
+                    this.SetMvalue<List<Optionsetvlu>>(tableName + "optionsetvalue", 10080, optionSet);
+                }
+                else
+                {
+                    optionSet = optionSet1;
+                }
+
+                string opztionValueId = optionSet.Where(x => x.optionTable == tableName && x.optionField == fieldName && x.optionValu == OptionValue).FirstOrDefault().optionKey;
+
+                return opztionValueId;
+
+            }
+            catch (Exception ex)
+            {               
+                this._log.LogError("getOptionSetValuToText", ex.Message, $"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionValue}");
+                return "";
+            }
+
+        }
+
+        public async Task<bool> DeleteFromTable(string tablename, string tableid = "", string filter = "", string filtervalu = "", string tableselecter = "")
+        {
+            if (!string.IsNullOrEmpty(tableid))
+            {
+                await this.HttpApiCall($"{tablename}({tableid})?", HttpMethod.Delete, "");
+                return true;
+            }
+            else if (!string.IsNullOrEmpty(filter) && !string.IsNullOrEmpty(filtervalu))
+            {
+                HttpClient httpClient = new HttpClient();
+                httpClient.BaseAddress = new Uri(this._keyVaultService.ReadSecret("APIUrl"));
+                List<HttpMessageContent> odataRequestforChild = new List<HttpMessageContent>();
+                List<HttpContent> httpcontent = new List<HttpContent>();
+
+                string query_url = $"{tablename}()?$select={tableselecter}&$filter={filter} eq '{filtervalu}'";
+                var deleteItems = await this.HttpApiCall(query_url, HttpMethod.Get, "");
+                var delete_Items = await this.getDataFromResponce(deleteItems);
+                foreach (var item in delete_Items)
+                {
+                    query_url = httpClient.BaseAddress + $"{tablename}({item[tableselecter]})" + "?";
+                    odataRequestforChild.Add(this.CreateHttpMessageContent(HttpMethod.Delete, query_url, this._log));
+                }
+
+                if (odataRequestforChild.Any())
+                {
+                    odataRequestforChild.ForEach(x =>
+                            httpcontent.Add(x)
+                        );
+                    await this.SendBatchRequestAsync(httpClient, httpcontent, this._log).ConfigureAwait(true);
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
+        {
+            string resourceID = "";
+            foreach (JObject item in RsponsData)
+            {
+                if (Enum.TryParse(item["responsecode"].ToString(), out HttpStatusCode responseStatus) && responseStatus == HttpStatusCode.OK)
+                {
+                    dynamic responseValue = item["responsebody"];
+                    JArray resArray = new JArray();
+                    string urlMetaData = string.Empty;
+                    if (responseValue?.value != null)
+                    {
+                        resArray = (JArray)responseValue?.value;
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+                    else if (responseValue is JArray)
+                    {
+                        resArray = responseValue;
+
+                    }
+                    else
+                    {
+                        resArray.Add(responseValue);
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+
+                    if (resArray != null && resArray.Any())
+                    {
+
+                        return resArray;
+
+                    }
+                }
+            }
+            return new JArray();
+        }
+
+        public bool GetMvalue<T>(string keyname, out T? Outvalue)
+        {
+            if (!this._cache.TryGetValue<T>(keyname, out Outvalue))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void SetMvalue<T>(string keyname, double timevalid, T inputvalue)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(DateTimeOffset.Now.AddMinutes(timevalid));
+
+            this._cache.Set<T>(keyname, inputvalue, cacheEntryOptions);
+        }
+
+
+    }
+
+    public class Optionsetvlu
+    {
+        public string optionKey { get; set; }
+        public string optionValu { get; set; }
+        public string optionTable { get; set; }
+        public string optionField { get; set; }
+        
     }
 }

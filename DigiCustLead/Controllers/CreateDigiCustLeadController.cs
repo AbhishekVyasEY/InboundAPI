@@ -35,6 +35,7 @@
 
 
         [HttpPost]
+        [Produces("application/json")]
         public async Task<IActionResult> Post()
         {
             try
@@ -42,34 +43,22 @@
                 StreamReader requestReader = new StreamReader(Request.Body);
                 dynamic request = JObject.Parse(await requestReader.ReadToEndAsync());
 
-                string Header_Value = string.Empty;
-                if (Request.Headers.TryGetValue("appkey", out var headerValues))
-                {
-                    Header_Value = headerValues;
-                }
-
-                if (Request.Headers.TryGetValue("ChannelID", out var ChannelID))
-                {
-                    _crDgCustLeadExecution.Channel_ID = ChannelID;
-                }
-
-                if (Request.Headers.TryGetValue("communicationID", out var communicationID))
-                {
-                    _crDgCustLeadExecution.Transaction_ID = communicationID;
-                }
-
+                
                 _crDgCustLeadExecution.API_Name = "CreateDigiCustLead";
                 _crDgCustLeadExecution.Input_payload = request.ToString();
-                CreateCustLeadReturn Casetatus = await _crDgCustLeadExecution.ValidateCustLeadDetls(request, Header_Value);
+                CreateCustLeadReturn Casetatus = await _crDgCustLeadExecution.ValidateCustLeadDetls(request);
 
                 watch.Stop();
                 Casetatus.TransactionID = this._crDgCustLeadExecution.Transaction_ID;
                 Casetatus.ExecutionTime = watch.ElapsedMilliseconds.ToString() + " ms";
 
                 string response = await _crDgCustLeadExecution.EncriptRespons(JsonConvert.SerializeObject(Casetatus));
-                this._crDgCustLeadExecution.CRMLog(JsonConvert.SerializeObject(request), response, Casetatus.ReturnCode);
+              
 
-                return Ok(response);
+                var contentResult = new ContentResult();
+                contentResult.Content = response;
+                contentResult.ContentType = "application/json";
+                return contentResult;
 
 
             }

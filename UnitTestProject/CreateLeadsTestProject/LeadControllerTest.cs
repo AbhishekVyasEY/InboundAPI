@@ -46,7 +46,7 @@ namespace CreateLeadsTestProject
 
             var ftch_Return = _fixture.Create<LeadReturnParam>();
 
-            _CreateLeadExecution.Setup(x => x.ValidateLeade(json, "APIKEY")).ReturnsAsync(ftch_Return);
+            _CreateLeadExecution.Setup(x => x.ValidateLeade("APIKEY")).ReturnsAsync(ftch_Return);
 
             _controller.ControllerContext = controllerContext;
 

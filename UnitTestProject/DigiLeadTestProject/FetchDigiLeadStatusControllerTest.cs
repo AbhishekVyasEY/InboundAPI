@@ -46,7 +46,7 @@ namespace DigiLeadTestProject
 
             var ftch_Return = _fixture.Create<FtchDgLdStsReturn>();
 
-            _FtchDgLdStsExecution.Setup(x => x.ValidateFtchDgLdSts(json, "APIKEY")).ReturnsAsync(ftch_Return);
+            _FtchDgLdStsExecution.Setup(x => x.ValidateFtchDgLdSts(json)).ReturnsAsync(ftch_Return);
 
             _controller.ControllerContext = controllerContext;
 

@@ -56,7 +56,7 @@ namespace CreateLeadsTestProject
 
             _commonFunction.Setup(x => x.getCityId(It.IsAny<string>())).ReturnsAsync("City ID");
             _commonFunction.Setup(x => x.getBranchId(It.IsAny<string>())).ReturnsAsync("BR0003");
-            _commonFunction.Setup(x => x.getCustomerId(It.IsAny<string>())).ReturnsAsync("Cus445566");
+            _commonFunction.Setup(x => x.getCustomerDetail(It.IsAny<string>())).ReturnsAsync(new JArray());
 
             _commonFunction.Setup(x => x.MeargeJsonString("Json1","Json 2")).ReturnsAsync("MJson");
             string query_resultST = "[{\"responsecode\":\"204\",\"responsebody\":\"yyuu(78678446)iio\"}]";

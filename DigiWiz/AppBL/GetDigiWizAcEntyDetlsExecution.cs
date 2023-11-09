@@ -18,6 +18,7 @@
 
         private ILoggers _logger;
         private IQueryParser _queryParser;
+        public string Bank_Code { set; get; }
 
         public string Channel_ID
         {
@@ -41,6 +42,8 @@
                 return _logger.Transaction_ID;
             }
         }
+
+        public string appkey { get; set; }
 
         public string API_Name { set
             {
@@ -70,14 +73,14 @@
         }
 
 
-        public async Task<WizAcEntyReturn> ValidateWizAcEntyDetls(dynamic RequestData, string appkey)
+        public async Task<WizAcEntyReturn> ValidateWizAcEntyDetls(dynamic RequestData)
         {
             WizAcEntyReturn ldRtPrm = new WizAcEntyReturn();
             RequestData = await this.getRequestData(RequestData);
             try
             {
                 string AccountNumber = RequestData.AccountNumber;
-                if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetDigiWizAcEntyDetlsappkey"))
+                if (!string.IsNullOrEmpty(this.appkey) && this.appkey != "" && checkappkey(this.appkey, "GetDigiWizAcEntyDetlsappkey"))
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
@@ -89,24 +92,24 @@
                         }
                         else
                         {
-                            this._logger.LogInformation("ValidateFtchDgLdSts", "Input parameters are incorrect");
+                            this._logger.LogInformation("ValidateWizAcEntyDetls", "Transaction ID or Channel ID is incorrect");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = OutputMSG.Incorrect_Input;
+                            ldRtPrm.Message = "Transaction ID or Channel ID is incorrect";
                         }
                     }
                 }
                 else
                 {
-                    this._logger.LogInformation("ValidateFtchDgLdSts", "Input parameters are incorrect");
+                    this._logger.LogInformation("ValidateWizAcEntyDetls", "Appkey is incorrect");
                     ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                    ldRtPrm.Message = OutputMSG.Incorrect_Input;
+                    ldRtPrm.Message = "Appkey is incorrect";
                 }
 
                 return ldRtPrm;
             }
             catch (Exception ex)
             {
-                this._logger.LogError("ValidateFtchDgLdSts", ex.Message);
+                this._logger.LogError("ValidateWizAcEntyDetls", ex.Message);
                 throw ex;
             }
             
@@ -142,25 +145,32 @@
                     {
                         csRtPrm.accountCreatedOn = AccountData.createdon;
                         csRtPrm.productVariant = AccountData.eqs_productcode;
-
+                        csRtPrm.accountTitle = AccountData.eqs_name;
                         string product_Cat_Id = AccountData._eqs_productcategoryid_value;
                         csRtPrm.productCategory = await this._commonFunc.getProductCatName(product_Cat_Id);
 
-                        string product_customer_Id = AccountData._eqs_customeridvalue_value;
+                        var all_customers = await this._commonFunc.getAllCustomers(AccountData.eqs_accountid.ToString()); 
 
-                        csRtPrm.customerInfo = new CustomerInfo();
-                        csRtPrm.customerInfo.accountTitle = AccountData.eqs_name;
-                        var Contact_data = await this._commonFunc.getContactData(product_customer_Id);
+                        csRtPrm.customerInfo = new List<CustomerInfo>();
+                        
+                       
+                        
 
-                        foreach (var cu_Data in Contact_data)
+                        foreach (var cu_Data in all_customers)
                         {
-                            csRtPrm.customerInfo.UCICCreatedOn = (cu_Data["createdon"].ToString()==null)? "" : cu_Data["createdon"].ToString();
-                            csRtPrm.customerInfo.entityFlag = (cu_Data["eqs_entityflag"].ToString() == null)? "" : cu_Data["eqs_entityflag"].ToString(); 
-                            csRtPrm.customerInfo.entityType = (AccountData["eqs_subentitytypeid"] == null)? "" : AccountData["eqs_subentitytypeid"].ToString();                           
-                            csRtPrm.customerInfo.phoneNumber = (cu_Data["mobilephone"].ToString() == null)? "" : cu_Data["mobilephone"].ToString();
-                            csRtPrm.customerInfo.ucic = (cu_Data["eqs_customerid"].ToString() == null) ? "" : cu_Data["eqs_customerid"].ToString();
-                        }                        
+                            CustomerInfo customerInfo = new CustomerInfo();
+                            var Contact_data = await this._commonFunc.getContactData(cu_Data._eqs_customeridvalue_value.ToString());
+                            
+                            customerInfo.UCICCreatedOn = (Contact_data[0]["createdon"].ToString()==null)? "" : Contact_data[0]["createdon"].ToString();                                                     
+                            customerInfo.phoneNumber = (Contact_data[0]["mobilephone"].ToString() == null)? "" : Contact_data[0]["mobilephone"].ToString();
+                            customerInfo.ucic = (Contact_data[0]["eqs_customerid"].ToString() == null) ? "" : Contact_data[0]["eqs_customerid"].ToString();
 
+                            customerInfo.entityFlag = (Contact_data[0]["_eqs_entitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getEntityType(Contact_data[0]["_eqs_entitytypeid_value"].ToString());
+                            customerInfo.subentityFlag = (Contact_data[0]["_eqs_subentitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getSubEntityType(Contact_data[0]["_eqs_subentitytypeid_value"].ToString());
+
+                            csRtPrm.customerInfo.Add(customerInfo);
+                        }                        
+                        
                         csRtPrm.ReturnCode = "CRM-SUCCESS";
                         csRtPrm.Message = OutputMSG.Case_Success;
                     }
@@ -171,14 +181,14 @@
                 }
                 else
                 {
-                    this._logger.LogInformation("getDigiLeadStatus", "Input parameters are incorrect");
+                    this._logger.LogInformation("getWizAcEntyDetls", "Account data not found.");
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
-                    csRtPrm.Message = OutputMSG.Incorrect_Input;
+                    csRtPrm.Message = "Account data not found.";
                 }
             }
             catch(Exception ex)
             {
-                this._logger.LogError("getDigiLeadStatus", ex.Message);
+                this._logger.LogError("getWizAcEntyDetls", ex.Message);
                 csRtPrm.ReturnCode = "CRM-ERROR-102";
                 csRtPrm.Message = OutputMSG.Incorrect_Input;
             }
@@ -191,35 +201,45 @@
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
-            return await _queryParser.PayloadEncryption(ResponsData, Transaction_ID);
+            return await _queryParser.PayloadEncryption(ResponsData, Transaction_ID, this.Bank_Code);
         }
 
-        public async Task CRMLog(string InputRequest, string OutputRespons, string CallStatus)
-        {
-            Dictionary<string, string> CRMProp = new Dictionary<string, string>();
-            CRMProp.Add("eqs_name", this.Transaction_ID);
-            CRMProp.Add("eqs_requestbody", InputRequest);
-            CRMProp.Add("eqs_responsebody", OutputRespons);
-            CRMProp.Add("eqs_requeststatus", (CallStatus.Contains("ERROR")) ? "615290001" : "615290000");
-            string postDataParametr = JsonConvert.SerializeObject(CRMProp);
-            await this._queryParser.HttpApiCall("eqs_apilogs", HttpMethod.Post, postDataParametr);
-        }
+       
 
         private async Task<dynamic> getRequestData(dynamic inputData)
         {
-            var EncryptedData = inputData.req_root.body.payload;
-            string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString());
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlData);
-            string xpath = "PIDBlock/payload";
-            var nodes = xmlDoc.SelectSingleNode(xpath);
-            foreach (XmlNode childrenNode in nodes)
+
+            dynamic rejusetJson;
+            try
             {
-                dynamic rejusetJson = JsonConvert.DeserializeObject(childrenNode.Value);
-                return rejusetJson;
+                var EncryptedData = inputData.req_root.body.payload;
+                string BankCode = inputData.req_root.header.cde.ToString();
+                this.Bank_Code = BankCode;
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xmlData);
+                string xpath = "PIDBlock/payload";
+                var nodes = xmlDoc.SelectSingleNode(xpath);
+                foreach (XmlNode childrenNode in nodes)
+                {
+                    rejusetJson = JsonConvert.DeserializeObject(childrenNode.Value);
+
+                    var payload = rejusetJson.GetDigiWizAccountEntityDetails;
+                    this.appkey = payload.msgHdr.authInfo.token.ToString();
+                    this.Transaction_ID = payload.msgHdr.conversationID.ToString();
+                    this.Channel_ID = payload.msgHdr.channelID.ToString();
+
+                    rejusetJson = payload.msgBdy;
+                    return rejusetJson;
+                }
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getRequestData", ex.Message);
             }
 
             return "";
+
         }
 
     }

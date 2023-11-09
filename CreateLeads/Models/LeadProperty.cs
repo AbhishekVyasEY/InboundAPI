@@ -7,10 +7,16 @@ namespace CreateLeads
     public class LeadMsdProperty
     {
        // public string leadid { get; set; }
-        public int leadsourcecode { get; set; }
+        public string eqs_leadchannel { get; set; }     
         public string firstname { get; set; }
         public string middlename { get; set; }
         public string lastname { get; set; }
+        public string eqs_companynamepart1 { get; set; }
+        public string eqs_companynamepart2 { get; set; }
+        public string eqs_companynamepart3 { get; set; }
+        public string eqs_dob { get; set; }
+        public string eqs_dateofincorporation { get; set; }
+        public string eqs_gendercode { get; set; }
         public string yomifullname
         {
             get
@@ -25,7 +31,7 @@ namespace CreateLeads
         public string eqs_pincode { get; set; }
         public string emailaddress1 { get; set; }
         public string eqs_crmproductcategorycode { get; set;}
-      //  public string eqs_SelfieJourneyStatus { get; set;}
+        public string eqs_ucic { get; set;}
         
 
     }
@@ -81,6 +87,15 @@ namespace CreateLeads
     public class LeadReturnParam
     {      
         public string LeadID { get; set; }
+        public string ReturnCode { get; set; }
+        public string Message { get; set; }
+        public string TransactionID { get; set; }
+        public string ExecutionTime { get; set; }
+
+    }
+
+    public class UpdateLidStatusReturnParam
+    {       
         public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
