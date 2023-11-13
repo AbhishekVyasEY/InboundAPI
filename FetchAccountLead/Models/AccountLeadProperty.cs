@@ -72,29 +72,29 @@ namespace FetchAccountLead
         public string MinimumDepositAmount { get; set; }
         public string MaximumDepositAmount { get; set; }
         public string CompoundingFrequency { get; set; }
-        public int MinimumTenureMonths { get; set; }
-        public int MaximumTenureMonths { get; set; }
+        public string MinimumTenureMonths { get; set; }
+        public string MaximumTenureMonths { get; set; }
         public string PayoutFrequency { get; set; }
-        public int MinimumTenureDays { get; set; }
-        public int MaximumTenureDays { get; set; }
+        public string MinimumTenureDays { get; set; }
+        public string MaximumTenureDays { get; set; }
         public string InterestCompoundFrequency { get; set; }
     }
 
     public class DepositDetails
     {
         public string DepositVariancePercentage { get; set; }
-        public int DepositAmount { get; set; }
+        public string DepositAmount { get; set; }
         public string FromESFBAccountNumber { get; set; }
         public string FromESFBGLAccount { get; set; }
         public string CurrencyofDeposit { get; set; }
         public string tenureInDays { get; set; }
-        public bool SpecialInterestRateRequired { get; set; }
-        public int SpecialInterestRate { get; set; }
+        public string SpecialInterestRateRequired { get; set; }
+        public string SpecialInterestRate { get; set; }
         public string SpecialInterestRequestID { get; set; }
         public string BranchCodeGL { get; set; }
         public string FDValueDate { get; set; }
-        public int TenureInMonths { get; set; }
-        public bool WaivedOffTDS { get; set; }
+        public string TenureInMonths { get; set; }
+        public string WaivedOffTDS { get; set; }
         public string TransactionID { get; set; }
     }
 
@@ -146,12 +146,12 @@ namespace FetchAccountLead
         public string DebitCardFlag { get; set; }
         public string NameonCard { get; set; }
         public string DebitCardID { get; set; }
-        public bool SMS { get; set; }
-        public bool NetBanking { get; set; }
-        public bool MobileBanking { get; set; }
-        public bool EmailStatement { get; set; }
-        public bool InternationalDCLimitAct { get; set; }
-        public bool physicalStatement { get; set; }
+        public string SMS { get; set; }
+        public string NetBanking { get; set; }
+        public string MobileBanking { get; set; }
+        public string EmailStatement { get; set; }
+        public string InternationalDCLimitAct { get; set; }
+        public string physicalStatement { get; set; }
         public string mobileBankingNumber { get; set; }
         public List<CustomerDeliverable> customerDeliverables { get; set; }
     }
@@ -180,7 +180,7 @@ namespace FetchAccountLead
         public string NomineeRelationship { get; set; }
         public string DOB { get; set; }
         public string NomineeDisplayName { get; set; }
-        public bool AddresssameasProspects { get; set; }
+        public string AddresssameasProspects { get; set; }
         public string email { get; set; }
         public string mobile { get; set; }
         public string Landline { get; set; }
