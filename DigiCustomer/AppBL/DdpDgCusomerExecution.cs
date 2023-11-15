@@ -144,20 +144,26 @@
                     msgBdy.DEMOGRAPHIC_INFORMATION.FIRST_NAME = applicentDtls[0]["eqs_firstname"].ToString();
                     msgBdy.DEMOGRAPHIC_INFORMATION.LAST_NAME = applicentDtls[0]["eqs_lastname"].ToString();
                     msgBdy.DEMOGRAPHIC_INFORMATION.MIDDLE_NAME = applicentDtls[0]["eqs_middlename"].ToString();
-                    string mm = applicentDtls[0]["eqs_dob"].ToString().Substring(0, 2);
-                    string dd = applicentDtls[0]["eqs_dob"].ToString().Substring(3, 2);
-                    string yy = applicentDtls[0]["eqs_dob"].ToString().Substring(6, 4);
-                    msgBdy.DEMOGRAPHIC_INFORMATION.DATE_OF_BIRTH = dd + "-" + mm + "-" + yy;
+                    if (!string.IsNullOrEmpty(applicentDtls[0]["eqs_dob"].ToString()))
+                    {
+                        string mm = applicentDtls[0]["eqs_dob"].ToString().Substring(0, 2);
+                        string dd = applicentDtls[0]["eqs_dob"].ToString().Substring(3, 2);
+                        string yy = applicentDtls[0]["eqs_dob"].ToString().Substring(6, 4);
+                        msgBdy.DEMOGRAPHIC_INFORMATION.DATE_OF_BIRTH = dd + "-" + mm + "-" + yy;
+                    }
                 }
                 else
                 {
                     msgBdy.DEMOGRAPHIC_INFORMATION.FIRST_NAME = applicentDtls[0]["eqs_companynamepart1"].ToString();
                     msgBdy.DEMOGRAPHIC_INFORMATION.LAST_NAME = applicentDtls[0]["eqs_companynamepart2"].ToString();
                     msgBdy.DEMOGRAPHIC_INFORMATION.MIDDLE_NAME = applicentDtls[0]["eqs_companynamepart3"].ToString();
-                    string dd = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
-                    string mm = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(3, 2);
-                    string yy = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(6, 4);
-                    msgBdy.DEMOGRAPHIC_INFORMATION.DATE_OF_INC = dd + "-" + mm + "-" + yy;
+                    if (!string.IsNullOrEmpty(applicentDtls[0]["eqs_dateofincorporation"].ToString()))
+                    {
+                        string dd = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
+                        string mm = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(3, 2);
+                        string yy = applicentDtls[0]["eqs_dateofincorporation"].ToString().Substring(6, 4);
+                        msgBdy.DEMOGRAPHIC_INFORMATION.DATE_OF_INC = dd + "-" + mm + "-" + yy;
+                    }
                 }
 
                 msgBdy.DEMOGRAPHIC_INFORMATION.PAN = applicentDtls[0]["eqs_internalpan"].ToString();
