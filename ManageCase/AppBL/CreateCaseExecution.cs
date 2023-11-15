@@ -437,7 +437,7 @@ namespace ManageCase
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(CaseData.AccountNumberToString()))
+                    if (!string.IsNullOrEmpty(CaseData.AccountNumber.ToString()))
                     {
                         this._logger.LogError("CreateCase", "Account not found!");
                         csRtPrm.ReturnCode = "CRM-ERROR-102";
