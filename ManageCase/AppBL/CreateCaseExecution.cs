@@ -415,10 +415,35 @@ namespace ManageCase
                     }
                 }
 
-                odatab.Add("customerid_contact@odata.bind", $"contacts({csProperty.customerid})");
+                if (!string.IsNullOrEmpty(csProperty.customerid))
+                {
+                    odatab.Add("customerid_contact@odata.bind", $"contacts({csProperty.customerid})");
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(CaseData.UCIC.ToString()))
+                    {
+
+                        this._logger.LogError("CreateCase", "Customer not found!");
+                        csRtPrm.ReturnCode = "CRM-ERROR-102";
+                        csRtPrm.Message = "Customer not found!";
+                        return csRtPrm;
+                    }
+                }
+
                 if (csProperty.Accountid != null && csProperty.Accountid.Length > 4)
                 {
                     odatab.Add("eqs_account@odata.bind", $"eqs_accounts({csProperty.Accountid})");
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(CaseData.AccountNumberToString()))
+                    {
+                        this._logger.LogError("CreateCase", "Account not found!");
+                        csRtPrm.ReturnCode = "CRM-ERROR-102";
+                        csRtPrm.Message = "Account not found!";
+                        return csRtPrm;
+                    }
                 }
                 //else
                 //{
