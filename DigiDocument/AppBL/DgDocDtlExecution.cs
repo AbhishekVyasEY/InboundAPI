@@ -174,24 +174,35 @@
                 odatab.Add("eqs_dmsrequestid", documentdtl.DmsDocumentID.ToString());
                 odatab.Add("eqs_issuedat", documentdtl.IssuedAt.ToString());
 
-                string dd = documentdtl.IssueDate.ToString().Substring(0, 2);
-                string mm = documentdtl.IssueDate.ToString().Substring(3, 2);
-                string yy = documentdtl.IssueDate.ToString().Substring(6, 4);
+                string dd = ""; string mm = ""; string yy = "";
 
-                odatab.Add("eqs_issuedate", yy + "-" + mm + "-" + dd);
+                if (!string.IsNullOrEmpty(documentdtl.IssueDate.ToString()))
+                {
+                    dd = documentdtl.IssueDate.ToString().Substring(0, 2);
+                    mm = documentdtl.IssueDate.ToString().Substring(3, 2);
+                    yy = documentdtl.IssueDate.ToString().Substring(6, 4);
 
-                dd = documentdtl.ExpiryDate.ToString().Substring(0, 2);
-                mm = documentdtl.ExpiryDate.ToString().Substring(3, 2);
-                yy = documentdtl.ExpiryDate.ToString().Substring(6, 4);
+                    odatab.Add("eqs_issuedate", yy + "-" + mm + "-" + dd);
+                }
+                if (!string.IsNullOrEmpty(documentdtl.ExpiryDate.ToString()))
+                {
+                    dd = documentdtl.ExpiryDate.ToString().Substring(0, 2);
+                    mm = documentdtl.ExpiryDate.ToString().Substring(3, 2);
+                    yy = documentdtl.ExpiryDate.ToString().Substring(6, 4);
 
-                odatab.Add("eqs_expirydate", yy + "-" + mm + "-" + dd);
+                    odatab.Add("eqs_expirydate", yy + "-" + mm + "-" + dd);
+                }
+
                 odatab.Add("eqs_verificationstatus", documentdtl.VerificationStatus.ToString());
 
-                dd = documentdtl.VerifiedOn.ToString().Substring(0, 2);
-                mm = documentdtl.VerifiedOn.ToString().Substring(3, 2);
-                yy = documentdtl.VerifiedOn.ToString().Substring(6, 4);
+                if (!string.IsNullOrEmpty(documentdtl.VerifiedOn.ToString()))
+                {
+                    dd = documentdtl.VerifiedOn.ToString().Substring(0, 2);
+                    mm = documentdtl.VerifiedOn.ToString().Substring(3, 2);
+                    yy = documentdtl.VerifiedOn.ToString().Substring(6, 4);
 
-                odatab.Add("eqs_verifiedon", yy + "-" + mm + "-" + dd);
+                    odatab.Add("eqs_verifiedon", yy + "-" + mm + "-" + dd);
+                }
 
                 string validateby = await this._commonFunc.getSystemuserId(documentdtl.VerifiedBy.ToString());
                 if (!string.IsNullOrEmpty(validateby))
@@ -266,24 +277,34 @@
                     odatab.Add("eqs_dmsrequestid", documentdtl.DmsDocumentID.ToString());
                     odatab.Add("eqs_issuedat", documentdtl.IssuedAt.ToString());
 
-                    string dd = documentdtl.IssueDate.ToString().Substring(0, 2);
-                    string mm = documentdtl.IssueDate.ToString().Substring(3, 2);
-                    string yy = documentdtl.IssueDate.ToString().Substring(6, 4);
+                    string dd = ""; string mm = ""; string yy = "";
 
-                    odatab.Add("eqs_issuedate", yy + "-" + mm + "-" + dd);
+                    if (!string.IsNullOrEmpty(documentdtl.IssueDate.ToString()))
+                    {
+                        dd = documentdtl.IssueDate.ToString().Substring(0, 2);
+                        mm = documentdtl.IssueDate.ToString().Substring(3, 2);
+                        yy = documentdtl.IssueDate.ToString().Substring(6, 4);
 
-                    dd = documentdtl.ExpiryDate.ToString().Substring(0, 2);
-                    mm = documentdtl.ExpiryDate.ToString().Substring(3, 2);
-                    yy = documentdtl.ExpiryDate.ToString().Substring(6, 4);
+                        odatab.Add("eqs_issuedate", yy + "-" + mm + "-" + dd);
+                    }
+                    if (!string.IsNullOrEmpty(documentdtl.ExpiryDate.ToString()))
+                    {
+                        dd = documentdtl.ExpiryDate.ToString().Substring(0, 2);
+                        mm = documentdtl.ExpiryDate.ToString().Substring(3, 2);
+                        yy = documentdtl.ExpiryDate.ToString().Substring(6, 4);
 
-                    odatab.Add("eqs_expirydate", yy + "-" + mm + "-" + dd);
+                        odatab.Add("eqs_expirydate", yy + "-" + mm + "-" + dd);
+                    }
                     odatab.Add("eqs_verificationstatus", documentdtl.VerificationStatus.ToString());
 
-                    dd = documentdtl.VerifiedOn.ToString().Substring(0, 2);
-                    mm = documentdtl.VerifiedOn.ToString().Substring(3, 2);
-                    yy = documentdtl.VerifiedOn.ToString().Substring(6, 4);
+                    if (!string.IsNullOrEmpty(documentdtl.VerifiedOn.ToString()))
+                    {
+                        dd = documentdtl.VerifiedOn.ToString().Substring(0, 2);
+                        mm = documentdtl.VerifiedOn.ToString().Substring(3, 2);
+                        yy = documentdtl.VerifiedOn.ToString().Substring(6, 4);
 
-                    odatab.Add("eqs_verifiedon", yy + "-" + mm + "-" + dd);
+                        odatab.Add("eqs_verifiedon", yy + "-" + mm + "-" + dd);
+                    }
 
                     string validateby = await this._commonFunc.getSystemuserId(documentdtl.VerifiedBy.ToString());
                     if (!string.IsNullOrEmpty(validateby))

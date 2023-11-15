@@ -47,31 +47,36 @@
 
         public string appkey { set; get; }
 
-        public string API_Name { set
+        public string API_Name
+        {
+            set
             {
                 _logger.API_Name = value;
             }
         }
-        public string Input_payload { set {
+        public string Input_payload
+        {
+            set
+            {
                 _logger.Input_payload = value;
-            } 
+            }
         }
 
         private readonly IKeyVaultService _keyVaultService;
 
-                
+
         private ICommonFunction _commonFunc;
 
         public FetchGFSProductExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
         {
-                    
+
             this._logger = logger;
-            
+
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
-           
-           
+
+
         }
 
 
@@ -105,7 +110,7 @@
                                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
                                 ldRtPrm.Message = "leadId or customerID is incorrect";
                             }
-                            
+
 
                         }
                         else
@@ -136,7 +141,7 @@
                 this._logger.LogError("ValidateProductInput", ex.Message);
                 throw ex;
             }
-            
+
         }
 
 
@@ -152,7 +157,7 @@
             }
         }
 
-        
+
 
         public async Task<GFSProducrListReturn> getUcicToProduct(string customerID, string CategoryCode)
         {
@@ -189,9 +194,9 @@
                         product_Filter.customerSegment = "elite";
                     }
 
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstafffcode"].ToString()))
+                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstafffcode"].ToString()) && applicentDetails[0]["eqs_isstafffcode"].ToString() == "789030001")
                     {
-                        product_Filter.gender = "staff";
+                        product_Filter.IsStaff = "staff";
                     }
 
                     product_Filter.productCategory = CategoryId;
@@ -205,14 +210,14 @@
                     csRtPrm.Message = "Applicent Details not found.";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this._logger.LogError("getUcicToProduct", ex.Message);
                 csRtPrm.ReturnCode = "CRM-ERROR-102";
                 csRtPrm.Message = OutputMSG.Incorrect_Input;
             }
-            
-            
+
+
 
             return csRtPrm;
         }
@@ -224,7 +229,7 @@
             {
                 string CategoryId = await this._commonFunc.getCategoryId(CategoryCode);
                 JArray applicentDetails = await this._commonFunc.getApplicantDetails(ApplicantId);
-                
+
                 if (applicentDetails.Count > 0)
                 {
                     productFilter product_Filter = new productFilter();
@@ -245,7 +250,7 @@
                         if (subentity.ToLower() == "foreigners" || subentity.ToLower() == "non resident individual")
                         {
                             product_Filter.subentity = "NRI";
-                        }                        
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_customersegment"].ToString()) && applicentDetails[0]["eqs_customersegment"].ToString() == "789030002")
@@ -253,9 +258,9 @@
                         product_Filter.customerSegment = "elite";
                     }
 
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstaffcode"].ToString()))
+                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstaffcode"].ToString()) && applicentDetails[0]["eqs_isstaffcode"].ToString() == "789030001")
                     {
-                        product_Filter.gender = "staff";
+                        product_Filter.IsStaff = "staff";
                     }
 
                     product_Filter.productCategory = CategoryId;
@@ -284,21 +289,21 @@
         {
             GFSProducrListReturn csRtPrm = new GFSProducrListReturn();
             var productDetails = await this._commonFunc.getProductData(product_Filter);
-            if (productDetails.Count >0 )
+            if (productDetails.Count > 0)
             {
                 csRtPrm.fdproductsApplicable = new List<FDProductsApplicable>();
                 csRtPrm.rdproductsApplicable = new List<RDProductsApplicable>();
                 csRtPrm.applicableCASAProducts = new List<ApplicableCASAProducts>();
 
             }
-            foreach(dynamic product_detail in productDetails)
+            foreach (dynamic product_detail in productDetails)
             {
                 if (CategoryCode == "PCAT04")
                 {
                     FDProductsApplicable fDProductsApplicable = new FDProductsApplicable();
                     fDProductsApplicable.productCode = product_detail.eqs_productcode;
                     fDProductsApplicable.productName = product_detail.eqs_name;
-                  
+
                     fDProductsApplicable.minTenureDays = product_detail.eqs_mintenuredays;
                     fDProductsApplicable.maxTenureDays = product_detail.eqs_maxtenuredays;
                     fDProductsApplicable.minTenureMonths = product_detail.eqs_mintenuremonths;
@@ -320,7 +325,7 @@
                     RDProductsApplicable rdProductsApplicable = new RDProductsApplicable();
                     rdProductsApplicable.productCode = product_detail.eqs_productcode;
                     rdProductsApplicable.productName = product_detail.eqs_name;
-                   
+
                     rdProductsApplicable.minTenureDays = product_detail.eqs_mintenuredays;
                     rdProductsApplicable.maxTenureDays = product_detail.eqs_maxtenuredays;
                     rdProductsApplicable.minTenureMonths = product_detail.eqs_mintenuremonths;
@@ -342,14 +347,14 @@
                     ApplicableCASAProducts applicableCASAProducts = new ApplicableCASAProducts();
                     applicableCASAProducts.productCode = product_detail.eqs_productcode;
                     applicableCASAProducts.productName = product_detail.eqs_name;
-                  
+
                     applicableCASAProducts.chequeBook = product_detail.eqs_chequebook;
                     applicableCASAProducts.debitCard = product_detail.eqs_debitcard;
                     applicableCASAProducts.applicableDebitCard = product_detail.eqs_applicabledebitcard;
                     applicableCASAProducts.defaultDebitCard = product_detail.eqs_defaultdebitcard;
                     applicableCASAProducts.instaKit = product_detail.eqs_InstaKit;
                     applicableCASAProducts.doorStep = product_detail.eqs_doorstep;
-                  
+
                     applicableCASAProducts.PMAY = product_detail.eqs_pmay;
                     applicableCASAProducts.isElite = product_detail.eqs_iselite;
                     applicableCASAProducts.srnoofchequeleaves = product_detail.eqs_srnoofchequeleaves;

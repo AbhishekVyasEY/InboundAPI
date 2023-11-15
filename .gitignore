@@ -339,3 +339,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/.vs/EquitasInboundAPI/v17/.suo
+/.vs/ProjectEvaluation/equitasinboundapi.metadata.v5.2
+/.vs/ProjectEvaluation/equitasinboundapi.projects.v5.2
