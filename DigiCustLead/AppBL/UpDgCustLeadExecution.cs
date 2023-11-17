@@ -206,10 +206,8 @@
                 CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"].ToString());
                 CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"].ToString());
 
-                //mm = Applicant_Data["eqs_dob"].ToString().Substring(0, 2);
-                //dd = Applicant_Data["eqs_dob"].ToString().Substring(3, 2);
-                dd = Applicant_Data["eqs_dob"].ToString().Substring(0, 2);
-                mm = Applicant_Data["eqs_dob"].ToString().Substring(3, 2);
+                mm = Applicant_Data["eqs_dob"].ToString().Substring(0, 2);
+                dd = Applicant_Data["eqs_dob"].ToString().Substring(3, 2);
                 yyyy = Applicant_Data["eqs_dob"].ToString().Substring(6, 4);
 
                 CRMDDEmappingFields.Add("eqs_dob", yyyy + "-" + mm + "-" + dd);
