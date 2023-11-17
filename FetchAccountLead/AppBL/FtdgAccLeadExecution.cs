@@ -62,15 +62,9 @@
         private readonly IKeyVaultService _keyVaultService;
 
         private string Leadid, LeadAccountid;
+        FtAccountLeadReturn AccountLeadReturn;
 
-        private List<string> applicents = new List<string>();
-        private LeadAccount _accountLead;
-        private LeadDetails _leadParam;
-        private List<AccountApplicant> _accountApplicants;
 
-              
-     
-        Dictionary<string, string> genderc = new Dictionary<string, string>();
 
         private ICommonFunction _commonFunc;
 
@@ -83,16 +77,7 @@
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
 
-            _leadParam = new LeadDetails();
-            _accountLead = new LeadAccount();
-            _accountApplicants = new List<AccountApplicant>();
-
-           
-          
-
-            genderc.Add("789030000", "Male");
-            genderc.Add("789030001", "Female");
-            genderc.Add("789030002", "Third Gender");
+            this.AccountLeadReturn = new FtAccountLeadReturn();
 
         }
 
@@ -148,186 +133,240 @@
 
         private async Task<FtAccountLeadReturn> FetLeadAccount(string LeadAccountId)
         {
-            FtAccountLeadReturn accountLeadReturn = new FtAccountLeadReturn();
+            
 
             var _leadDetails  = await this._commonFunc.getLeadAccountDetails(LeadAccountId);
             if (_leadDetails.Count>0)
             {
-                if(await getLeadAccount(_leadDetails))
-                {
-                    if (await getLeadData())
-                    {
-                        if (await getApplicent())
-                        {
-                            accountLeadReturn.AccountLead = _accountLead;
-                            accountLeadReturn.leadDetails = _leadParam;
-                            accountLeadReturn.Applicants = _accountApplicants;
-                            accountLeadReturn.ReturnCode = "CRM-SUCCESS";
-                            accountLeadReturn.Message = OutputMSG.Case_Success;
-
-                        }
-                    }
+                this.LeadAccountid = LeadAccountId;
+                if (await getLeadAccount(_leadDetails))
+                {                   
+                           
+                    this.AccountLeadReturn.ReturnCode = "CRM-SUCCESS";
+                    this.AccountLeadReturn.Message = OutputMSG.Case_Success;
+                                           
                 }
             }
             else
             {
                 this._logger.LogInformation("FetLeadAccount", "Lead Account Details not found.");
-                accountLeadReturn.ReturnCode = "CRM-ERROR-102";
-                accountLeadReturn.Message = "Lead Account Details not found.";
+                this.AccountLeadReturn.ReturnCode = "CRM-ERROR-102";
+                this.AccountLeadReturn.Message = "Lead Account Details not found.";
             }
 
 
             
 
-            return accountLeadReturn;
+            return this.AccountLeadReturn;
         }
 
 
-        private async Task<bool> getLeadData()
-        {
-
-            var _leadDetails = await this._commonFunc.getLeadDetails(this.Leadid);
-
-            _leadParam.ucic = _leadDetails[0]["eqs_ucic"].ToString();
-            _leadParam.leadid = _leadDetails[0]["eqs_crmleadid"].ToString();
-            _leadParam.title = await this._commonFunc.getTitleCode(_leadDetails[0]["_eqs_titleid_value"].ToString());
-            _leadParam.Firstname = _leadDetails[0]["firstname"].ToString();
-            _leadParam.Lastname = _leadDetails[0]["lastname"].ToString();
-            _leadParam.CustomerPhoneNumber = _leadDetails[0]["mobilephone"].ToString();
-            _leadParam.CustomerEmailID = _leadDetails[0]["emailaddress1"].ToString();
-            _leadParam.companynamepart1 = _leadDetails[0]["eqs_companynamepart1"].ToString();
-            _leadParam.companynamepart2 = _leadDetails[0]["eqs_companynamepart2"].ToString();
-            _leadParam.companynamepart3 = _leadDetails[0]["eqs_companynamepart3"].ToString();
-
-            _leadParam.dateofincorporation = _leadDetails[0]["eqs_dateofincorporation"].ToString();
-            _leadParam.DOB = _leadDetails[0]["eqs_dob"].ToString();
-            _leadParam.PAN = _leadDetails[0]["eqs_pan"].ToString();
-            _leadParam.gender = _leadDetails[0]["eqs_gendercode"].ToString();
-
-            _leadParam.branchid = await this._commonFunc.getBranchCode(_leadDetails[0]["_eqs_branchid_value"].ToString());
-            _leadParam.productid = await this._commonFunc.getProductCode(_leadDetails[0]["_eqs_productid_value"].ToString());
-            _leadParam.productCategory = await this._commonFunc.getProductCategoryCode(_leadDetails[0]["_eqs_productcategoryid_value"].ToString());
-            _leadParam.EntityType = await this._commonFunc.getEntityCode(_leadDetails[0]["_eqs_entitytypeid_value"].ToString());
-            _leadParam.SubEntityType = await this._commonFunc.getSubEntityCode(_leadDetails[0]["_eqs_subentitytypeid_value"].ToString());
-            
-
-            return true;
-        }
+        
 
         private async Task<bool> getLeadAccount(JArray LeadData)
-        {                
+        {
 
-            this.LeadAccountid = LeadData[0]["eqs_leadaccountid"].ToString();
-            this.Leadid = LeadData[0]["_eqs_lead_value"].ToString();
+            /****************** General  ***********************/
 
-            _accountLead.productCode = await this._commonFunc.getProductCode(LeadData[0]["_eqs_productid_value"].ToString());
+            General general = new General();
 
-            if (!string.IsNullOrEmpty(LeadData[0]["_eqs_branchid_value"].ToString())) {
-                _accountLead.sourceBranch = await this._commonFunc.getBranchCode(LeadData[0]["_eqs_branchid_value"].ToString());
+            general.AccountLeadId = this.LeadAccountid;
+            general.AccountNumber = LeadData[0]["eqs_predefinedaccountnumber"].ToString();
+            general.ApplicationDate = LeadData[0]["eqs_applicationdate"].ToString();
+            general.ProductCategory = await this._commonFunc.getProductCategoryCode(LeadData[0]["_eqs_productcategoryid_value"].ToString());
+            general.Product = await this._commonFunc.getProductCode(LeadData[0]["_eqs_productid_value"].ToString());
+            general.InstaKit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_instakitcode", LeadData[0]["eqs_instakitcode"].ToString());
+            general.InstaKitAccountNumber = LeadData[0]["eqs_instakitaccountnumber"].ToString();
+            general.AccountOpeningBranch = await this._commonFunc.getBranchCode(LeadData[0]["_eqs_accountopeningbranchid_value"].ToString());
+            general.PurposeofOpeningAccount = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_purposeofopeningaccountcode", LeadData[0]["eqs_purposeofopeningaccountcode"].ToString());            
+            general.PurposeOfOpeningAccountOthers = LeadData[0]["eqs_purposeofopeningaaccountothers"].ToString();
+            general.ModeofOperation = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_modeofoperationcode", LeadData[0]["eqs_modeofoperationcode"].ToString());
+            general.AccountOwnership = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_accountownershipcode", LeadData[0]["eqs_accountownershipcode"].ToString());
+            general.InitialDepositMode = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_initialdepositmodecode", LeadData[0]["eqs_initialdepositmodecode"].ToString());
+            general.TransactionDate = LeadData[0]["eqs_transactiondate"].ToString();
+            general.TransactionID = LeadData[0]["eqs_transactionid"].ToString();
+            general.Fundingchequebank = LeadData[0]["eqs_fundingchequebank"].ToString();
+            general.FundingchequeNumber = LeadData[0]["eqs_fundingchequenumber"].ToString();
+            general.SourceBranchTerritory = await this._commonFunc.getBranchCode(LeadData[0]["_eqs_sourcebranchterritoryid_value"].ToString());
+            general.SweepFacility = LeadData[0]["eqs_sweepfacility"].ToString();
+            general.LGCode = LeadData[0]["eqs_lgcode"].ToString();
+            general.LCCode = LeadData[0]["eqs_lccode"].ToString();
+
+            this.AccountLeadReturn.General = general;
+
+            /****************** Additional Details  ***********************/
+
+            AdditionalDetails additionalDetails = new AdditionalDetails();
+
+            additionalDetails.AccountTitle = LeadData[0]["eqs_accounttitle"].ToString();
+            additionalDetails.LOBType = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_lobtypecode", LeadData[0]["eqs_lobtypecode"].ToString());
+            additionalDetails.AOBO = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_aobotypecode", LeadData[0]["eqs_aobotypecode"].ToString());
+            additionalDetails.ModeofOperationRemarks = LeadData[0]["eqs_modeofoperationremarks"].ToString();
+            additionalDetails.SourceofFund = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_sourceoffundcode", LeadData[0]["eqs_sourceoffundcode"].ToString());
+            additionalDetails.OtherSourceoffund = LeadData[0]["eqs_othersourceoffund"].ToString();
+            additionalDetails.PredefinedAccountNumber = LeadData[0]["eqs_predefinedaccountnumber"].ToString();
+
+            this.AccountLeadReturn.AdditionalDetails = additionalDetails;
+
+            /****************** FDRD Details  ***********************/
+
+            ProductDetails productDetails = new ProductDetails();
+            productDetails.MinimumDepositAmount = LeadData[0]["eqs_minimumdepositamount"].ToString();
+            productDetails.MaximumDepositAmount = LeadData[0]["eqs_maximumdepositamount"].ToString();
+            productDetails.CompoundingFrequency = LeadData[0]["eqs_compoundingfrequency"].ToString();
+            productDetails.MinimumTenureMonths = LeadData[0]["eqs_minimumtenuremonths"].ToString();
+            productDetails.MaximumTenureMonths = LeadData[0]["eqs_maximumtenuremonths"].ToString();
+            productDetails.PayoutFrequency = LeadData[0]["eqs_payoutfrequency"].ToString();
+            productDetails.MinimumTenureDays = LeadData[0]["eqs_minimumtenuredays"].ToString();
+            productDetails.MaximumTenureDays = LeadData[0]["eqs_maximumtenuredays"].ToString();
+            productDetails.InterestCompoundFrequency = LeadData[0]["eqs_interestcompoundfrequency"].ToString();
+
+            DepositDetails depositDetails = new DepositDetails();
+            depositDetails.DepositVariancePercentage = LeadData[0]["eqs_depositvariance"].ToString();
+            depositDetails.DepositAmount = LeadData[0]["eqs_depositamount"].ToString();
+            depositDetails.FromESFBAccountNumber = LeadData[0]["eqs_fromesfbaccountnumber"].ToString();
+            depositDetails.FromESFBGLAccount = LeadData[0]["eqs_fromesfbglaccount"].ToString();
+            depositDetails.CurrencyofDeposit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_currencyofdepositcode", LeadData[0]["eqs_currencyofdepositcode"].ToString());
+            depositDetails.tenureInDays = LeadData[0]["eqs_tenureindays"].ToString();
+            depositDetails.SpecialInterestRateRequired = LeadData[0]["eqs_specialinterestraterequired"].ToString();
+            depositDetails.SpecialInterestRate = LeadData[0]["eqs_specialinterestrate"].ToString();
+            depositDetails.SpecialInterestRequestID = LeadData[0]["eqs_specialinterestrequestid"].ToString();
+            depositDetails.BranchCodeGL = LeadData[0]["eqs_branchcodegl"].ToString();
+            depositDetails.FDValueDate = LeadData[0]["eqs_fdvaluedate"].ToString();
+            depositDetails.TenureInMonths = LeadData[0]["eqs_tenureinmonths"].ToString();
+            depositDetails.WaivedOffTDS = LeadData[0]["eqs_waivedofftds"].ToString();
+           
+
+            InterestPayoutDetails interestPayoutDetails = new InterestPayoutDetails();
+            interestPayoutDetails.interestPayoutMode = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_interestpayoutmode", LeadData[0]["eqs_interestpayoutmode"].ToString());
+            interestPayoutDetails.iPayToESFBAccountNo = LeadData[0]["eqs_esfbaccountnumber_interest"].ToString();
+            interestPayoutDetails.iPayToOtherBankAccountNo = LeadData[0]["eqs_otherbankaccountnumber_interest"].ToString();
+            interestPayoutDetails.BeneficiaryAccountType = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_beneficiaryaccounttypeinterest", LeadData[0]["eqs_beneficiaryaccounttypeinterest"].ToString());
+            interestPayoutDetails.iPayToOtherBankBenificiaryName = LeadData[0]["eqs_beneficiarynameinterest"].ToString();
+            interestPayoutDetails.iPayToOtherBankIFSC = LeadData[0]["eqs_ifsccodeinterest"].ToString();
+            interestPayoutDetails.iPayToOtherBankName = LeadData[0]["eqs_banknameinterest"].ToString();
+            interestPayoutDetails.iPayToOtherBankBranch = LeadData[0]["eqs_branchinterest"].ToString();
+            interestPayoutDetails.iPayToOtherBankMICR = LeadData[0]["eqs_micrinterest"].ToString();
+            interestPayoutDetails.iPByDDPOIssuerCode = LeadData[0]["eqs_issuercode_interest"].ToString();
+            interestPayoutDetails.iPByDDPOPayeeName = LeadData[0]["eqs_payeename_interest"].ToString();
+
+            MaturityInstructionDetails maturityInstructionDetails = new MaturityInstructionDetails();
+            maturityInstructionDetails.MaturityInstruction = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_maturityinstruction", LeadData[0]["eqs_maturityinstruction"].ToString());
+            maturityInstructionDetails.MaturityPayoutMode = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_maturitypayoutmode", LeadData[0]["eqs_maturitypayoutmode"].ToString());
+            maturityInstructionDetails.MICreditToESFBAccountNo = LeadData[0]["eqs_esfbaccountnumber_maturity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankAccountNo = LeadData[0]["eqs_otherbankaccountnumber_maturity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankAccountType = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_beneficiaryaccounttype_maturity", LeadData[0]["eqs_beneficiaryaccounttype_maturity"].ToString());
+            maturityInstructionDetails.BeneficiaryName = LeadData[0]["eqs_beneficiaryname_maturity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankIFSC = LeadData[0]["eqs_ifccodematurity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankName = LeadData[0]["eqs_banknamematurity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankBranch = LeadData[0]["eqs_branchmaturity"].ToString();
+            maturityInstructionDetails.MICreditToOtherBankMICR = LeadData[0]["eqs_micrmaturity"].ToString();
+            maturityInstructionDetails.MIByDDPOIssuerCode = LeadData[0]["eqs_issuercode_maturity"].ToString();
+            maturityInstructionDetails.MIByDDPOPayeeName = LeadData[0]["eqs_payeename_maturity"].ToString();
+
+
+
+            FDRDDetails fDRDDetails = new FDRDDetails();
+            fDRDDetails.ProductDetails = productDetails;
+            fDRDDetails.DepositDetails = depositDetails;
+            fDRDDetails.InterestPayoutDetails = interestPayoutDetails;
+            fDRDDetails.MaturityInstructionDetails = maturityInstructionDetails;
+            this.AccountLeadReturn.FDRDDetails = fDRDDetails;
+
+
+            /****************** Direct Banking  ***********************/
+
+            DirectBanking directBanking = new DirectBanking();
+
+            directBanking.IssuedInstaKit = LeadData[0]["eqs_issuedinstakit"].ToString();
+            directBanking.ChequeBookRequired = LeadData[0]["eqs_chequebookrequired"].ToString();
+            directBanking.NumberChequeBook = LeadData[0]["eqs_numberofchequebook"].ToString();
+            directBanking.NumberofChequeLeaves = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_numberofchequeleavescode", LeadData[0]["eqs_numberofchequeleavescode"].ToString());
+            directBanking.DispatchMode = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_dispatchmodecode", LeadData[0]["eqs_dispatchmodecode"].ToString());
+            directBanking.Preferences = new List<Preference>();
+
+            var applicentPreferences = await this._commonFunc.getPreferences(LeadData[0]["eqs_ddeaccountid"].ToString());
+            foreach (var prefItem in applicentPreferences)
+            {
+                Preference preference = new Preference();
+
+                preference.PreferenceID = prefItem["eqs_preferenceid"].ToString();
+                preference.UCIC = await this._commonFunc.getUCIC(prefItem["_eqs_applicantid_value"].ToString());
+                preference.DebitCardID = await this._commonFunc.getDebitCard(prefItem["_eqs_debitcard_value"].ToString());
+
+                preference.DebitCardFlag = prefItem["eqs_debitcardflag"].ToString();
+                preference.NameonCard = prefItem["eqs_nameoncard"].ToString();
+               
+                preference.SMS = prefItem["eqs_sms"].ToString();
+                preference.NetBanking = prefItem["eqs_netbanking"].ToString();
+                preference.MobileBanking = prefItem["eqs_mobilebanking"].ToString();
+                preference.EmailStatement = prefItem["eqs_emailstatement"].ToString();
+                preference.InternationalDCLimitAct = prefItem["eqs_internationaldclimitact"].ToString();
+
+               
+                directBanking.Preferences.Add(preference);
             }
+           
 
-            _accountLead.productCategory = await this._commonFunc.getProductCategoryCode(LeadData[0]["_eqs_typeofaccountid_value"].ToString()); 
+            this.AccountLeadReturn.DirectBanking = directBanking;
 
-            _accountLead.LeadAccountID = LeadData[0]["eqs_crmleadaccountid"].ToString();
-            _accountLead.accountType =  await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_accountownershipcode", LeadData[0]["eqs_accountownershipcode"].ToString());
-            _accountLead.accountOpeningFlow =  await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_instakitoptioncode", LeadData[0]["eqs_instakitoptioncode"].ToString());
-            _accountLead.initialDepositType = await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_initialdepositmodecode", LeadData[0]["eqs_initialdepositmodecode"].ToString());
-            _accountLead.fdAccOpeningDate = LeadData[0]["eqs_fdvaluedate"].ToString();
-            _accountLead.tenureinmonths = LeadData[0]["eqs_tenureinmonths"].ToString();
-            _accountLead.tenureindays = LeadData[0]["eqs_tenureindays"].ToString();
-            _accountLead.fieldEmployeeCode = LeadData[0]["eqs_sourcebyemployeecode"].ToString();
-            _accountLead.applicationDate = LeadData[0]["eqs_applicationdate"].ToString();
-            _accountLead.fundsTobeDebitedFrom = LeadData[0]["eqs_fundstobedebitedfrom"].ToString();
-            _accountLead.mopRemarks = LeadData[0]["eqs_modeofoperationremarks"].ToString();
-            _accountLead.initialDeposit = (LeadData[0]["eqs_initialdepositamountcode"].ToString() == "789030000") ? "Up To Rs. 500000" : "Above Rs. 500000";
-            _accountLead.rateOfInterest = LeadData[0]["eqs_rateofinterest"].ToString();
-            _accountLead.depositAmount = LeadData[0]["eqs_depositamount"].ToString();
-            _accountLead.sweepFacility = Convert.ToBoolean(LeadData[0]["eqs_sweepfacility"].ToString());
 
+            /****************** Nominee  ***********************/
+
+            var nomineeobj = await this._commonFunc.getNomineDetails(LeadData[0]["eqs_ddeaccountid"].ToString());
+            
+
+            Nominee nominee = new Nominee();
+            nominee.nomineeUCICIfCustomer = nomineeobj[0]["eqs_nomineeucic"].ToString();
+            nominee.name = nomineeobj[0]["eqs_nomineename"].ToString();
+            
+            nominee.DOB = nomineeobj[0]["eqs_nomineedob"].ToString();
+            nominee.NomineeDisplayName = nomineeobj[0]["eqs_nomineedisplayname"].ToString();
+            nominee.AddresssameasProspects = nomineeobj[0]["eqs_guardianaddresssameasprospectaddress"].ToString();
+            nominee.email = nomineeobj[0]["eqs_emailid"].ToString();
+            nominee.mobile = nomineeobj[0]["eqs_mobile"].ToString();
+            nominee.Landline = nomineeobj[0]["eqs_landlinenumber"].ToString();
+            nominee.Address1 = nomineeobj[0]["eqs_addressline1"].ToString();
+            nominee.Address2 = nomineeobj[0]["eqs_addressline2"].ToString();
+            nominee.Address3 = nomineeobj[0]["eqs_addressline3"].ToString();
+            nominee.Pin = nomineeobj[0]["eqs_pincode"].ToString();           
+            nominee.District = nomineeobj[0]["eqs_district"].ToString();
+            nominee.PO = nomineeobj[0]["eqs_pobox"].ToString();
+            nominee.Landmark = nomineeobj[0]["eqs_landmark"].ToString();
+
+            nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
+            nominee.CityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
+            nominee.CountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
+            nominee.State = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
+
+            Guardian guardian = new Guardian();
+            guardian.Name = nomineeobj[0]["eqs_guardianname"].ToString();
+            guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"].ToString();
+            guardian.GuardianUCIC = nomineeobj[0]["eqs_guardianucic"].ToString();
+            guardian.GuardianMobile = nomineeobj[0]["eqs_guardianmobile"].ToString();
+            guardian.GuardianLandline = nomineeobj[0]["eqs_guardianlandlinenumber"].ToString();
+            guardian.GuardianAddress1 = nomineeobj[0]["eqs_guardianaddressline1"].ToString();
+            guardian.GuardianAddress2 = nomineeobj[0]["eqs_guardianaddressline2"].ToString();
+            guardian.GuardianAddress3 = nomineeobj[0]["eqs_guardianaddressline3"].ToString();
+            guardian.GuardianPin = nomineeobj[0]["eqs_guardianpincode"].ToString();
+            guardian.GuardianLandmark = nomineeobj[0]["eqs_guardianlandmark"].ToString();
+            guardian.GuardianPO = nomineeobj[0]["eqs_guardianpobox"].ToString();
+
+            guardian.GuardianCityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_guardiancity_value"].ToString());
+            guardian.GuardianDistrict = nomineeobj[0]["eqs_guardiandistrict"].ToString();
+            guardian.GuardianCountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_guardiancountry_value"].ToString());
+            guardian.GuardianState = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
+          
+            
+
+            nominee.Guardian = guardian;
+            this.AccountLeadReturn.Nominee = nominee;
 
             return true;      
 
         }
 
-        private async Task<bool> getApplicent()
-        {
-            var _leadAcDetails = await this._commonFunc.getApplicentsSetails(this.LeadAccountid);
-            foreach (var applicant in _leadAcDetails)
-            {
-                AccountApplicant _accountApplicant = new AccountApplicant();
-
-                _accountApplicant.applicantid = applicant["eqs_applicantid"].ToString();
-                _accountApplicant.UCIC = applicant["eqs_customer"].ToString();
-                _accountApplicant.title = await this._commonFunc.getTitleCode(applicant["_eqs_titleid_value"].ToString());
-                _accountApplicant.firstname = applicant["eqs_firstname"].ToString();
-                _accountApplicant.lastname = applicant["eqs_lastname"].ToString();
-                _accountApplicant.customerPhoneNumber = applicant["eqs_mobilenumber"].ToString();
-                _accountApplicant.customerEmailID = applicant["eqs_emailaddress"].ToString();
-                _accountApplicant.dob = applicant["eqs_dob"].ToString();
-                _accountApplicant.pan = applicant["eqs_pan"].ToString();
-                _accountApplicant.age = applicant["eqs_leadage"].ToString();
-                _accountApplicant.gender = await this._queryParser.getOptionSetValuToText("eqs_accountapplicant", "eqs_gendercode", applicant["eqs_gendercode"].ToString());
-
-                _accountApplicant.eqs_companynamepart1 = applicant["eqs_companynamepart1"].ToString();
-                _accountApplicant.eqs_companynamepart2 = applicant["eqs_companynamepart2"].ToString();
-                _accountApplicant.eqs_companynamepart3 = applicant["eqs_companynamepart3"].ToString();
-                _accountApplicant.eqs_dateofincorporation = applicant["eqs_dateofincorporation"].ToString();
-
-                _accountApplicant.entityType = await this._commonFunc.getEntityCode(applicant["_eqs_entitytypeid_value"].ToString()); 
-                _accountApplicant.subentityType = await this._commonFunc.getSubEntityCode(applicant["_eqs_subentity_value"].ToString());
-                if (!string.IsNullOrEmpty(applicant["_eqs_accountrelationship_value"].ToString()))
-                {
-                    _accountApplicant.customerAccountRelation = await this._commonFunc.getAccRelationshipCode(applicant["_eqs_accountrelationship_value"].ToString());
-                }
-               
-                _accountApplicant.isPrimaryHolder = (applicant["eqs_isprimaryholder"].ToString() == "789030001") ? true : false;
-                _accountApplicant.isStaff = applicant["eqs_isstaffcode"].ToString();
-
-                if (!string.IsNullOrEmpty(applicant["_eqs_relationship_value"].ToString()))
-                {
-                    _accountApplicant.relationToPrimaryHolder = await this._commonFunc.getRelationshipCode(applicant["_eqs_relationship_value"].ToString());
-                }
-
-                /*
-                var applicentPreferences = await this._commonFunc.getPreferences(applicant["eqs_accountapplicantid"].ToString());
-
-                if (applicentPreferences.Count > 0)
-                {
-                    Preferences preferences = new Preferences();
-
-                    preferences.sms = Convert.ToBoolean(applicentPreferences[0]["eqs_sms"].ToString());
-                    preferences.allSMSAlerts = Convert.ToBoolean(applicentPreferences[0]["eqs_allsmsalerts"].ToString());
-                    preferences.onlyTransactionAlerts = Convert.ToBoolean(applicentPreferences[0]["eqs_onlytransactionalerts"].ToString());
-                    preferences.passbook = Convert.ToBoolean(applicentPreferences[0]["eqs_passbook"].ToString());
-                    preferences.physicalStatement = Convert.ToBoolean(applicentPreferences[0]["eqs_physicalstatement"].ToString());
-                    preferences.emailStatement = Convert.ToBoolean(applicentPreferences[0]["eqs_emailstatement"].ToString());
-                    preferences.netBanking = Convert.ToBoolean(applicentPreferences[0]["eqs_netbanking"].ToString());
-                    preferences.bankGuarantee = Convert.ToBoolean(applicentPreferences[0]["eqs_bankguarantee"].ToString());
-                    preferences.letterofCredit = Convert.ToBoolean(applicentPreferences[0]["eqs_letterofcredit"].ToString());
-                    preferences.businessLoan = Convert.ToBoolean(applicentPreferences[0]["eqs_businessloan"].ToString());
-                    preferences.doorStepBanking = Convert.ToBoolean(applicentPreferences[0]["eqs_doorstepbanking"].ToString());
-                    preferences.doorStepBankingOnCall = Convert.ToBoolean(applicentPreferences[0]["eqs_doorstepbankingoncall"].ToString());
-                    preferences.doorStepBankingBeat = Convert.ToBoolean(applicentPreferences[0]["eqs_doorstepbankingbeat"].ToString());
-                    preferences.tradeForex = Convert.ToBoolean(applicentPreferences[0]["eqs_tradeforex"].ToString());
-                    preferences.loanAgainstProperty = Convert.ToBoolean(applicentPreferences[0]["eqs_loanagainstproperty"].ToString());
-                    preferences.overdraftsagainstFD = Convert.ToBoolean(applicentPreferences[0]["eqs_overdraftagainstfd"].ToString());
-                    preferences.preferencesCopied = Convert.ToBoolean(applicentPreferences[0]["eqs_preferencescopied"].ToString());
-                    preferences.bankLevelAlerts = Convert.ToBoolean(applicentPreferences[0]["eqs_banklevelalerts"].ToString());
-                 
-
-                    _accountApplicant.preferences = preferences;
-                }
-                */
-
-                _accountApplicants.Add(_accountApplicant);
-
-
-            }
-
        
-            return true;
-
-        }
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -342,9 +381,7 @@
         }
 
                
-                
-
-
+             
         public async Task<string> EncriptRespons(string ResponsData)
         {
             return await _queryParser.PayloadEncryption(ResponsData, Transaction_ID, this.Bank_Code);

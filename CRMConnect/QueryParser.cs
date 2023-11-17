@@ -583,7 +583,7 @@
             catch(Exception ex)
             {
                 this._log.LogError("getOptionSetTextToValue", ex.Message,$"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionText}");
-                return "";
+                return null;
             }
            
             
@@ -628,7 +628,7 @@
             catch (Exception ex)
             {               
                 this._log.LogError("getOptionSetValuToText", ex.Message, $"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionValue}");
-                return "";
+                return null;
             }
 
         }

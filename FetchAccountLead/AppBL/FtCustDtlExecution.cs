@@ -64,11 +64,7 @@
         private string Leadid, LeadAccountid;
 
         private List<string> applicents = new List<string>();
-        private LeadAccount _accountLead;
-        private LeadDetails _leadParam;
-        private List<AccountApplicant> _accountApplicants;
-
-              
+                     
      
         Dictionary<string, string> genderc = new Dictionary<string, string>();
 
@@ -83,11 +79,7 @@
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
 
-            _leadParam = new LeadDetails();
-            _accountLead = new LeadAccount();
-            _accountApplicants = new List<AccountApplicant>();
-
-           
+                    
 
         }
 
