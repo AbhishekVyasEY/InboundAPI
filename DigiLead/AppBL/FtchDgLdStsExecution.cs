@@ -166,7 +166,7 @@
                         csRtPrm.individualDetails.PAN = LeadData.eqs_internalpan;
                         csRtPrm.individualDetails.motherMaidenName = LeadData.eqs_mothermaidenname;
                         csRtPrm.individualDetails.identityType = (!string.IsNullOrEmpty(LeadData.eqs_panform60code.ToString())) ? this.IdentityType[LeadData.eqs_panform60code.ToString()] : "";
-                        csRtPrm.individualDetails.NLFound = LeadData.eqs_nlmatchcode;
+                        csRtPrm.individualDetails.NLFound = await this._queryParser.getOptionSetValuToText("lead", "eqs_nlmatchcode", LeadData.eqs_nlmatchcode.ToString());
                         csRtPrm.individualDetails.reasonNotApplicable = LeadData.eqs_reasonforna;
                         csRtPrm.individualDetails.voterid = LeadData.eqs_voterid;
                         csRtPrm.individualDetails.drivinglicense = LeadData.eqs_dlnumber;
@@ -202,7 +202,7 @@
                         csRtPrm.corporateDetails.cinNumber = LeadData.eqs_cinnumber;
                         csRtPrm.corporateDetails.dateOfIncorporation = LeadData.eqs_dateofincorporation;                
                         csRtPrm.corporateDetails.tanNumber = LeadData.eqs_tannumber;
-                        csRtPrm.corporateDetails.NLFound = LeadData.eqs_nlmatchcode;
+                        csRtPrm.corporateDetails.NLFound = await this._queryParser.getOptionSetValuToText("lead", "eqs_nlmatchcode", LeadData.eqs_nlmatchcode.ToString());
                         csRtPrm.corporateDetails.identityType = (!string.IsNullOrEmpty(LeadData.eqs_panform60code.ToString())) ? this.IdentityType[LeadData.eqs_panform60code.ToString()] : "";
                         csRtPrm.corporateDetails.gstNumber = LeadData.eqs_gstnumber;
                         csRtPrm.corporateDetails.alternateMandatoryCheck = (LeadData.eqs_deferalcode.ToString()== "615290000") ? "Yes" : "No";
