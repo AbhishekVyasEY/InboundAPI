@@ -233,8 +233,11 @@ namespace CreateLeads
                     ldProperty.ProductId = productDetails["ProductId"];
                     ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
                     ldProperty.Productcategoryid = productDetails["productcategory"];
-                    lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
 
+                    if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                    {
+                        lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                    }
                     if (ldProperty.ProductId != "")
                     {
                         lead_Property.firstname = LeadData.FirstName;
@@ -649,11 +652,17 @@ namespace CreateLeads
                         ldRtPrm.ReturnCode = "CRM - SUCCESS";
                         ldRtPrm.Message = OutputMSG.Lead_Success;
                     }
+                    else if (respons_code.responsecode == 400)
+                    {
+                        this._logger.LogInformation("CreateLead", JsonConvert.SerializeObject(Lead_details));
+                        ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                        ldRtPrm.Message = $"Lead creation failed.{respons_code.responsebody.error.message.ToString()}";
+                    }
                     else
                     {
                         this._logger.LogInformation("CreateLead", JsonConvert.SerializeObject(Lead_details));
                         ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                        ldRtPrm.Message = "Lead creation failed";
+                        ldRtPrm.Message = "Lead creation failed.";
                     }
                 }
                 else
