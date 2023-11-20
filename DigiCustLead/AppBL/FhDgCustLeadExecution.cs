@@ -375,7 +375,11 @@
                     csRtPrm.RMDetails = rm;
 
                     /*********** FATCA *********/
-                    FATCA fATCAobj = new FATCA();
+                    FATCA fATCA = new FATCA();
+                    fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
+                    fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+
+                    FATCADetails fATCAobj = new FATCADetails();
                     dynamic fatcaDetail = await this._commonFunc.getDDEFinalFatcaDetail(DDEDetails[0].eqs_ddeindividualcustomerid.ToString(), "indv");
                     foreach (var fatcaitem in fatcaDetail)
                     {
@@ -422,8 +426,10 @@
                             fATCAobj.Address = fATCAAddress;
                         }
 
-                        csRtPrm.fatca = fATCAobj;
+                        fATCA.FATCADetails = fATCAobj;                       
                     }
+                    csRtPrm.fatca = fATCA;
+
 
                     /*********** NRI Details *********/
                     NRIDetails nRIDetails = new NRIDetails();
@@ -618,7 +624,12 @@
 
 
                     /*********** FATCA *********/
-                    FATCA fATCAobj = new FATCA();
+
+                    FATCA fATCA = new FATCA();
+                    fATCA.TaxResident = DDEDetails[0].eqs_taxresident.ToString();
+                    fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+
+                    FATCADetails fATCAobj = new FATCADetails();
                     dynamic fatcaDetail = await this._commonFunc.getDDEFinalFatcaDetail(DDEDetails[0].eqs_ddecorporatecustomerid.ToString(), "corp");
                     foreach (var fatcaitem in fatcaDetail)
                     {
@@ -665,11 +676,12 @@
                             fATCAobj.Address = fATCAAddress;
                         }
 
-                        csRtPrm.fatca = fATCAobj;
+                        fATCA.FATCADetails = fATCAobj;
+                        
                     }
 
 
-
+                    csRtPrm.fatca = fATCA;
 
                     /*********** Point Of Contact *********/
                     PointOfContact pointOfContact = new PointOfContact();
