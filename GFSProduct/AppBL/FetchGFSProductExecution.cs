@@ -189,9 +189,17 @@
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_customersegment"].ToString()) && applicentDetails[0]["eqs_customersegment"].ToString() == "789030002")
+                    //if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_customersegment"].ToString()) && applicentDetails[0]["eqs_customersegment"].ToString() == "789030002")
+                    //{
+                    //    product_Filter.customerSegment = "elite";
+                    //}
+
+                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_program"].ToString()))
                     {
-                        product_Filter.customerSegment = "elite";
+                        if ((applicentDetails[0]["eqs_program"].ToString() == "789030001") || (applicentDetails[0]["eqs_program"].ToString() == "789030002"))
+                        {
+                            product_Filter.customerSegment = "elite";
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstafffcode"].ToString()) && applicentDetails[0]["eqs_isstafffcode"].ToString() == "789030001")
