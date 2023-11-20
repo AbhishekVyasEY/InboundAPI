@@ -314,54 +314,53 @@
             /****************** Nominee  ***********************/
 
             var nomineeobj = await this._commonFunc.getNomineDetails(LeadData[0]["eqs_ddeaccountid"].ToString());
-            
 
-            Nominee nominee = new Nominee();
-            nominee.nomineeUCICIfCustomer = nomineeobj[0]["eqs_nomineeucic"].ToString();
-            nominee.name = nomineeobj[0]["eqs_nomineename"].ToString();
-            
-            nominee.DOB = nomineeobj[0]["eqs_nomineedob"].ToString();
-            nominee.NomineeDisplayName = nomineeobj[0]["eqs_nomineedisplayname"].ToString();
-            nominee.AddresssameasProspects = nomineeobj[0]["eqs_guardianaddresssameasprospectaddress"].ToString();
-            nominee.email = nomineeobj[0]["eqs_emailid"].ToString();
-            nominee.mobile = nomineeobj[0]["eqs_mobile"].ToString();
-            nominee.Landline = nomineeobj[0]["eqs_landlinenumber"].ToString();
-            nominee.Address1 = nomineeobj[0]["eqs_addressline1"].ToString();
-            nominee.Address2 = nomineeobj[0]["eqs_addressline2"].ToString();
-            nominee.Address3 = nomineeobj[0]["eqs_addressline3"].ToString();
-            nominee.Pin = nomineeobj[0]["eqs_pincode"].ToString();           
-            nominee.District = nomineeobj[0]["eqs_district"].ToString();
-            nominee.PO = nomineeobj[0]["eqs_pobox"].ToString();
-            nominee.Landmark = nomineeobj[0]["eqs_landmark"].ToString();
+            if (nomineeobj.Count > 0)
+            {
+                Nominee nominee = new Nominee();
+                nominee.nomineeUCICIfCustomer = nomineeobj[0]["eqs_nomineeucic"].ToString();
+                nominee.name = nomineeobj[0]["eqs_nomineename"].ToString();
 
-            nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
-            nominee.CityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
-            nominee.CountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
-            nominee.State = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
+                nominee.DOB = nomineeobj[0]["eqs_nomineedob"].ToString();
+                nominee.NomineeDisplayName = nomineeobj[0]["eqs_nomineedisplayname"].ToString();
+                nominee.AddresssameasProspects = nomineeobj[0]["eqs_guardianaddresssameasprospectaddress"].ToString();
+                nominee.email = nomineeobj[0]["eqs_emailid"].ToString();
+                nominee.mobile = nomineeobj[0]["eqs_mobile"].ToString();
+                nominee.Landline = nomineeobj[0]["eqs_landlinenumber"].ToString();
+                nominee.Address1 = nomineeobj[0]["eqs_addressline1"].ToString();
+                nominee.Address2 = nomineeobj[0]["eqs_addressline2"].ToString();
+                nominee.Address3 = nomineeobj[0]["eqs_addressline3"].ToString();
+                nominee.Pin = nomineeobj[0]["eqs_pincode"].ToString();
+                nominee.District = nomineeobj[0]["eqs_district"].ToString();
+                nominee.PO = nomineeobj[0]["eqs_pobox"].ToString();
+                nominee.Landmark = nomineeobj[0]["eqs_landmark"].ToString();
 
-            Guardian guardian = new Guardian();
-            guardian.Name = nomineeobj[0]["eqs_guardianname"].ToString();
-            guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"].ToString();
-            guardian.GuardianUCIC = nomineeobj[0]["eqs_guardianucic"].ToString();
-            guardian.GuardianMobile = nomineeobj[0]["eqs_guardianmobile"].ToString();
-            guardian.GuardianLandline = nomineeobj[0]["eqs_guardianlandlinenumber"].ToString();
-            guardian.GuardianAddress1 = nomineeobj[0]["eqs_guardianaddressline1"].ToString();
-            guardian.GuardianAddress2 = nomineeobj[0]["eqs_guardianaddressline2"].ToString();
-            guardian.GuardianAddress3 = nomineeobj[0]["eqs_guardianaddressline3"].ToString();
-            guardian.GuardianPin = nomineeobj[0]["eqs_guardianpincode"].ToString();
-            guardian.GuardianLandmark = nomineeobj[0]["eqs_guardianlandmark"].ToString();
-            guardian.GuardianPO = nomineeobj[0]["eqs_guardianpobox"].ToString();
+                nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
+                nominee.CityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
+                nominee.CountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
+                nominee.State = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
 
-            guardian.GuardianCityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_guardiancity_value"].ToString());
-            guardian.GuardianDistrict = nomineeobj[0]["eqs_guardiandistrict"].ToString();
-            guardian.GuardianCountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_guardiancountry_value"].ToString());
-            guardian.GuardianState = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
-          
-            
+                Guardian guardian = new Guardian();
+                guardian.Name = nomineeobj[0]["eqs_guardianname"].ToString();
+                guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"].ToString();
+                guardian.GuardianUCIC = nomineeobj[0]["eqs_guardianucic"].ToString();
+                guardian.GuardianMobile = nomineeobj[0]["eqs_guardianmobile"].ToString();
+                guardian.GuardianLandline = nomineeobj[0]["eqs_guardianlandlinenumber"].ToString();
+                guardian.GuardianAddress1 = nomineeobj[0]["eqs_guardianaddressline1"].ToString();
+                guardian.GuardianAddress2 = nomineeobj[0]["eqs_guardianaddressline2"].ToString();
+                guardian.GuardianAddress3 = nomineeobj[0]["eqs_guardianaddressline3"].ToString();
+                guardian.GuardianPin = nomineeobj[0]["eqs_guardianpincode"].ToString();
+                guardian.GuardianLandmark = nomineeobj[0]["eqs_guardianlandmark"].ToString();
+                guardian.GuardianPO = nomineeobj[0]["eqs_guardianpobox"].ToString();
 
-            nominee.Guardian = guardian;
-            this.AccountLeadReturn.Nominee = nominee;
+                guardian.GuardianCityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_guardiancity_value"].ToString());
+                guardian.GuardianDistrict = nomineeobj[0]["eqs_guardiandistrict"].ToString();
+                guardian.GuardianCountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_guardiancountry_value"].ToString());
+                guardian.GuardianState = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
 
+                nominee.Guardian = guardian;
+                this.AccountLeadReturn.Nominee = nominee;
+            }
             return true;      
 
         }
