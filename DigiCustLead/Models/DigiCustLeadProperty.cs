@@ -319,6 +319,13 @@ namespace DigiCustLead
     }
     public class FATCA
     {
+        public string TaxResident { get; set; }
+        public string CityofBirth { get; set; }
+
+        public FATCADetails FATCADetails { get; set; }
+    }
+    public class FATCADetails
+    {
         public string FATCAID { get; set; }
         public string TaxResident { get; set; }
         public string CityofBirth { get; set; }
