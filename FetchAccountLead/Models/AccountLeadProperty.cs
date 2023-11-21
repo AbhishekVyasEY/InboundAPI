@@ -3,9 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace FetchAccountLead
 {
-       
-   
-    
     public class FtAccountLeadReturn
     {
         public General General { get; set; }
@@ -13,7 +10,7 @@ namespace FetchAccountLead
         public FDRDDetails FDRDDetails { get; set; }
         public DirectBanking DirectBanking { get; set; }
         public Nominee Nominee { get; set; }
-        public string ReturnCode { get; set; } 
+        public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
@@ -215,23 +212,4 @@ namespace FetchAccountLead
         public string GuardianPO { get; set; }
         public string GuardianLandmark { get; set; }
     }
-
-
-   
-
-
-
-    public class FetchCustomerDtlReturn
-    {
-        
-        public string ReturnCode { get; set; }
-        public string Message { get; set; }
-        public string TransactionID { get; set; }
-        public string ExecutionTime { get; set; }
-
-    }
-
-
-
-
 }

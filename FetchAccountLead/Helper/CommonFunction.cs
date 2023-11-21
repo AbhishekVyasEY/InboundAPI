@@ -1,19 +1,19 @@
 ﻿namespace FetchAccountLead
 {
 
-using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Identity.Client;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Diagnostics.Metrics;
-using CRMConnect;
+    using Microsoft.Extensions.Caching.Memory;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Identity.Client;
+    using Microsoft.AspNetCore.Http;
+    using Newtonsoft.Json.Linq;
+    using System.Net;
+    using System.Diagnostics.Metrics;
+    using CRMConnect;
 
 
     public class CommonFunction : ICommonFunction
@@ -58,13 +58,13 @@ using CRMConnect;
             {
                 return ex.Message;
             }
-            
+
         }
 
         public static string GetIdFromPostRespons(string PResponseData)
         {
-           
-           string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
+
+            string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
             return Respons_Id;
         }
 
@@ -74,7 +74,7 @@ using CRMConnect;
             return Respons_Id;
         }
 
-        public async Task<string> getIDFromGetResponce(string primaryField ,List<JObject> RsponsData)
+        public async Task<string> getIDFromGetResponce(string primaryField, List<JObject> RsponsData)
         {
             string resourceID = "";
             foreach (JObject item in RsponsData)
@@ -114,7 +114,7 @@ using CRMConnect;
                     }
                 }
             }
-                return resourceID;
+            return resourceID;
         }
 
         public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
@@ -190,7 +190,7 @@ using CRMConnect;
         {
             return await this.getIDfromMSDTable("eqs_products", "eqs_productcode", "eqs_productid", Productid);
         }
-        
+
         public async Task<string> getProductCategoryCode(string Productcatid)
         {
             return await this.getIDfromMSDTable("eqs_productcategories", "eqs_productcategorycode", "eqs_productcategoryid", Productcatid);
@@ -214,20 +214,25 @@ using CRMConnect;
         {
             return await this.getIDfromMSDTable("eqs_cities", "eqs_citycode", "eqs_cityid", city_id);
         }
-        
-        
+
+
         public async Task<string> getUCIC(string accountapplicant_id)
         {
             return await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_customer", "eqs_accountapplicantid", accountapplicant_id);
         }
         public async Task<string> getDebitCard(string DebitCardId)
         {
-            return await this.getIDfromMSDTable("eqs_debitcards", "eqs_cardid", "eqs_debitcardid",  DebitCardId);
+            return await this.getIDfromMSDTable("eqs_debitcards", "eqs_cardid", "eqs_debitcardid", DebitCardId);
         }
 
         public async Task<string> getTitleCode(string title_id)
         {
             return await this.getIDfromMSDTable("eqs_titles", "eqs_name", "eqs_titleid", title_id);
+        }
+
+        public async Task<string> getPurposeOfCreation(string id)
+        {
+            return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", id);
         }
 
         public async Task<JArray> getNomineDetails(string DDEId)
@@ -261,7 +266,7 @@ using CRMConnect;
                 throw ex;
             }
         }
-        
+
         public async Task<JArray> getPreferences(string DDeid)
         {
             try
@@ -278,7 +283,7 @@ using CRMConnect;
             }
         }
 
-        
+
 
         public async Task<JArray> getLeadDetails(string Lead_id)
         {
@@ -296,7 +301,53 @@ using CRMConnect;
             }
         }
 
-       
+        public async Task<JArray> getCustomerDetails(string filterkey, string filtervalue)
+        {
+            try
+            {
+                string query_url = $"contacts()?$filter={filterkey} eq '{filtervalue}'";
+                var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
+                return Customer_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCustomerDetails", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getAccountRelationshipDetails(string CustomerID, string AccountNumber)
+        {
+            try
+            {
+                string query_url = $"eqs_accountrelationships()?$filter=eqs_name eq '{AccountNumber}' and eqs_customerid eq '{CustomerID}'";
+                var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
+                return Customer_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getAccountDetails", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getServiceDetails(string customerid, string accountid)
+        {
+            try
+            {
+                string query_url = $"eqs_doorstepregistries()?$expand=eqs_CashDeliveryLimit($select=eqs_name),eqs_CashPickupLimit($select=eqs_name),eqs_VendorLocationCashDelivery($select=eqs_name),eqs_VendorLocationCashPickup($select=eqs_name),eqs_VendorLocationChequePickup($select=eqs_name),eqs_VendorCashDelivery($select=eqs_vendorid,eqs_name),eqs_VendorCashPickup($select=eqs_vendorid,eqs_name),eqs_VendorChequePickup($select=eqs_vendorid,eqs_name)&$filter=_eqs_customer_value eq '{customerid}' and _eqs_account_value eq '{accountid}'";
+                var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
+                return Customer_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getAccountDetails", ex.Message);
+                throw ex;
+            }
+        }
 
         public async Task<string> MeargeJsonString(string json1, string json2)
         {

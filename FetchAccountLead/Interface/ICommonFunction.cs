@@ -23,9 +23,12 @@ namespace FetchAccountLead
         public Task<JArray> getLeadDetails(string contact_id);
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
         public Task<JArray> getLeadAccountDetails(string LdApplicantId);
+        public Task<JArray> getCustomerDetails(string filterkey, string filtervalue);
+        public Task<JArray> getAccountRelationshipDetails(string CustomerID, string AccountNumber);
+        public Task<JArray> getServiceDetails(string customerid, string accountid);
+        public Task<string> getPurposeOfCreation(string id);
         public Task<string> MeargeJsonString(string json1, string json2);
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);
-
     }
 }
