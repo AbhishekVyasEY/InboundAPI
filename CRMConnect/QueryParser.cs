@@ -46,7 +46,7 @@
             this._errorLogger = loggers;
         }
 
-        public async Task<List<JObject>> HttpApiCall(string odataQuery, HttpMethod httpMethod, string parameterToPost = "")
+        public async Task<List<JObject>> HttpApiCall(string odataQuery, HttpMethod httpMethod, string parameterToPost = "", bool isFormattedValueRequired = false)
         {
             try
             {
@@ -59,11 +59,11 @@
                
                 if (!string.IsNullOrEmpty(parameterToPost))
                 {
-                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, 1, parameterToPost));
+                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, 1, parameterToPost, isFormattedValueRequired));
                 }
                 else
                 {
-                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log));
+                    odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, isFormattedValueRequired: isFormattedValueRequired));
                 }
 
                 odataRequestforChild.ForEach(x =>
@@ -132,7 +132,7 @@
         }
 
 
-        public HttpMessageContent CreateHttpMessageContent(HttpMethod httpMethod, string requestUri, ILogger log, int contentId = 0, string content = null, bool isUpsert = false)
+        public HttpMessageContent CreateHttpMessageContent(HttpMethod httpMethod, string requestUri, ILogger log, int contentId = 0, string content = null, bool isFormattedValueRequired = false)
         {
             try
             {
@@ -146,6 +146,8 @@
                 if (httpMethod == HttpMethod.Get)
                 {
                     requestMessage.Headers.Add("Accept", "application/json");
+                    if (isFormattedValueRequired)
+                        requestMessage.Headers.Add("Prefer", "odata.include-annotations=*");
                 }
                 else if (httpMethod == HttpMethod.Delete)
                 {

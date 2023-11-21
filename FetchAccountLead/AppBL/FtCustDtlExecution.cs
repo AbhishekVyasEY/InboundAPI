@@ -49,37 +49,42 @@
 
         public string appkey { set; get; }
 
-        public string API_Name { set
+        public string API_Name
+        {
+            set
             {
                 _logger.API_Name = value;
             }
         }
-        public string Input_payload { set {
+        public string Input_payload
+        {
+            set
+            {
                 _logger.Input_payload = value;
-            } 
+            }
         }
 
         private readonly IKeyVaultService _keyVaultService;
 
-        private string Leadid, LeadAccountid;
+        private string customerid, accountid;
 
         private List<string> applicents = new List<string>();
-                     
-     
+
+
         Dictionary<string, string> genderc = new Dictionary<string, string>();
 
         private ICommonFunction _commonFunc;
 
         public FtCustDtlExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
         {
-                    
+
             this._logger = logger;
-            
+
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
 
-                    
+
 
         }
 
@@ -89,28 +94,36 @@
             FetchCustomerDtlReturn ldRtPrm = new FetchCustomerDtlReturn();
             RequestData = await this.getRequestData(RequestData, "FetchCustomerDetails");
             try
-            { 
+            {
 
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "FetchCustomerDetailsappkey"))
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
-                        
-                        if (!string.IsNullOrEmpty(RequestData.AccountLeadId.ToString()))
+
+                        if (!string.IsNullOrEmpty(RequestData.CustomerID.ToString()))
                         {
-                            ldRtPrm = await this.FetCustomerDtl(RequestData.AccountLeadId.ToString());
+                            string accountnumber = string.Empty;
+                            if (!string.IsNullOrEmpty(RequestData.AccountNumber))
+                            {
+                                accountnumber = RequestData.AccountNumber.ToString();
+                            }
+                            ldRtPrm = await this.FetCustomerDtl(RequestData.CustomerID.ToString(), accountnumber);
+
+                            ldRtPrm.ReturnCode = "CRM-SUCCESS";
+                            ldRtPrm.Message = OutputMSG.Case_Success;
                         }
                         else
                         {
-                            this._logger.LogInformation("ValidateLeadtInput", "Account LeadId is incorrect");
+                            this._logger.LogInformation("ValidateLeadtInput", "Customer ID is incorrect");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = "Account LeadId is incorrect";
+                            ldRtPrm.Message = "Customer ID is incorrect";
                         }
-                        
+
                     }
                     else
                     {
-                        this._logger.LogInformation("ValidateLeadtInput", "Transaction_ID or  Channel_ID is incorrect.");
+                        this._logger.LogInformation("ValidateLeadtInput", "Transaction_ID or Channel_ID is incorrect.");
                         ldRtPrm.ReturnCode = "CRM-ERROR-102";
                         ldRtPrm.Message = "Transaction_ID or  Channel_ID is incorrect.";
                     }
@@ -129,23 +142,146 @@
                 this._logger.LogError("ValidateLeadtInput", ex.Message);
                 throw ex;
             }
-            
+
         }
 
 
-        private async Task<FetchCustomerDtlReturn> FetCustomerDtl(string LeadAccountId)
+        private async Task<FetchCustomerDtlReturn> FetCustomerDtl(string CustomerID, string AccountNumber)
         {
-            FetchCustomerDtlReturn accountLeadReturn = new FetchCustomerDtlReturn();
+            FetchCustomerDtlReturn customerDetailReturn = new FetchCustomerDtlReturn();
 
-            
+            var CuatomerDetails = await this._commonFunc.getCustomerDetails("eqs_customerid", CustomerID);
+            if (CuatomerDetails.Count > 0)
+            {
+                customerDetailReturn.General = new GeneralDetails();
 
-            
+                //Logic for Minor
+                if (!string.IsNullOrEmpty(CuatomerDetails[0]["birthdate"].ToString()))
+                {
+                    int years = GetAgeInYears(CuatomerDetails[0]["birthdate"].ToString());
+                    if (years < 18)
+                        customerDetailReturn.General.IsMinor = "Yes";
+                    else
+                        customerDetailReturn.General.IsMinor = "No";
+                }
 
-            return accountLeadReturn;
+                customerDetailReturn.General.IsMFICustomer = CuatomerDetails[0]["eqs_ismficustomer"].ToString();
+                customerDetailReturn.General.NPAClassification = CuatomerDetails[0]["eqs_npaclassification"].ToString();
+                customerDetailReturn.General.PANVerifiedStatus = CuatomerDetails[0]["eqs_panverifiedstatus"].ToString();
+                customerDetailReturn.General.IsDeferral = CuatomerDetails[0]["eqs_isdeferral"].ToString();
+                customerDetailReturn.General.PoliticallyExposedPerson = CuatomerDetails[0]["eqs_politicallyexposedperson"].ToString();
+                customerDetailReturn.General.NRIKYCMode = CuatomerDetails[0]["eqs_nrikycmode"].ToString();
+                customerDetailReturn.General.NRIMobileNoPref = CuatomerDetails[0]["eqs_nrimobilenopref"].ToString();
+                customerDetailReturn.General.AlternateMandatoryCheck = CuatomerDetails[0]["eqs_alternatemandatorycheck"].ToString();
+                customerDetailReturn.General.NPO = CuatomerDetails[0]["eqs_npoflag"].ToString();
+                customerDetailReturn.General.EntityFlag = CuatomerDetails[0]["eqs_entityflag"].ToString();
+                customerDetailReturn.General.EntityKey = CuatomerDetails[0]["eqs_subentitykey"].ToString();
+
+                //Lookup
+                customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"].ToString();
+
+                //Option set
+                customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"].ToString();
+                customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
+
+                if (!string.IsNullOrEmpty(AccountNumber))
+                {
+                    var AccountRelDetails = await this._commonFunc.getAccountRelationshipDetails(CustomerID, AccountNumber);
+                    if (AccountRelDetails.Count > 0)
+                    {
+                        customerDetailReturn.CustomerPreferences = new CustomerPreferences();
+                        customerDetailReturn.CustomerPreferences.NetBanking = AccountRelDetails[0]["eqs_netbanking"].ToString();
+                        customerDetailReturn.CustomerPreferences.MobileBanking = AccountRelDetails[0]["eqs_mobilebanking"].ToString();
+                        customerDetailReturn.CustomerPreferences.SMS = AccountRelDetails[0]["eqs_smstwo"].ToString();
+                        customerDetailReturn.CustomerPreferences.AllSMSAlerts = (!Convert.ToBoolean(AccountRelDetails[0]["eqs_onlytransactionalerts"].ToString())).ToString();
+                        customerDetailReturn.CustomerPreferences.PhysicalStatement = AccountRelDetails[0]["eqs_physicalstatement"].ToString();
+                        customerDetailReturn.CustomerPreferences.EmailStatement = AccountRelDetails[0]["eqs_emailstatement"].ToString();
+
+                        this.customerid = AccountRelDetails[0]["_eqs_customeridvalue_value"].ToString();
+                        this.accountid = AccountRelDetails[0]["_eqs_accountid_value"].ToString();
+                        //Add Beat and OnCall Service Details
+                        var ServiceDetails = await this._commonFunc.getServiceDetails(customerid, accountid);
+                        if (ServiceDetails.Count > 0)
+                        {
+                            customerDetailReturn.DSBServiceDetails = new List<ServiceDetails>();
+                            var servicedetail = ServiceDetails[0];
+
+                            ServiceDetails item = new ServiceDetails();
+                            if (!string.IsNullOrEmpty(servicedetail["eqs_cashpickup"].ToString()))
+                            {
+                                item.ServiceName = "Cash Pickup";
+                                item.IsRegistered = "Yes";
+                                item.ServiceType = servicedetail["eqs_cashpickup@OData.Community.Display.V1.FormattedValue"].ToString().Substring(0, 1);
+                                item.Limit = servicedetail["_eqs_cashpickuplimit_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                                item.VendorID = servicedetail["eqs_VendorCashPickup"]["eqs_vendorid"].ToString();
+                                item.VendorName = servicedetail["eqs_VendorCashPickup"]["eqs_name"].ToString();
+                                item.Location = servicedetail["_eqs_vendorlocationcashpickup_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                            }
+                            else
+                            {
+                                item.ServiceName = "Cash Pickup";
+                                item.IsRegistered = "No";
+                            }
+                            customerDetailReturn.DSBServiceDetails.Add(item);
+
+                            item = new ServiceDetails();
+                            if (!string.IsNullOrEmpty(servicedetail["eqs_cashdelivery"].ToString()))
+                            {
+                                item.ServiceName = "Cash Delivery";
+                                item.IsRegistered = "Yes";
+                                item.ServiceType = servicedetail["eqs_cashdelivery@OData.Community.Display.V1.FormattedValue"].ToString().Substring(0, 1);
+                                item.Limit = servicedetail["_eqs_cashdeliverylimit_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                                item.VendorID = servicedetail["eqs_VendorCashDelivery"]["eqs_vendorid"].ToString();
+                                item.VendorName = servicedetail["eqs_VendorCashDelivery"]["eqs_name"].ToString();
+                                item.Location = servicedetail["_eqs_vendorlocationcashdelivery_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                            }
+                            else
+                            {
+                                item.ServiceName = "Cash Delivery";
+                                item.IsRegistered = "No";
+                            }
+                            customerDetailReturn.DSBServiceDetails.Add(item);
+
+                            item = new ServiceDetails();
+                            if (!string.IsNullOrEmpty(servicedetail["eqs_chequepickup"].ToString()))
+                            {
+                                item.ServiceName = "Cheque Pickup";
+                                item.IsRegistered = "Yes";
+                                item.ServiceType = servicedetail["eqs_chequepickup@OData.Community.Display.V1.FormattedValue"].ToString().Substring(0, 1);
+                                item.VendorID = servicedetail["eqs_VendorChequePickup"]["eqs_vendorid"].ToString();
+                                item.VendorName = servicedetail["eqs_VendorChequePickup"]["eqs_name"].ToString();
+                                item.Location = servicedetail["_eqs_vendorlocationchequepickup_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                            }
+                            else
+                            {
+                                item.ServiceName = "Cheque Pickup";
+                                item.IsRegistered = "No";
+                            }
+                            customerDetailReturn.DSBServiceDetails.Add(item);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                customerDetailReturn.ReturnCode = "CRM-ERROR-101";
+                customerDetailReturn.Message = OutputMSG.Resource_n_Found;
+            }
+
+            return customerDetailReturn;
         }
 
+        private int GetAgeInYears(string dobstring)
+        {
+            int yy = Convert.ToInt32(dobstring.Substring(0, 4));
+            int mm = Convert.ToInt32(dobstring.Substring(5, 2));
+            int dd = Convert.ToInt32(dobstring.Substring(8, 2));
+            DateTime dob = new DateTime(yy, mm, dd);
+            TimeSpan diff = DateTime.Today - dob;
 
-     
+            DateTime zerodate = new DateTime(1, 1, 1);
+            return (zerodate + diff).Year - 1;
+        }
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -159,8 +295,8 @@
             }
         }
 
-               
-                
+
+
 
 
         public async Task<string> EncriptRespons(string ResponsData)
