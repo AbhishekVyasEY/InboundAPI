@@ -177,19 +177,19 @@
                 Request_Template.searchOrUpdateDigiDedupeCustomerReq.msgBdy = msgBdy;
 
                 string request_body = JsonConvert.SerializeObject(Request_Template);
-               
+                this._logger.LogInformation("getCustomerLead", request_body,"B4 calling CBS API");
                 string postDataParametr = await EncriptRespons(request_body, "FI0060");
                 string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSsearchOrUpdateDedupeCustomer", postDataParametr);
                 //string Lead_details = "{\"searchOrUpdateDigiDedupeCustomerRes\":{\"msgHdr\":{\"result\":\"OK\"},\"msgBdy\":{\"REQUEST_ID\":\"1051065\",\"STATUS\":\"C\",\"RESPONSE_CODE\":\"200\",\"DESCRIPTION\":\"RequestProcessedSuccessfully\",\"CUSTOMER_MATCH_COUNT\":\"10\",\"EXACT_MATCH_COUNT\":\"10\",\"PROBABLE_MATCH_COUNT\":\"0\",\"SUCCESS_MESSAGE\":\"Customerinformationsearchedsuccessfully\",\"CUSTOMER_MATCHES\":{\"INDIVIDUAL_MATCHES\":[{\"NAME\":\"RAVANALANKAPRABU\",\"FATHER_NAME\":\"\",\"FATHER_SPOUSE_NAME\":\"\",\"MOTHER_NAME\":\"\",\"SPOUSE_NAME\":\"\",\"DATE_OF_BIRTH\":\"\",\"DATE_OF_INC\":\"\",\"AADHAR_REFERENCE_NO\":\"\",\"PAN\":\"EIXIX6982G\",\"PASSPORT_NO\":\"\",\"DRIVING_LICENSE_NO\":\"\",\"TIN\":\"\",\"TAN\":\"\",\"CIN\":\"\",\"DIN\":\"\",\"NREGA\":\"\",\"CKYC\":\"\",\"VOTER_CARD_NO\":\"\",\"GST_IN\":\"\",\"RATION_CARD\":\"\",\"ADDRESS_TYPE_0\":\"\",\"ADDRESS_0\":\"\",\"AREA_0\":\"\",\"CITY_0\":\"\",\"STATE_0\":\"\",\"PINCODE_0\":\"\",\"ADDRESS_TYPE_1\":\"\",\"ADDRESS_1\":\"\",\"AREA_1\":\"\",\"CITY_1\":\"\",\"STATE_1\":\"\",\"PINCODE_1\":\"\",\"ADDRESS_TYPE_2\":\"\",\"ADDRESS_2\":\"\",\"AREA_2\":\"\",\"CITY_2\":\"\",\"STATE_2\":\"\",\"PINCODE_2\":\"\",\"ADDRESS_TYPE_3\":\"\",\"ADDRESS_3\":\"\",\"AREA_3\":\"\",\"CITY_3\":\"\",\"STATE_3\":\"\",\"PINCODE_3\":\"\",\"ADDRESS_TYPE_4\":\"\",\"ADDRESS_4\":\"\",\"AREA_4\":\"\",\"CITY_4\":\"\",\"STATE_4\":\"\",\"PINCODE_4\":\"\",\"MOBILE_TYPE_0\":\"\",\"MOBILE_0\":\"\",\"MOBILE_TYPE_1\":\"\",\"MOBILE_1\":\"\",\"MOBILE_TYPE_2\":\"\",\"MOBILE_2\":\"\",\"MOBILE_TYPE_3\":\"\",\"MOBILE_3\":\"\",\"MOBILE_TYPE_4\":\"\",\"MOBILE_4\":\"\",\"RECORD_TYPE\":\"ONLINE\",\"MATCH_CRITERIA\":\"PAN\",\"IS_EXACT_MATCH\":\"True\",\"IS_PROBABLE_MATCH\":\"False\",\"MATCHED_ID\":\"12312\",\"UCIC\":\"12312\",\"LEAD_ID\":\"\",\"IND_NON_DETAILS\":\"I\"}],\"ORGANISATION_MATCHES\":[]}}}}";
                 dynamic responsD = JsonConvert.DeserializeObject(Lead_details);
-                
+                this._logger.LogInformation("getCustomerLead", Lead_details, "After calling CBS API");
                 if (responsD.searchOrUpdateDigiDedupeCustomerRes.msgBdy.CUSTOMER_MATCHES.INDIVIDUAL_MATCHES.Count > 0)
                 {
                     List<Individual> all_individuals = new List<Individual>();
                     var individuals = responsD.searchOrUpdateDigiDedupeCustomerRes.msgBdy.CUSTOMER_MATCHES.INDIVIDUAL_MATCHES;
                     foreach (var individual in individuals)
                     {
-                        
+                        this._logger.LogInformation("getCustomerLead", JsonConvert.SerializeObject(individual), "Inside individual loop");
                         Individual individual_obj = new Individual();
                         individual_obj.NAME = individual["NAME"].ToString();
                         individual_obj.FATHER_NAME = individual["FATHER_NAME"].ToString();
@@ -245,7 +245,7 @@
                     var Organisations = responsD.searchOrUpdateDigiDedupeCustomerRes.msgBdy.CUSTOMER_MATCHES.ORGANISATION_MATCHES;
                     foreach (var Organisation in Organisations)
                     {
-                       
+                        this._logger.LogInformation("getCustomerLead", JsonConvert.SerializeObject(Organisation), "Inside Corporate loop");
                         Individual individual_obj = new Individual();
                         individual_obj.NAME = Organisation["NAME"].ToString();
                         individual_obj.FATHER_NAME = Organisation["FATHER_NAME"].ToString();

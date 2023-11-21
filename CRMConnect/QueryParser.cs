@@ -93,7 +93,8 @@
                 stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json;type=entry");
                 requestMessage.Content = stringContent;
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Token);
-
+                
+                _errorLogger.LogInformation("HttpCBSApiCall Request", parameterToPost, "JWD Token \n" + Token);
                 var response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
                 responJsonText = await response.Content.ReadAsStringAsync();
                 dynamic responsej = JsonConvert.DeserializeObject(responJsonText);
@@ -101,7 +102,7 @@
                 if (responsej.req_root!=null)
                 {
                     string xmlData = await PayloadDecryption(responsej.req_root.body.payload.ToString(), "FI0060");
-                    _errorLogger.LogInformation("HttpCBSApiCall response", parameterToPost, xmlData);
+                    _errorLogger.LogInformation("HttpCBSApiCall Response", xmlData, parameterToPost);
                     string xpath = "PIDBlock/payload";
                     XmlDocument xmlDoc = new XmlDocument();
                     xmlDoc.LoadXml(xmlData);
@@ -413,7 +414,7 @@
                     TokenId = responsej.access_token.ToString();
 
 
-                    this.SetMvalue<string>("wso2token", 3600, TokenId);
+                    this.SetMvalue<string>("wso2token", 40, TokenId);
                 }
                 else
                 {
@@ -584,7 +585,7 @@
             }
             catch(Exception ex)
             {
-                this._log.LogError("getOptionSetTextToValue", ex.Message,$"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionText}");
+                _errorLogger.LogError("getOptionSetTextToValue", ex.Message,$"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionText}");
                 return null;
             }
            
@@ -628,8 +629,8 @@
 
             }
             catch (Exception ex)
-            {               
-                this._log.LogError("getOptionSetValuToText", ex.Message, $"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionValue}");
+            {
+                _errorLogger.LogError("getOptionSetValuToText", ex.Message, $"Table:- {tableName} Eield name:- {fieldName} option value :- {OptionValue}");
                 return null;
             }
 
