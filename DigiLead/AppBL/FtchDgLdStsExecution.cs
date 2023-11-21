@@ -142,46 +142,47 @@
             FtchDgLdStsReturn csRtPrm = new FtchDgLdStsReturn();
             try
             {
-                var Lead_data = await getLeadData(RequestData.LeadID.ToString());
-                if (Lead_data.Count > 0)
+                var Applicant_data = await getAccountApplicantData(RequestData.LeadID.ToString());
+                if (Applicant_data.Count > 0)
                 {
-                    dynamic LeadData = Lead_data[0];
-                    string Entity_type = await this._commonFunc.getLeadType(LeadData._eqs_entitytypeid_value.ToString());
+                    dynamic ApplicantData = Applicant_data[0];
+                    string Entity_type = await this._commonFunc.getLeadType(ApplicantData._eqs_entitytypeid_value.ToString());
                     csRtPrm.LeadID = RequestData.LeadID;
-                    
-                    csRtPrm.Status = await this._queryParser.getOptionSetValuToText("lead", "statuscode", LeadData.statuscode.ToString());
-                    csRtPrm.EntityType = await this._commonFunc.getEntityType(LeadData._eqs_entitytypeid_value.ToString());
-                    csRtPrm.SubEntityType = await this._commonFunc.getSubEntityType(LeadData._eqs_subentitytypeid_value.ToString()); 
+
+                    //csRtPrm.Status = await this._queryParser.getOptionSetValuToText("lead", "statuscode", ApplicantData.statuscode.ToString());
+                    csRtPrm.Status = await this._commonFunc.getLeadStatus(ApplicantData._eqs_leadid_value.ToString());
+                    csRtPrm.EntityType = await this._commonFunc.getEntityType(ApplicantData._eqs_entitytypeid_value.ToString());
+                    csRtPrm.SubEntityType = await this._commonFunc.getSubEntityType(ApplicantData._eqs_subentity_value.ToString()); 
 
                     if (Entity_type == "Individual")
                     {
                         csRtPrm.individualDetails = new IndividualDetails();
-                        csRtPrm.individualDetails.firstName = LeadData.firstname;
-                        csRtPrm.individualDetails.lastName = LeadData.lastname;
-                        csRtPrm.individualDetails.middleName = LeadData.middlename;
+                        csRtPrm.individualDetails.firstName = ApplicantData.firstname;
+                        csRtPrm.individualDetails.lastName = ApplicantData.lastname;
+                        csRtPrm.individualDetails.middleName = ApplicantData.middlename;
                        //csRtPrm.individualDetails.shortName = LeadData.eqs_shortname;
-                        csRtPrm.individualDetails.mobilePhone = LeadData.mobilephone;
-                        csRtPrm.individualDetails.dob = LeadData.eqs_dob;
-                        csRtPrm.individualDetails.aadhar = LeadData.eqs_aadhaarreference;                     
-                        csRtPrm.individualDetails.PAN = LeadData.eqs_internalpan;
-                        csRtPrm.individualDetails.motherMaidenName = LeadData.eqs_mothermaidenname;
-                        csRtPrm.individualDetails.identityType = (!string.IsNullOrEmpty(LeadData.eqs_panform60code.ToString())) ? this.IdentityType[LeadData.eqs_panform60code.ToString()] : "";
-                        csRtPrm.individualDetails.NLFound = await this._queryParser.getOptionSetValuToText("lead", "eqs_nlmatchcode", LeadData.eqs_nlmatchcode.ToString());
-                        csRtPrm.individualDetails.reasonNotApplicable = LeadData.eqs_reasonforna;
-                        csRtPrm.individualDetails.voterid = LeadData.eqs_voterid;
-                        csRtPrm.individualDetails.drivinglicense = LeadData.eqs_dlnumber;
-                        csRtPrm.individualDetails.passport = LeadData.eqs_passportnumber;
-                        csRtPrm.individualDetails.ckycnumber = LeadData.eqs_ckycnumber;
+                        csRtPrm.individualDetails.mobilePhone = ApplicantData.mobilephone;
+                        csRtPrm.individualDetails.dob = ApplicantData.eqs_dob;
+                        csRtPrm.individualDetails.aadhar = ApplicantData.eqs_aadhaarreference;                     
+                        csRtPrm.individualDetails.PAN = ApplicantData.eqs_internalpan;
+                        csRtPrm.individualDetails.motherMaidenName = ApplicantData.eqs_mothermaidenname;
+                        csRtPrm.individualDetails.identityType = (!string.IsNullOrEmpty(ApplicantData.eqs_panform60code.ToString())) ? this.IdentityType[ApplicantData.eqs_panform60code.ToString()] : "";
+                        csRtPrm.individualDetails.NLFound = await this._queryParser.getOptionSetValuToText("eqs_accountapplicant", "eqs_nlvalidatedcode", ApplicantData.eqs_nlvalidatedcode.ToString());
+                        csRtPrm.individualDetails.reasonNotApplicable = ApplicantData.eqs_reasonforna;
+                        csRtPrm.individualDetails.voterid = ApplicantData.eqs_voterid;
+                        csRtPrm.individualDetails.drivinglicense = ApplicantData.eqs_dlnumber;
+                        csRtPrm.individualDetails.passport = ApplicantData.eqs_passportnumber;
+                        csRtPrm.individualDetails.ckycnumber = ApplicantData.eqs_ckycnumber;
 
                      
-                        if (LeadData._eqs_titleid_value != null)
+                        if (ApplicantData._eqs_titleid_value != null)
                         {
-                            csRtPrm.individualDetails.title = await this._commonFunc.getTitle(LeadData._eqs_titleid_value.ToString());
+                            csRtPrm.individualDetails.title = await this._commonFunc.getTitle(ApplicantData._eqs_titleid_value.ToString());
                         }
-                        if (LeadData._eqs_purposeofcreationid_value != null)
+                        if (ApplicantData._eqs_purposeofcreationid_value != null)
                         {
-                            csRtPrm.individualDetails.purposeOfCreation = await this._commonFunc.getPurposeOfCreation(LeadData._eqs_purposeofcreationid_value.ToString());
-                            csRtPrm.individualDetails.OtherPurpose = LeadData.eqs_otherpurpose;
+                            csRtPrm.individualDetails.purposeOfCreation = await this._commonFunc.getPurposeOfCreation(ApplicantData._eqs_purposeofcreationid_value.ToString());
+                            csRtPrm.individualDetails.OtherPurpose = ApplicantData.eqs_otherpurpose;
                         }
 
                         csRtPrm.ReturnCode = "CRM-SUCCESS";
@@ -192,29 +193,29 @@
                     {
                         csRtPrm.individualDetails = null;
                         csRtPrm.corporateDetails = new CorporateDetails();
-                        csRtPrm.corporateDetails.companyName = LeadData.eqs_companynamepart1;
-                        csRtPrm.corporateDetails.companyName2 = LeadData.eqs_companynamepart2;
-                        csRtPrm.corporateDetails.companyName3 = LeadData.eqs_companynamepart3;
-                        csRtPrm.corporateDetails.companyPhone = LeadData.mobilephone;
+                        csRtPrm.corporateDetails.companyName = ApplicantData.eqs_companynamepart1;
+                        csRtPrm.corporateDetails.companyName2 = ApplicantData.eqs_companynamepart2;
+                        csRtPrm.corporateDetails.companyName3 = ApplicantData.eqs_companynamepart3;
+                        csRtPrm.corporateDetails.companyPhone = ApplicantData.mobilephone;
                        
-                        csRtPrm.corporateDetails.pocNumber = LeadData.eqs_contactpersonmobile;
-                        csRtPrm.corporateDetails.pocName = LeadData.eqs_contactperson;
-                        csRtPrm.corporateDetails.cinNumber = LeadData.eqs_cinnumber;
-                        csRtPrm.corporateDetails.dateOfIncorporation = LeadData.eqs_dateofincorporation;                
-                        csRtPrm.corporateDetails.tanNumber = LeadData.eqs_tannumber;
-                        csRtPrm.corporateDetails.NLFound = await this._queryParser.getOptionSetValuToText("lead", "eqs_nlmatchcode", LeadData.eqs_nlmatchcode.ToString());
-                        csRtPrm.corporateDetails.identityType = (!string.IsNullOrEmpty(LeadData.eqs_panform60code.ToString())) ? this.IdentityType[LeadData.eqs_panform60code.ToString()] : "";
-                        csRtPrm.corporateDetails.gstNumber = LeadData.eqs_gstnumber;
-                        csRtPrm.corporateDetails.alternateMandatoryCheck = (LeadData.eqs_deferalcode.ToString()== "615290000") ? "Yes" : "No";
-                        csRtPrm.corporateDetails.cstNumber = LeadData.eqs_cstvatnumber;
-                        csRtPrm.corporateDetails.ckycnumber = LeadData.eqs_ckycnumber;
+                        csRtPrm.corporateDetails.pocNumber = ApplicantData.eqs_contactpersonmobile;
+                        csRtPrm.corporateDetails.pocName = ApplicantData.eqs_contactperson;
+                        csRtPrm.corporateDetails.cinNumber = ApplicantData.eqs_cinnumber;
+                        csRtPrm.corporateDetails.dateOfIncorporation = ApplicantData.eqs_dateofincorporation;                
+                        csRtPrm.corporateDetails.tanNumber = ApplicantData.eqs_tannumber;
+                        csRtPrm.corporateDetails.NLFound = await this._queryParser.getOptionSetValuToText("eqs_accountapplicant", "eqs_nlvalidatedcode", ApplicantData.eqs_nlvalidatedcode.ToString());
+                        csRtPrm.corporateDetails.identityType = (!string.IsNullOrEmpty(ApplicantData.eqs_panform60code.ToString())) ? this.IdentityType[ApplicantData.eqs_panform60code.ToString()] : "";
+                        csRtPrm.corporateDetails.gstNumber = ApplicantData.eqs_gstnumber;
+                        csRtPrm.corporateDetails.alternateMandatoryCheck = (ApplicantData.eqs_deferalcode.ToString()== "615290000") ? "Yes" : "No";
+                        csRtPrm.corporateDetails.cstNumber = ApplicantData.eqs_cstvatnumber;
+                        csRtPrm.corporateDetails.ckycnumber = ApplicantData.eqs_ckycnumber;
 
 
                       
-                        if (LeadData._eqs_purposeofcreationid_value != null)
+                        if (ApplicantData._eqs_purposeofcreationid_value != null)
                         {
-                            csRtPrm.corporateDetails.purposeOfCreation = await this._commonFunc.getPurposeOfCreation(LeadData._eqs_purposeofcreationid_value.ToString());
-                            csRtPrm.corporateDetails.OtherPurpose = LeadData.eqs_otherpurpose;
+                            csRtPrm.corporateDetails.purposeOfCreation = await this._commonFunc.getPurposeOfCreation(ApplicantData._eqs_purposeofcreationid_value.ToString());
+                            csRtPrm.corporateDetails.OtherPurpose = ApplicantData.eqs_otherpurpose;
                         }
 
 
@@ -261,6 +262,22 @@
             catch(Exception ex) {
                 this._logger.LogError("getLeadData", ex.Message);
                 throw ex; 
+            }
+        }
+
+        private async Task<JArray> getAccountApplicantData(string ApplicantId)
+        {
+            try
+            {
+                string query_url = $"eqs_accountapplicants()?$filter=eqs_applicantid eq '{ApplicantId}'";
+                var Leaddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Lead_dtails = await this._commonFunc.getDataFromResponce(Leaddtails);
+                return Lead_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getLeadData", ex.Message);
+                throw ex;
             }
         }
 

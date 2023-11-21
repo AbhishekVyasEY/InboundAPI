@@ -208,7 +208,15 @@ using System.Diagnostics.Metrics;
             return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", PurposeOfCreatioId);
         }
 
-       
+        public async Task<string> getLeadStatus(string LeadId)
+        {
+            var leadStatus = await this.getIDfromMSDTable("leads", "eqs_leadstatus", "leadid", LeadId);
+            if (!string.IsNullOrEmpty(leadStatus))
+            {
+                return await this._queryParser.getOptionSetValuToText("lead", "eqs_leadstatus", leadStatus);
+            }
+            return null;
+        }
 
         public async Task<string> MeargeJsonString(string json1, string json2)
         {
