@@ -157,11 +157,11 @@
                     if (Entity_type == "Individual")
                     {
                         csRtPrm.individualDetails = new IndividualDetails();
-                        csRtPrm.individualDetails.firstName = ApplicantData.firstname;
-                        csRtPrm.individualDetails.lastName = ApplicantData.lastname;
-                        csRtPrm.individualDetails.middleName = ApplicantData.middlename;
+                        csRtPrm.individualDetails.firstName = ApplicantData.eqs_firstname;
+                        csRtPrm.individualDetails.lastName = ApplicantData.eqs_lastname;
+                        csRtPrm.individualDetails.middleName = ApplicantData.eqs_middlename;
                        //csRtPrm.individualDetails.shortName = LeadData.eqs_shortname;
-                        csRtPrm.individualDetails.mobilePhone = ApplicantData.mobilephone;
+                        csRtPrm.individualDetails.mobilePhone = ApplicantData.eqs_mobilenumber;
                         csRtPrm.individualDetails.dob = ApplicantData.eqs_dob;
                         csRtPrm.individualDetails.aadhar = ApplicantData.eqs_aadhaarreference;                     
                         csRtPrm.individualDetails.PAN = ApplicantData.eqs_internalpan;
@@ -198,7 +198,7 @@
                         csRtPrm.corporateDetails.companyName3 = ApplicantData.eqs_companynamepart3;
                         csRtPrm.corporateDetails.companyPhone = ApplicantData.mobilephone;
                        
-                        csRtPrm.corporateDetails.pocNumber = ApplicantData.eqs_contactpersonmobile;
+                        csRtPrm.corporateDetails.pocNumber = ApplicantData.eqs_contactmobilenumber;
                         csRtPrm.corporateDetails.pocName = ApplicantData.eqs_contactperson;
                         csRtPrm.corporateDetails.cinNumber = ApplicantData.eqs_cinnumber;
                         csRtPrm.corporateDetails.dateOfIncorporation = ApplicantData.eqs_dateofincorporation;                
