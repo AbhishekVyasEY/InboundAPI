@@ -81,6 +81,7 @@ namespace ManageCase
         public string openDate { get; set; }
         public string modifiedDate { get; set; }
         public string closeDate { get; set; }
+        public string cancellationDate { get; set; }
         public string Channel { get; set; }
         public string Source { get; set; }
         public string Priority { get; set; }
