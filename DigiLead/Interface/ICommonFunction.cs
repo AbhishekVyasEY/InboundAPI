@@ -10,6 +10,7 @@ namespace DigiLead
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
         public Task<string> getEntityType(string EntityTypeId);
         public Task<string> getSubEntityType(string SubEntityTypeId);
+        public Task<string> getLeadStatus(string LeadId);
 
     }
 }
