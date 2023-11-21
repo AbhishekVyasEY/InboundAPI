@@ -571,12 +571,12 @@ namespace ManageCase
                         if (custId==1)
                         {
                             string customerid = await this._commonFunc.getCustomerId(CaseData.CustomerID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}'";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}'";
                         }
                         if (AccId == 1)
                         {
                             string Accountid = await this._commonFunc.getAccountId(CaseData.AccountID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'";
                         }
 
                         var caseresponsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -593,6 +593,7 @@ namespace ManageCase
                                 case_details.openDate = caseDetails["createdon"].ToString();
                                 case_details.modifiedDate = caseDetails["modifiedon"].ToString();
                                 case_details.closeDate = caseDetails["ccs_resolveddate"].ToString();
+                                case_details.cancellationDate = caseDetails["eqs_casecancellationdate"].ToString();
 
                                 if (!string.IsNullOrEmpty(caseDetails["eqs_casetype"].ToString()))
                                 {
