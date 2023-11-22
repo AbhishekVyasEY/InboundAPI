@@ -10,9 +10,10 @@ namespace GFSProduct
         public Task<JArray> getCustomerDetails(string CustomerId);
         public Task<JArray> getProductData(productFilter product_Filter);
         public Task<JArray> getContactData(string contact_id);
-
+        public Task<string> getEntityType(string EntityTypeId);
+        public Task<JArray> getIndividualDdeDetails(string ApplicantId);
+        public Task<JArray> getProductSubTypeLink(string SubTypeId);
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);
-
     }
 }

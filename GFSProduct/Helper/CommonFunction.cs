@@ -191,6 +191,44 @@ using System.Diagnostics.Metrics;
             return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_name", "eqs_subentitytypeid", subentity_Id);
         }
 
+        public async Task<string> getEntityType(string entityTypeId)
+        {
+            return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_name", "eqs_entitytypeid", entityTypeId);
+        }
+
+        public async Task<JArray> getIndividualDdeDetails(string ApplicantId)
+        {
+            try
+            {
+                string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
+                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_isstaffcode,eqs_programcode&$filter=_eqs_accountapplicantid_value eq '{ApplicantId}' and eqs_dataentrystage eq {finalValue}";
+                var Applicantdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Applicant_dtails = await this.getDataFromResponce(Applicantdtails);
+                return Applicant_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getIndividualDdeDetails", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getProductSubTypeLink(string SubTypeId)
+        {
+            try
+            {
+                string query_url = $"eqs_product_eqs_subentitytypeset()?$select=eqs_productid&$filter=eqs_subentitytypeid eq '{SubTypeId}'";
+                var Customerdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Customer_dtails = await this.getDataFromResponce(Customerdtails);
+                return Customer_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCustomerDetails", ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task<JArray> getApplicantDetails(string ApplicantId)
         {
             try

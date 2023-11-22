@@ -241,38 +241,73 @@
                 if (applicentDetails.Count > 0)
                 {
                     productFilter product_Filter = new productFilter();
-
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_gendercode"].ToString()) && applicentDetails[0]["eqs_gendercode"].ToString() == "789030001")
+                    string entityType = await this._commonFunc.getEntityType(applicentDetails[0]["_eqs_entitytypeid_value"].ToString());
+                    if (entityType == "Individual")
                     {
-                        product_Filter.gender = "Woman";
-                    }
-
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_leadage"].ToString()))
-                    {
-                        product_Filter.age = applicentDetails[0]["eqs_leadage"].ToString();
-                    }
-
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["_eqs_subentity_value"].ToString()))
-                    {
-                        string subentity = await this._commonFunc.getSubentity(applicentDetails[0]["_eqs_subentity_value"].ToString());
-                        if (subentity.ToLower() == "foreigners" || subentity.ToLower() == "non resident individual")
+                        JArray individualDdeDetails = await this._commonFunc.getIndividualDdeDetails(applicentDetails[0]["eqs_accountapplicantid"].ToString());
+                        if (individualDdeDetails.Count > 0)
                         {
-                            product_Filter.subentity = "NRI";
+                            if (!string.IsNullOrEmpty(individualDdeDetails[0]["eqs_programcode"].ToString()) && (individualDdeDetails[0]["eqs_programcode"].ToString() == "789030001" || individualDdeDetails[0]["eqs_programcode"].ToString() == "789030002"))
+                            {
+                                product_Filter.customerSegment = "elite";
+                            }
+
+                            if (!string.IsNullOrEmpty(individualDdeDetails[0]["eqs_isstaffcode"].ToString()) && individualDdeDetails[0]["eqs_isstaffcode"].ToString() == "789030001")
+                            {
+                                product_Filter.IsStaff = "staff";
+                            }
+                            if (!string.IsNullOrEmpty(individualDdeDetails[0]["eqs_gendercode"].ToString()) && individualDdeDetails[0]["eqs_gendercode"].ToString() == "789030001")
+                            {
+                                product_Filter.gender = "Woman";
+                            }
+                            if (!string.IsNullOrEmpty(individualDdeDetails[0]["eqs_age"].ToString()))
+                            {
+                                product_Filter.age = individualDdeDetails[0]["eqs_age"].ToString();
+                            }
+                            if (!string.IsNullOrEmpty(individualDdeDetails[0]["_eqs_subentity_value"].ToString()))
+                            {
+                                string subentity = await this._commonFunc.getSubentity(individualDdeDetails[0]["_eqs_subentitytypeid_value"].ToString());
+                                if (subentity.ToLower() == "foreigners" || subentity.ToLower() == "non resident individual")
+                                {
+                                    product_Filter.subentity = "NRI";
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_gendercode"].ToString()) && applicentDetails[0]["eqs_gendercode"].ToString() == "789030001")
+                            {
+                                product_Filter.gender = "Woman";
+                            }
+
+                            if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_leadage"].ToString()))
+                            {
+                                product_Filter.age = applicentDetails[0]["eqs_leadage"].ToString();
+                            }
+
+                            if (!string.IsNullOrEmpty(applicentDetails[0]["_eqs_subentity_value"].ToString()))
+                            {
+                                string subentity = await this._commonFunc.getSubentity(applicentDetails[0]["_eqs_subentity_value"].ToString());
+                                if (subentity.ToLower() == "foreigners" || subentity.ToLower() == "non resident individual")
+                                {
+                                    product_Filter.subentity = "NRI";
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstaffcode"].ToString()) && applicentDetails[0]["eqs_isstaffcode"].ToString() == "789030001")
+                            {
+                                product_Filter.IsStaff = "staff";
+                            }
                         }
                     }
-
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_customersegment"].ToString()) && applicentDetails[0]["eqs_customersegment"].ToString() == "789030002")
+                    else if (entityType == "Corporate")
                     {
-                        product_Filter.customerSegment = "elite";
-                    }
+                        JArray subentityList = await this._commonFunc.getProductSubTypeLink(applicentDetails[0]["_eqs_subentity_value"].ToString());
+                        if (subentityList.Count > 0)
+                        {
 
-                    if (!string.IsNullOrEmpty(applicentDetails[0]["eqs_isstaffcode"].ToString()) && applicentDetails[0]["eqs_isstaffcode"].ToString() == "789030001")
-                    {
-                        product_Filter.IsStaff = "staff";
+                        }
                     }
-
                     product_Filter.productCategory = CategoryId;
-
                     csRtPrm = await this.getProductDetails(product_Filter, CategoryCode);
                 }
                 else
@@ -281,7 +316,6 @@
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
                     csRtPrm.Message = "Applicent Details not found.";
                 }
-
             }
             catch (Exception ex)
             {
@@ -289,9 +323,9 @@
                 csRtPrm.ReturnCode = "CRM-ERROR-102";
                 csRtPrm.Message = OutputMSG.Incorrect_Input;
             }
-
             return csRtPrm;
         }
+
 
         public async Task<GFSProducrListReturn> getProductDetails(productFilter product_Filter, string CategoryCode)
         {

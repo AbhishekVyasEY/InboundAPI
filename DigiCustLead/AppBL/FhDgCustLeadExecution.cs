@@ -376,7 +376,15 @@
 
                     /*********** FATCA *********/
                     FATCA fATCA = new FATCA();
-                    fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
+                    if(!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
+                    {
+                        fATCA.TaxResident = "Tax Resident of India";
+                    }
+                    else if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == true)
+                    {
+                        fATCA.TaxResident = "Tax Resident of India and other countries";
+                    }
+                   // fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
                     fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
 
                     FATCADetails fATCAobj = new FATCADetails();
@@ -384,7 +392,15 @@
                     foreach (var fatcaitem in fatcaDetail)
                     {
                         fATCAobj.FATCAID = fatcaitem.eqs_name.ToString();
-                        fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresident", DDEDetails[0].eqs_taxresident.ToString());
+                        //fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresident", DDEDetails[0].eqs_taxresident.ToString());
+                        if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
+                        {
+                            fATCA.TaxResident = "Tax Resident of India";
+                        }
+                        else if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == true)
+                        {
+                            fATCA.TaxResident = "Tax Resident of India and other countries";
+                        }
                         fATCAobj.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
                         fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
 
