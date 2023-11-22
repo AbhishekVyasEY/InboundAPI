@@ -104,7 +104,7 @@
                         if (!string.IsNullOrEmpty(RequestData.CustomerID.ToString()))
                         {
                             string accountnumber = string.Empty;
-                            if (!string.IsNullOrEmpty(RequestData.AccountNumber))
+                            if (RequestData is JObject && ((JObject)RequestData).ContainsKey("AccountNumber"))
                             {
                                 accountnumber = RequestData.AccountNumber.ToString();
                             }
@@ -178,11 +178,14 @@
                 customerDetailReturn.General.EntityKey = CuatomerDetails[0]["eqs_subentitykey"].ToString();
 
                 //Lookup
-                customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                if (CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"] != null)
+                    customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"].ToString();
 
                 //Option set
-                customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"].ToString();
-                customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
+                if (CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"] != null)
+                    customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"].ToString();
+                if (CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"] != null)
+                    customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
 
                 if (!string.IsNullOrEmpty(AccountNumber))
                 {
