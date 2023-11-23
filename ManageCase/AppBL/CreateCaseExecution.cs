@@ -13,6 +13,8 @@ using System.Xml;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Identity.Client;
+using System.Dynamic;
+using System.Runtime.ConstrainedExecution;
 
 namespace ManageCase
 {
@@ -279,6 +281,41 @@ namespace ManageCase
                                 CSRtPrm.category = await this._commonFunc.getCategoryName(statusCodeId[0]["_ccs_category_value"].ToString());
                                 CSRtPrm.subcategory = await this._commonFunc.getSubCategoryName(statusCodeId[0]["_ccs_subcategory_value"].ToString());
                                 CSRtPrm.AdditionalField = JsonConvert.DeserializeObject(statusCodeId[0]["eqs_casepayload"].ToString());
+
+                                dynamic obj = new ExpandoObject();
+                                if (CSRtPrm.AdditionalField == null)
+                                {
+                                    var additionalFields = await this._commonFunc.getCaseAdditionalFields(statusCodeId[0]["_ccs_subcategory_value"].ToString());
+                                    if (additionalFields.Count > 0)
+                                    {
+                                        var fields = additionalFields[0]["eqs_showfield"].ToString();
+                                        var caseAdditionalData = await this._commonFunc.getCaseAdditionalDetails(CaseData.CaseID.ToString(), fields);
+                                        if (caseAdditionalData.Count > 0)
+                                        {
+                                            string[] str = fields.Split(',');
+
+                                            for (int i = 0; i < str.Length; i++)
+                                            {
+                                                int j = i; j++;
+                                                string value = null;
+                                                //lookup
+                                                if (caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"] != null)
+                                                    value = caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"];
+
+                                                //Option set
+                                                if (caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"] != null)
+                                                    value = caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"];
+                                                else
+                                                    value = caseAdditionalData[0][str[i].ToString()];
+
+                                                ((IDictionary<string, object>)obj).Add("FieldName" + j, str[i].ToString().Replace("eqs_", ""));
+
+                                                ((IDictionary<string, object>)obj).Add("FieldValue" + j, value);
+                                            }
+                                            CSRtPrm.AdditionalField = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj));
+                                        }
+                                    }
+                                }
 
                                 CSRtPrm.Description = statusCodeId[0]["description"];
                                 CSRtPrm.Priority = await this._queryParser.getOptionSetValuToText("incident", "eqs_casepriority", statusCodeId[0]["eqs_casepriority"].ToString());
