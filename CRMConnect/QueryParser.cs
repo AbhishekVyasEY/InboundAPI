@@ -414,7 +414,7 @@
                     TokenId = responsej.access_token.ToString();
 
 
-                    this.SetMvalue<string>("wso2token", 40, TokenId);
+                    this.SetMvalue<string>("wso2token", 15, TokenId);
                 }
                 else
                 {
