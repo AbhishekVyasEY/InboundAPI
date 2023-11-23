@@ -230,7 +230,24 @@ namespace ManageCase
 
         }
 
-       
+        public async Task<JArray> getCaseAdditionalFields(string subCategoryCode)
+        {
+            try
+            {
+                string query_url = $"eqs_fieldvisibilitymetadataconfigurations()?$select=eqs_showfield&$filter=_eqs_subcategory_value eq '{subCategoryCode}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseAdditionalFields", ex.Message);
+                throw ex;
+            }
+
+        }
+
+
 
         public async Task<JArray> getCaseStatus(string CaseID)
         {
@@ -247,6 +264,22 @@ namespace ManageCase
                 throw ex;
             }
 
+        }
+
+        public async Task<JArray> getCaseAdditionalDetails(string CaseID, string idfield)
+        {
+            try
+            {
+                string query_url = $"incidents()?$select={idfield}&$filter=ticketnumber eq '{CaseID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var incidentFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return incidentFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseAdditionalDetails", ex.Message);
+                throw ex;
+            }
         }
 
         public async Task<List<MandatoryField>> getMandatoryFields(string subCategoryID)

@@ -6,6 +6,7 @@ namespace ManageCase
     {
        
         public Task<JArray> getCaseStatus(string CityCode);
+        public Task<JArray> getCaseAdditionalDetails(string CaseID, string idfield);
         public Task<string> getAccountId(string BranchCode);
         public Task<string> getAccountNumber(string AccountId);
         public Task<string> getChannelId(string channelName);
@@ -21,7 +22,7 @@ namespace ManageCase
         public Task<string> getSubCategoryId(string CustomerCode, string CategoryId);
         public Task<string> getSubCategoryName(string SubCategoryId);
         public Task<bool> checkDuplicate(string UCIC, string Account, string Classification, string Category, string SubCategory);
-   
+        public Task<JArray> getCaseAdditionalFields(string subCategoryCode);
         public Task<string> MeargeJsonString(string json1, string json2);
         public Task<List<MandatoryField>> getMandatoryFields(string subCategoryID);
         public Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue);
