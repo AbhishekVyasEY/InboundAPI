@@ -290,28 +290,31 @@ namespace ManageCase
                                     {
                                         var fields = additionalFields[0]["eqs_showfield"].ToString();
                                         var caseAdditionalData = await this._commonFunc.getCaseAdditionalDetails(CaseData.CaseID.ToString(), fields);
-                                        string[] str = fields.Split(',');
-                                        
-                                        for (int i = 0; i < str.Length; i++)
+                                        if (caseAdditionalData.Count > 0)
                                         {
-                                            int j = i; j++;
-                                            string value = null;
-                                            //lookup
-                                            if (caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"] != null)
-                                                value = caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"];
+                                            string[] str = fields.Split(',');
 
-                                            //Option set
-                                            if (caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"] != null)
-                                                value = caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"];
-                                            else
-                                                value = caseAdditionalData[0][str[i].ToString()];
+                                            for (int i = 0; i < str.Length; i++)
+                                            {
+                                                int j = i; j++;
+                                                string value = null;
+                                                //lookup
+                                                if (caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"] != null)
+                                                    value = caseAdditionalData[0][$"_{str[i].ToString()}_value@OData.Community.Display.V1.FormattedValue"];
 
-                                            ((IDictionary<string, object>)obj).Add("FieldName" + j, str[i].ToString().Replace("eqs_", ""));
-                                            
-                                            ((IDictionary<string, object>)obj).Add("FieldValue" + j, value);
+                                                //Option set
+                                                if (caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"] != null)
+                                                    value = caseAdditionalData[0][$"{str[i].ToString()}@OData.Community.Display.V1.FormattedValue"];
+                                                else
+                                                    value = caseAdditionalData[0][str[i].ToString()];
+
+                                                ((IDictionary<string, object>)obj).Add("FieldName" + j, str[i].ToString().Replace("eqs_", ""));
+
+                                                ((IDictionary<string, object>)obj).Add("FieldValue" + j, value);
+                                            }
+                                            CSRtPrm.AdditionalField = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj));
                                         }
                                     }
-                                    CSRtPrm.AdditionalField = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj));
                                 }
 
                                 CSRtPrm.Description = statusCodeId[0]["description"];
