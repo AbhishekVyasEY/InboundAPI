@@ -3,17 +3,56 @@ using System.Text.Json.Serialization;
 
 namespace FetchAccountLead
 {
-    public class FtAccountLeadReturn
+    public class FtAccountLead_Return
+    {
+        public string ReturnCode { get; set; }
+        public string Message { get; set; }
+        public string TransactionID { get; set; }
+        public string ExecutionTime { get; set; }
+    }
+
+    public class CDgAccountLead : FtAccountLead_Return
+    {
+        public AccountLead accountLead { get; set; }
+        public List<CustomerAccLdRelation> CustomerAccLdRelations { get; set; }
+    }
+
+    public class AccountLead
+    {
+        public string accountType { get; set; }
+        public string productCategory { get; set; }
+        public string productCode { get; set; }
+        public string accountOpeningFlow { get; set; }
+        public string sourceBranch { get; set; }
+        public string leadsource { get; set; }
+        public string initialDepositType { get; set; }
+        public string fieldEmployeeCode { get; set; }
+        public string applicationDate { get; set; }
+        public string tenureInMonths { get; set; }
+        public string tenureInDays { get; set; }
+        public string rateOfInterest { get; set; }
+        public string fundsTobeDebitedFrom { get; set; }
+        public string InitialDeposit { get; set; }
+        public string depositAmount { get; set; }
+        public string mopRemarks { get; set; }
+        public string fdAccOpeningDate { get; set; }
+        public string sweepFacility { get; set; }
+    }
+
+    public class CustomerAccLdRelation
+    {
+        public string UCIC { get; set; }
+        public string customerAccountRelation { get; set; }
+        public string isPrimaryHolder { get; set; }
+        public string relationToPrimaryHolder { get; set; }
+    }
+    public class FtAccountLeadReturn : FtAccountLead_Return
     {
         public General General { get; set; }
         public AdditionalDetails AdditionalDetails { get; set; }
         public FDRDDetails FDRDDetails { get; set; }
         public DirectBanking DirectBanking { get; set; }
-        public Nominee Nominee { get; set; }
-        public string ReturnCode { get; set; }
-        public string Message { get; set; }
-        public string TransactionID { get; set; }
-        public string ExecutionTime { get; set; }
+        public Nominee Nominee { get; set; }             
 
     }
 

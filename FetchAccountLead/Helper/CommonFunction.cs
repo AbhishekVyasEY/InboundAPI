@@ -242,13 +242,24 @@
             var Nomini_details = await this.getDataFromResponce(LeadAccountDtl);
             return Nomini_details;
         }
-        public async Task<JArray> getLeadAccountDetails(string LdApplicantId)
+        public async Task<JArray> getLeadAccountDetails(string LdApplicantId, string stage = "")
         {
-            string LeadAccountID = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", LdApplicantId);
-            string query_url = $"eqs_ddeaccounts()?$filter=_eqs_leadaccountid_value eq '{LeadAccountID}'";
-            var LeadAccountDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-            var LeadAccount_dtails = await this.getDataFromResponce(LeadAccountDtl);
-            return LeadAccount_dtails;
+            if (stage == "D0") 
+            {
+                string query_url = $"eqs_leadaccounts()?$filter=eqs_crmleadaccountid eq '{LdApplicantId}' &$expand=eqs_Lead($select=)";
+                var LeadAccountDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "",true);
+                var LeadAccount_dtails = await this.getDataFromResponce(LeadAccountDtl);
+                return LeadAccount_dtails;
+            }
+            else
+            {
+                string LeadAccountID = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", LdApplicantId);
+                string query_url = $"eqs_ddeaccounts()?$filter=_eqs_leadaccountid_value eq '{LeadAccountID}'";
+                var LeadAccountDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var LeadAccount_dtails = await this.getDataFromResponce(LeadAccountDtl);
+                return LeadAccount_dtails;
+            }
+           
         }
 
         public async Task<JArray> getApplicentsSetails(string LeadAccId)
@@ -256,7 +267,7 @@
             try
             {
                 string query_url = $"eqs_accountapplicants()?$filter=_eqs_leadaccountid_value eq '{LeadAccId}'";
-                var Applicantdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Applicantdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var Applicant_dtails = await this.getDataFromResponce(Applicantdtails);
                 return Applicant_dtails;
             }

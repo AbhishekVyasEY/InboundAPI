@@ -62,7 +62,7 @@
         private readonly IKeyVaultService _keyVaultService;
 
         private string Leadid, LeadAccountid;
-        FtAccountLeadReturn AccountLeadReturn;
+        FtAccountLead_Return AccountLeadReturn;
 
 
 
@@ -77,14 +77,14 @@
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
 
-            this.AccountLeadReturn = new FtAccountLeadReturn();
+            this.AccountLeadReturn = new FtAccountLead_Return();
 
         }
 
 
-        public async Task<FtAccountLeadReturn> ValidateLeadtInput(dynamic RequestData)
+        public async Task<FtAccountLead_Return> ValidateLeadtInput(dynamic RequestData)
         {
-            FtAccountLeadReturn ldRtPrm = new FtAccountLeadReturn();
+            FtAccountLead_Return ldRtPrm = new FtAccountLead_Return();
             RequestData = await this.getRequestData(RequestData, "FetchDigiAccountLead");
             try
             { 
@@ -131,7 +131,7 @@
         }
 
 
-        private async Task<FtAccountLeadReturn> FetLeadAccount(string LeadAccountId)
+        private async Task<FtAccountLead_Return> FetLeadAccount(string LeadAccountId)
         {
             
 
@@ -140,22 +140,28 @@
             {
                 this.LeadAccountid = LeadAccountId;
                 if (await getLeadAccount(_leadDetails))
-                {                   
-                           
+                {        
                     this.AccountLeadReturn.ReturnCode = "CRM-SUCCESS";
                     this.AccountLeadReturn.Message = OutputMSG.Case_Success;
-                                           
                 }
             }
             else
             {
-                this._logger.LogInformation("FetLeadAccount", "Lead Account Details not found.");
-                this.AccountLeadReturn.ReturnCode = "CRM-ERROR-102";
-                this.AccountLeadReturn.Message = "Lead Account Details not found.";
+                _leadDetails = await this._commonFunc.getLeadAccountDetails(LeadAccountId, "D0");
+
+                if (_leadDetails.Count > 0)
+                {
+                    this.AccountLeadReturn = await getLeadAccountD0(_leadDetails);
+                    this.AccountLeadReturn.ReturnCode = "CRM-SUCCESS";
+                    this.AccountLeadReturn.Message = OutputMSG.Case_Success;
+                }
+                else
+                {
+                    this._logger.LogInformation("FetLeadAccount", "Lead Account Details not found.");
+                    this.AccountLeadReturn.ReturnCode = "CRM-ERROR-102";
+                    this.AccountLeadReturn.Message = "Lead Account Details not found.";
+                }
             }
-
-
-            
 
             return this.AccountLeadReturn;
         }
@@ -165,7 +171,7 @@
 
         private async Task<bool> getLeadAccount(JArray LeadData)
         {
-
+            FtAccountLeadReturn ftAccountLeadReturn = new FtAccountLeadReturn();
             /****************** General  ***********************/
 
             General general = new General();
@@ -192,7 +198,7 @@
             general.LGCode = LeadData[0]["eqs_lgcode"].ToString();
             general.LCCode = LeadData[0]["eqs_lccode"].ToString();
 
-            this.AccountLeadReturn.General = general;
+            ftAccountLeadReturn.General = general;
 
             /****************** Additional Details  ***********************/
 
@@ -206,7 +212,7 @@
             additionalDetails.OtherSourceoffund = LeadData[0]["eqs_othersourceoffund"].ToString();
             additionalDetails.PredefinedAccountNumber = LeadData[0]["eqs_predefinedaccountnumber"].ToString();
 
-            this.AccountLeadReturn.AdditionalDetails = additionalDetails;
+            ftAccountLeadReturn.AdditionalDetails = additionalDetails;
 
             /****************** FDRD Details  ***********************/
 
@@ -271,7 +277,7 @@
             fDRDDetails.DepositDetails = depositDetails;
             fDRDDetails.InterestPayoutDetails = interestPayoutDetails;
             fDRDDetails.MaturityInstructionDetails = maturityInstructionDetails;
-            this.AccountLeadReturn.FDRDDetails = fDRDDetails;
+            ftAccountLeadReturn.FDRDDetails = fDRDDetails;
 
 
             /****************** Direct Banking  ***********************/
@@ -306,9 +312,9 @@
                
                 directBanking.Preferences.Add(preference);
             }
-           
 
-            this.AccountLeadReturn.DirectBanking = directBanking;
+
+            ftAccountLeadReturn.DirectBanking = directBanking;
 
 
             /****************** Nominee  ***********************/
@@ -359,13 +365,56 @@
                 guardian.GuardianState = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
 
                 nominee.Guardian = guardian;
-                this.AccountLeadReturn.Nominee = nominee;
+                ftAccountLeadReturn.Nominee = nominee;
             }
+
+             this.AccountLeadReturn = ftAccountLeadReturn;
             return true;      
 
         }
 
-       
+       private async Task<CDgAccountLead> getLeadAccountD0(JArray LeadData)
+        {
+            CDgAccountLead cDgAccountLead = new CDgAccountLead();
+            AccountLead accountLead = new AccountLead();
+
+            accountLead.accountType = await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_accountownershipcode", LeadData[0]["eqs_accountownershipcode"].ToString());
+            accountLead.productCategory = LeadData[0]["_eqs_typeofaccountid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.productCode = LeadData[0]["_eqs_productid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.accountOpeningFlow = LeadData[0]["eqs_instakitoptioncode@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.sourceBranch = LeadData[0]["eqs_Lead"]["_eqs_branchid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.leadsource = LeadData[0]["_eqs_leadsourceid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.initialDepositType = LeadData[0]["eqs_initialdepositmodecode@OData.Community.Display.V1.FormattedValue"].ToString();
+            accountLead.fieldEmployeeCode = LeadData[0]["eqs_sourcebyemployeecode"].ToString();
+            accountLead.applicationDate = LeadData[0]["eqs_applicationdate"].ToString();
+            accountLead.tenureInMonths = LeadData[0]["eqs_tenureinmonths"].ToString();
+            accountLead.tenureInDays = LeadData[0]["eqs_tenureindays"].ToString();
+            accountLead.rateOfInterest = LeadData[0]["eqs_rateofinterest"].ToString();
+            accountLead.fundsTobeDebitedFrom = LeadData[0]["eqs_fundstobedebitedfrom"].ToString();
+            accountLead.InitialDeposit = await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_initialdepositamountcode", LeadData[0]["eqs_initialdepositamountcode"].ToString());
+            accountLead.depositAmount = LeadData[0]["eqs_depositamount"].ToString();
+            accountLead.mopRemarks = LeadData[0]["eqs_modeofoperationremarks"].ToString();
+            accountLead.fdAccOpeningDate = LeadData[0]["eqs_fdvaluedate"].ToString();
+            accountLead.sweepFacility = LeadData[0]["eqs_sweepfacility"].ToString();
+            cDgAccountLead.accountLead = accountLead;
+
+            cDgAccountLead.CustomerAccLdRelations = new List<CustomerAccLdRelation>();
+
+            var applicentdetails = await this._commonFunc.getApplicentsSetails(LeadData[0]["eqs_leadaccountid"].ToString());
+            foreach (var item in applicentdetails)
+            {
+                CustomerAccLdRelation customerAccLdRelation = new CustomerAccLdRelation();
+                customerAccLdRelation.UCIC = item["eqs_ucic"].ToString();
+                customerAccLdRelation.customerAccountRelation = item["_eqs_accountrelationship_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                customerAccLdRelation.isPrimaryHolder = item["eqs_isprimaryholder@OData.Community.Display.V1.FormattedValue"].ToString();
+                customerAccLdRelation.relationToPrimaryHolder = await this._commonFunc.getRelationshipCode(item["_eqs_relationship_value"].ToString());
+
+                cDgAccountLead.CustomerAccLdRelations.Add(customerAccLdRelation);
+            }
+
+
+            return cDgAccountLead;
+        }
 
         public bool checkappkey(string appkey, string APIKey)
         {

@@ -22,7 +22,7 @@ namespace FetchAccountLead
         public Task<JArray> getNomineDetails(string DDEId);
         public Task<JArray> getLeadDetails(string contact_id);
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
-        public Task<JArray> getLeadAccountDetails(string LdApplicantId);
+        public Task<JArray> getLeadAccountDetails(string LdApplicantId, string stage = "");
         public Task<JArray> getCustomerDetails(string filterkey, string filtervalue);
         public Task<JArray> getAccountRelationshipDetails(string CustomerID, string AccountNumber);
         public Task<JArray> getServiceDetails(string customerid, string accountid);
