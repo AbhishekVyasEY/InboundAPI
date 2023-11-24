@@ -20,6 +20,7 @@
     using Azure.Core;
     using System.Reflection.PortableExecutable;
     using Azure;
+    using System.Xml.Linq;
 
 
     public class QueryParser : IQueryParser
@@ -115,6 +116,7 @@
                 }
                 else
                 {
+                    _errorLogger.LogInformation("HttpCBSApiCall Response", responJsonText, parameterToPost + "\n JWT Token \n " + Token);
                     ret_responJsonText = responJsonText;
                 }
                 
@@ -124,7 +126,6 @@
             }
             catch (Exception ex)
             {
-                
                 _errorLogger.LogError("HttpCBSApiCall", $"Error from CBS connect: {ex.Message} {ex.InnerException!} {ex.StackTrace!}", $"API {requestUri} \n  parameterToPost:-  {parameterToPost} \n responJsonText:- {responJsonText} ");
                 throw;
             }
