@@ -8,7 +8,7 @@
         public string Transaction_ID { set; get; }
         public string appkey { set; get; }
  
-        public Task<FtAccountLeadReturn> ValidateLeadtInput(dynamic CaseData);
+        public Task<FtAccountLead_Return> ValidateLeadtInput(dynamic CaseData);
         public Task<string> EncriptRespons(string ResponsData);
        
 

@@ -46,7 +46,7 @@
                 
                 _ftdgaccleadExecution.API_Name = "FetchDigiAccountLead";
                 _ftdgaccleadExecution.Input_payload = request.ToString();
-                FtAccountLeadReturn AccountDetails = await _ftdgaccleadExecution.ValidateLeadtInput(request);
+                FtAccountLead_Return AccountDetails = await _ftdgaccleadExecution.ValidateLeadtInput(request);
 
                 watch.Stop();
                 AccountDetails.TransactionID = this._ftdgaccleadExecution.Transaction_ID;
