@@ -74,15 +74,69 @@ namespace DigiCustLead
 
     }
 
-    public class FetchCustLeadReturn
+    public class FetchCust_LeadReturn
     {
-        public Individual individual { get; set; }
-        public Corporate corporate { get; set; }
-
         public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
+    }
+
+    public class FetchCustD0Return : FetchCust_LeadReturn
+    {
+        public string EntityType { get; set; }        
+        public string EntityFlagType { get; set; }
+        public string ProductCode { get; set; }
+        public IndividualEntry IndividualEntry { get; set; }
+        public CorporateEntry CorporateEntry { get; set; }
+    }
+
+    public class IndividualEntry
+    {
+        public string ApplicantId { get; set; }
+        public string Drivinglicense { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string ShortName { get; set; }
+        public string Title { get; set; }
+        public string LastName { get; set; }
+        public string FullName { get; set; }
+        public string PurposeOfCreation { get; set; }
+        public string MobilePhone { get; set; }
+        public string Passport { get; set; }
+        public string AadharReference { get; set; }
+        public string Dob { get; set; }
+        public string CKYCNumber { get; set; }
+        public string Voterid { get; set; }
+        public string PANForm60 { get; set; }
+        public string PAN { get; set; }
+        public string Pincode { get; set; }
+        public string BranchCode { get; set; }
+        public string MotherMaidenName { get; set; }
+        public string ReasonNotApplicable { get; set; }
+    }
+
+    public class CorporateEntry
+    {
+        public string CompanyName { get; set; }
+        public string CompanyName2 { get; set; }
+        public string CompanyName3 { get; set; }
+        public string PocNumber { get; set; }
+        public string PocName { get; set; }
+        public string CinNumber { get; set; }
+        public string TanNumber { get; set; }
+        public string GstNumber { get; set; }
+        public string CstNumber { get; set; }
+        public string PAN { get; set; }
+        public string DateOfIncorporation { get; set; }
+        public string PurposeOfCreation { get; set; }
+    }
+
+
+    public class FetchCustLeadReturn : FetchCust_LeadReturn
+    {
+        public Individual individual { get; set; }
+        public Corporate corporate { get; set; }       
     }
 
     public class Individual
