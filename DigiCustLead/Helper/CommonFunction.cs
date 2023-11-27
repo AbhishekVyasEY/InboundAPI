@@ -439,6 +439,18 @@
             }
            
         }
+        public async Task<string> getDDEEntry(string AccountapplicantID, string type)
+        {
+            if (type == "Individual")
+            {
+                return await this.getIDfromMSDTable("eqs_ddeindividualcustomers", "eqs_ddeindividualcustomerid", "_eqs_accountapplicantid_value", AccountapplicantID);
+            }
+            else
+            {
+                return await this.getIDfromMSDTable("eqs_ddecorporatecustomers", "eqs_ddecorporatecustomerid", "_eqs_accountapplicantid_value", AccountapplicantID);
+            }
+            
+        }
 
 
         public async Task<string> getDDEFinalAccountIndvData(string AccountNumber)

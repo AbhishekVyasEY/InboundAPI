@@ -84,9 +84,9 @@
         }
 
 
-        public async Task<FetchCustLeadReturn> ValidateFetchLeadDetls(dynamic RequestData)
+        public async Task<FetchCust_LeadReturn> ValidateFetchLeadDetls(dynamic RequestData)
         {
-            FetchCustLeadReturn ldRtPrm = new FetchCustLeadReturn();
+            FetchCust_LeadReturn ldRtPrm = new FetchCust_LeadReturn();
 
             try
             {
@@ -147,45 +147,61 @@
             }
         }
 
-        public async Task<FetchCustLeadReturn> getDDEFinal(string AccountapplicantID)
+        public async Task<FetchCust_LeadReturn> getDDEFinal(string AccountapplicantID)
         {
-            FetchCustLeadReturn csRtPrm = new FetchCustLeadReturn();
+            FetchCust_LeadReturn csRtPrm = new FetchCust_LeadReturn();
             try
             {
                 var Applicant_Data = await this._commonFunc.getApplicentData(AccountapplicantID);
                 if (Applicant_Data.Count > 0)
                 {
                     string EntityType = await this._commonFunc.getEntityName(Applicant_Data[0]["_eqs_entitytypeid_value"].ToString());
-                    if (EntityType == "Individual")
+                    string DDEID = await this._commonFunc.getDDEEntry(Applicant_Data[0]["eqs_accountapplicantid"].ToString(), EntityType);
+                    if (DDEID!="")
                     {
-                        csRtPrm.individual = await this.getDigiCustLeadIndv(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
-                        if (csRtPrm.individual == null)
+                        FetchCustLeadReturn fetchCustLeadReturn = new FetchCustLeadReturn();
+                        
+                        if (EntityType == "Individual")
                         {
-                            this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
-                            csRtPrm.ReturnCode = "CRM-ERROR-102";
-                            csRtPrm.Message = "Final-DDE Entry not available.";
+                            fetchCustLeadReturn.individual = await this.getDigiCustLeadIndv(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
+                            if (fetchCustLeadReturn.individual == null)
+                            {
+                                this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
+                                csRtPrm.ReturnCode = "CRM-ERROR-102";
+                                csRtPrm.Message = "Final-DDE Entry not available.";
+                            }
+                            else
+                            {
+                                csRtPrm.Message = OutputMSG.Case_Success;
+                                csRtPrm.ReturnCode = "CRM-SUCCESS";
+                            }
                         }
                         else
                         {
-                            csRtPrm.Message = OutputMSG.Case_Success;
-                            csRtPrm.ReturnCode = "CRM-SUCCESS";
+                            fetchCustLeadReturn.corporate = await this.getDigiCustLeadCorp(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
+                            if (fetchCustLeadReturn.corporate == null)
+                            {
+                                this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
+                                csRtPrm.ReturnCode = "CRM-ERROR-102";
+                                csRtPrm.Message = "Final-DDE Entry not available.";
+                            }
+                            else
+                            {
+                                csRtPrm.Message = OutputMSG.Case_Success;
+                                csRtPrm.ReturnCode = "CRM-SUCCESS";
+                            }
                         }
+
+                        csRtPrm =fetchCustLeadReturn;
                     }
                     else
                     {
-                        csRtPrm.corporate = await this.getDigiCustLeadCorp(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
-                        if (csRtPrm.corporate == null)
-                        {
-                            this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
-                            csRtPrm.ReturnCode = "CRM-ERROR-102";
-                            csRtPrm.Message = "Final-DDE Entry not available.";
-                        }
-                        else
-                        {
-                            csRtPrm.Message = OutputMSG.Case_Success;
-                            csRtPrm.ReturnCode = "CRM-SUCCESS";
-                        }
+                        FetchCustD0Return fetchCustD0Return = new FetchCustD0Return();
+
+
+                        csRtPrm = fetchCustD0Return;
                     }
+                    
                 }
                 else
                 {

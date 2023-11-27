@@ -57,6 +57,7 @@ namespace DigiCustLead
         public Task<string> getIndividualDDEText(string DDEID);
         public Task<JArray> getDDEFinalFatcaDetail(string DDEId, string type);
         public Task<string> getKYCVerificationID(string DDEId, string type);
+        public Task<string> getDDEEntry(string AccountapplicantID, string type);
         public Task<string> getCustomerText(string customerId);
         public Task<string> getAccountapplicantName(string AccountapplicantId);
         public Task<string> getLeadsourceName(string leadsourceid);

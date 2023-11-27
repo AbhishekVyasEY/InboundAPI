@@ -46,7 +46,7 @@
                 
                 _fhDgCustLeadExecution.API_Name = "FetchDigiCustLead";
                 _fhDgCustLeadExecution.Input_payload = request.ToString();
-                FetchCustLeadReturn Casetatus = await _fhDgCustLeadExecution.ValidateFetchLeadDetls(request);
+                FetchCust_LeadReturn Casetatus = await _fhDgCustLeadExecution.ValidateFetchLeadDetls(request);
 
                 watch.Stop();
                 Casetatus.TransactionID = this._fhDgCustLeadExecution.Transaction_ID;
