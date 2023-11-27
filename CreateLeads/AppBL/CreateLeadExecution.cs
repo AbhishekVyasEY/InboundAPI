@@ -334,7 +334,11 @@ namespace CreateLeads
                     ldProperty.ProductId = productDetails["ProductId"];
                     ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
                     ldProperty.Productcategoryid = productDetails["productcategory"];
-                    lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+
+                    if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                    {
+                        lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                    }
 
                     if (ldProperty.ProductId != "")
                     {
@@ -434,7 +438,10 @@ namespace CreateLeads
                         ldProperty.ProductId = productDetails["ProductId"];
                         ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
                         ldProperty.Productcategoryid = productDetails["productcategory"];
-                        lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                        if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                        {
+                            lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                        }
 
                         odatab.Add("eqs_productid@odata.bind", $"eqs_products({ldProperty.ProductId})");
                         odatab.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({ldProperty.Productcategoryid})");
@@ -548,8 +555,10 @@ namespace CreateLeads
                         ldProperty.ProductId = productDetails["ProductId"];
                         ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
                         ldProperty.Productcategoryid = productDetails["productcategory"];
-                        lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
-
+                        if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                        {
+                            lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                        }
                         odatab.Add("eqs_productid@odata.bind", $"eqs_products({ldProperty.ProductId})");
                         odatab.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({ldProperty.Productcategoryid})");
                         odatab.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({ldProperty.Businesscategoryid})");
@@ -620,7 +629,6 @@ namespace CreateLeads
 
                     odatab.Add("eqs_createdfromonline", "true");
 
-
                     if (LeadData.Pincode != null && LeadData.Pincode.ToString() != "")
                         lead_Property.eqs_pincode = LeadData.Pincode;
 
@@ -634,8 +642,6 @@ namespace CreateLeads
 
                     Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
                 }
-                       
-
 
                 if (Lead_details.Count >0 )
                 {
