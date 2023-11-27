@@ -1,18 +1,18 @@
 ﻿namespace GFSProduct
 {
 
-using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Identity.Client;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Diagnostics.Metrics;
+    using Microsoft.Extensions.Caching.Memory;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Identity.Client;
+    using Microsoft.AspNetCore.Http;
+    using Newtonsoft.Json.Linq;
+    using System.Net;
+    using System.Diagnostics.Metrics;
     using CRMConnect;
 
 
@@ -58,13 +58,13 @@ using System.Diagnostics.Metrics;
             {
                 return ex.Message;
             }
-            
+
         }
 
         public static string GetIdFromPostRespons(string PResponseData)
         {
-           
-           string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
+
+            string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
             return Respons_Id;
         }
 
@@ -74,7 +74,7 @@ using System.Diagnostics.Metrics;
             return Respons_Id;
         }
 
-        public async Task<string> getIDFromGetResponce(string primaryField ,List<JObject> RsponsData)
+        public async Task<string> getIDFromGetResponce(string primaryField, List<JObject> RsponsData)
         {
             string resourceID = "";
             foreach (JObject item in RsponsData)
@@ -114,7 +114,7 @@ using System.Diagnostics.Metrics;
                     }
                 }
             }
-                return resourceID;
+            return resourceID;
         }
 
         public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
@@ -182,7 +182,7 @@ using System.Diagnostics.Metrics;
         }
 
         public async Task<string> getCategoryId(string product_Cat_Id)
-        {            
+        {
             return await this.getIDfromMSDTable("eqs_productcategories", "eqs_productcategoryid", "eqs_productcategorycode", product_Cat_Id);
         }
 
@@ -213,11 +213,57 @@ using System.Diagnostics.Metrics;
             }
         }
 
-        public async Task<JArray> getProductSubTypeLink(string SubTypeId)
+        public async Task<JArray> getCorporateProducts(string SubTypeId, string ProductCategoryId)
         {
             try
             {
-                string query_url = $"eqs_product_eqs_subentitytypeset()?$select=eqs_productid&$filter=eqs_subentitytypeid eq '{SubTypeId}'";
+                string fetchxml = $"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>"+
+                                    "<entity name='eqs_product'>"+
+                                    "<attribute name='eqs_productid'/>" +
+                                    "<attribute name='eqs_name'/>" +
+                                    "<attribute name='eqs_productcode'/>" +
+                                    "<attribute name='eqs_productcategory'/>" +
+                                    "<attribute name='eqs_mintenuredays'/>" +
+                                    "<attribute name='eqs_maxtenuredays'/>" +
+                                    "<attribute name='eqs_mintenuremonths'/>" +
+                                    "<attribute name='eqs_maxtenuremonths'/>" +
+                                    "<attribute name='eqs_minamount'/>" +
+                                    "<attribute name='eqs_maxamount'/>" +
+                                    "<attribute name='eqs_depositvariance'/>" +
+                                    "<attribute name='eqs_payoutfrequency'/>" +
+                                    "<attribute name='eqs_compoundingfrequency'/>" +
+                                    "<attribute name='eqs_renewaloptions'/>" +
+                                    "<attribute name='eqs_payoutfrequencytype'/>" +
+                                    "<attribute name='eqs_compoundingfrequencytype'/>" +
+                                    "<attribute name='eqs_iselite'/>" +
+                                    "<attribute name='eqs_chequebook'/>" +
+                                    "<attribute name='eqs_debitcard'/>" +
+                                    "<attribute name='eqs_applicabledebitcard'/>" +
+                                    "<attribute name='eqs_defaultdebitcard'/>" +
+                                    "<attribute name='eqs_instakit'/>" +
+                                    "<attribute name='eqs_doorstep'/>" +
+                                    "<attribute name='eqs_pmay'/>" +
+                                    "<attribute name='eqs_srnoofchequeleaves'/>" +
+                                    "<attribute name='eqs_noofchequeleaves'/>" +
+                                    "<attribute name='eqs_srdefaultchequeleaves'/>" +
+                                    "<attribute name='eqs_defaultchequeleaves'/>" +
+                                    "<order attribute='eqs_name' descending='false'/>" +
+                                    "<filter type='and'>" +
+                                    "<condition attribute='statecode' operator='eq' value='0'/>" +
+                                    $"<condition attribute='eqs_productcategory' operator='eq' uitype='eqs_productcategory' value='{ProductCategoryId}'/>" +
+                                    "</filter>" +
+                                    "<link-entity name='eqs_product_eqs_subentitytype' from='eqs_productid' to='eqs_productid' visible='false' intersect='true'>" +
+                                    "<link-entity name='eqs_subentitytype' from='eqs_subentitytypeid' to='eqs_subentitytypeid' alias='am'>" +
+                                    "<filter type='and'>" +
+                                    $"<condition attribute='eqs_subentitytypeid' operator='eq' uitype='eqs_subentitytype' value='{SubTypeId}'/>" +
+                                    "</filter>" +
+                                    "</link-entity>" +
+                                    "</link-entity>" +
+                                    "</entity>" +
+                                    "</fetch>";
+               
+                var escapedFetchXML = Uri.EscapeDataString(fetchxml);
+                string query_url = $"eqs_products?fetchXml=" + escapedFetchXML;
                 var Customerdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Customer_dtails = await this.getDataFromResponce(Customerdtails);
                 return Customer_dtails;
@@ -244,7 +290,7 @@ using System.Diagnostics.Metrics;
                 throw ex;
             }
         }
-        
+
         public async Task<JArray> getCustomerDetails(string CustomerId)
         {
             try
@@ -312,7 +358,7 @@ using System.Diagnostics.Metrics;
                 {
                     Product_dtails = Product_dtails1;
                 }
-                
+
                 return Product_dtails;
             }
             catch (Exception ex)

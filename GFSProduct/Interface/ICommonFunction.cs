@@ -12,7 +12,7 @@ namespace GFSProduct
         public Task<JArray> getContactData(string contact_id);
         public Task<string> getEntityType(string EntityTypeId);
         public Task<JArray> getIndividualDdeDetails(string ApplicantId);
-        public Task<JArray> getProductSubTypeLink(string SubTypeId);
+        public Task<JArray> getCorporateProducts(string SubTypeId, string ProductCategoryId);
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);
     }

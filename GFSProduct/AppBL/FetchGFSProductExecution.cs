@@ -301,9 +301,89 @@
                     }
                     else if (entityType == "Corporate")
                     {
-                        JArray subentityList = await this._commonFunc.getProductSubTypeLink(applicentDetails[0]["_eqs_subentity_value"].ToString());
-                        if (subentityList.Count > 0)
+                        JArray productDetails = await this._commonFunc.getCorporateProducts(applicentDetails[0]["_eqs_subentity_value"].ToString(), CategoryId);
+                        if (productDetails.Count > 0)
                         {
+                            csRtPrm.fdproductsApplicable = new List<FDProductsApplicable>();
+                            csRtPrm.rdproductsApplicable = new List<RDProductsApplicable>();
+                            csRtPrm.applicableCASAProducts = new List<ApplicableCASAProducts>();
+
+                            foreach (dynamic product_detail in productDetails)
+                            {
+                                if (CategoryCode == "PCAT04")
+                                {
+                                    FDProductsApplicable fDProductsApplicable = new FDProductsApplicable();
+                                    fDProductsApplicable.productCode = product_detail.eqs_productcode;
+                                    fDProductsApplicable.productName = product_detail.eqs_name;
+
+                                    fDProductsApplicable.minTenureDays = product_detail.eqs_mintenuredays;
+                                    fDProductsApplicable.maxTenureDays = product_detail.eqs_maxtenuredays;
+                                    fDProductsApplicable.minTenureMonths = product_detail.eqs_mintenuremonths;
+                                    fDProductsApplicable.maxTenureMonths = product_detail.eqs_maxtenuremonths;
+                                    fDProductsApplicable.minAmount = product_detail.eqs_minamount;
+                                    fDProductsApplicable.maxAmount = product_detail.eqs_maxamount;
+                                    fDProductsApplicable.depositVariance = product_detail.eqs_depositvariance;
+                                    fDProductsApplicable.payoutFrequency = product_detail.eqs_payoutfrequency;
+                                    fDProductsApplicable.compoundingFrequency = product_detail.eqs_compoundingfrequency;
+                                    fDProductsApplicable.renewalOptions = product_detail.eqs_renewaloptions;
+                                    fDProductsApplicable.payoutFrequencyType = product_detail.eqs_payoutfrequencytype;
+                                    fDProductsApplicable.compoundingFrequencyType = product_detail.eqs_compoundingfrequencytype;
+                                    fDProductsApplicable.isElite = product_detail.eqs_iselite;
+
+                                    csRtPrm.fdproductsApplicable.Add(fDProductsApplicable);
+                                }
+                                else if (CategoryCode == "PCAT05")
+                                {
+                                    RDProductsApplicable rdProductsApplicable = new RDProductsApplicable();
+                                    rdProductsApplicable.productCode = product_detail.eqs_productcode;
+                                    rdProductsApplicable.productName = product_detail.eqs_name;
+
+                                    rdProductsApplicable.minTenureDays = product_detail.eqs_mintenuredays;
+                                    rdProductsApplicable.maxTenureDays = product_detail.eqs_maxtenuredays;
+                                    rdProductsApplicable.minTenureMonths = product_detail.eqs_mintenuremonths;
+                                    rdProductsApplicable.maxTenureMonths = product_detail.eqs_maxtenuremonths;
+                                    rdProductsApplicable.minAmount = product_detail.eqs_minamount;
+                                    rdProductsApplicable.maxAmount = product_detail.eqs_maxamount;
+                                    rdProductsApplicable.depositVariance = product_detail.eqs_depositvariance;
+                                    rdProductsApplicable.payoutFrequency = product_detail.eqs_payoutfrequency;
+                                    rdProductsApplicable.compoundingFrequency = product_detail.eqs_compoundingfrequency;
+                                    rdProductsApplicable.renewalOptions = product_detail.eqs_renewaloptions;
+                                    rdProductsApplicable.payoutFrequencyType = product_detail.eqs_payoutfrequencytype;
+                                    rdProductsApplicable.compoundingFrequencyType = product_detail.eqs_compoundingfrequencytype;
+                                    rdProductsApplicable.isElite = product_detail.eqs_iselite;
+
+                                    csRtPrm.rdproductsApplicable.Add(rdProductsApplicable);
+                                }
+                                else if (CategoryCode == "PCAT02" || CategoryCode == "PCAT01")
+                                {
+                                    ApplicableCASAProducts applicableCASAProducts = new ApplicableCASAProducts();
+                                    applicableCASAProducts.productCode = product_detail.eqs_productcode;
+                                    applicableCASAProducts.productName = product_detail.eqs_name;
+
+                                    applicableCASAProducts.chequeBook = product_detail.eqs_chequebook;
+                                    applicableCASAProducts.debitCard = product_detail.eqs_debitcard;
+                                    applicableCASAProducts.applicableDebitCard = product_detail.eqs_applicabledebitcard;
+                                    applicableCASAProducts.defaultDebitCard = product_detail.eqs_defaultdebitcard;
+                                    applicableCASAProducts.instaKit = product_detail.eqs_instakit;
+                                    applicableCASAProducts.doorStep = product_detail.eqs_doorstep;
+
+                                    applicableCASAProducts.PMAY = product_detail.eqs_pmay;
+                                    applicableCASAProducts.isElite = product_detail.eqs_iselite;
+                                    applicableCASAProducts.srnoofchequeleaves = product_detail.eqs_srnoofchequeleaves;
+                                    applicableCASAProducts.noofchequeleaves = product_detail.eqs_noofchequeleaves;
+                                    applicableCASAProducts.srdefaultchequeleaves = product_detail.eqs_srdefaultchequeleaves;
+                                    applicableCASAProducts.defaultchequeleaves = product_detail.eqs_defaultchequeleaves;
+
+
+                                    csRtPrm.applicableCASAProducts.Add(applicableCASAProducts);
+                                }
+
+                            }
+
+                            csRtPrm.ReturnCode = "CRM-SUCCESS";
+                            csRtPrm.Message = OutputMSG.Case_Success;
+
+                            return csRtPrm;
 
                         }
                     }
@@ -325,7 +405,6 @@
             }
             return csRtPrm;
         }
-
 
         public async Task<GFSProducrListReturn> getProductDetails(productFilter product_Filter, string CategoryCode)
         {

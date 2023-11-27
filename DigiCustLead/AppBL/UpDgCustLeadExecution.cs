@@ -173,7 +173,8 @@
             Dictionary<string, string> CRMDDEmappingFields = new Dictionary<string, string>();
             Dictionary<string, bool> CRMDDEmappingFields1 = new Dictionary<string, bool>();
             Dictionary<string, int> CRMDDEmappingFields2 = new Dictionary<string, int>();
-           
+            Dictionary<string, bool> CRMDDEupdateTriggerFields = new Dictionary<string, bool>();
+
             try
             {
                 this.DDEId = await this._commonFunc.getDDEFinalAccountIndvData(Applicant_Data["eqs_accountapplicantid"].ToString());
@@ -533,8 +534,14 @@
                 */
 
 
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    CRMDDEupdateTriggerFields.Add("eqs_triggervalidation",  true);
+                    postDataParametr = JsonConvert.SerializeObject(CRMDDEupdateTriggerFields);
+                    var response = await this._queryParser.HttpApiCall($"eqs_ddeindividualcustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
+                }
 
-                csRtPrm.Address = Address_Id;
+                    csRtPrm.Address = Address_Id;
                 
                 csRtPrm.Message = OutputMSG.Case_Success;
                 csRtPrm.ReturnCode = "CRM-SUCCESS";
@@ -559,7 +566,8 @@
             Dictionary<string, string> CRMDDEmappingFields = new Dictionary<string, string>();
             Dictionary<string, bool> CRMDDEmappingFields1 = new Dictionary<string, bool>();
             Dictionary<string, int> CRMDDEmappingFields2 = new Dictionary<string, int>();
-            Dictionary<string, string> CRMCustomermappingFields = new Dictionary<string, string>();          
+            Dictionary<string, string> CRMCustomermappingFields = new Dictionary<string, string>();
+            Dictionary<string, bool> CRMDDEupdateTriggerFields = new Dictionary<string, bool>();
 
             try
             {
@@ -1028,7 +1036,14 @@
 
 
                 csRtPrm.Address = Address_Id;
-                               
+
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    CRMDDEupdateTriggerFields.Add("eqs_triggervalidation", true);
+                    postDataParametr = JsonConvert.SerializeObject(CRMDDEupdateTriggerFields);
+                    var response = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
+                }
+
                 csRtPrm.Message = OutputMSG.Case_Success;
                 csRtPrm.ReturnCode = "CRM-SUCCESS";
 

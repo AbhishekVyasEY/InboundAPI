@@ -120,72 +120,56 @@ namespace ManageCase
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID) && !string.IsNullOrEmpty(channel) && channel != "")
                     {
                         int ValidationError = 0;
-                        string errorText = "";
+                        List<string> errors = new List<string>();
 
                         if (CaseData.UCIC == null || string.IsNullOrEmpty(CaseData.UCIC.ToString()) || CaseData.UCIC.ToString() == "")
                         {
                             ValidationError = 1;
-                            errorText = "UCIC";
+                            errors.Add("UCIC");                           
                         }
                         if (CaseData.Classification == null || string.IsNullOrEmpty(CaseData.Classification.ToString()) || CaseData.Classification.ToString() == "")
                         {
                             ValidationError = 1;
-                            errorText = "Classification";
+                            errors.Add("Classification");
                         }
                         if (CaseData.CaseType == null || string.IsNullOrEmpty(CaseData.CaseType.ToString()) || CaseData.CaseType.ToString() == "")
                         {
                             ValidationError = 1;
-                            errorText = "CaseType";
+                            errors.Add("CaseType");
                         }
                         if (CaseData.Source == null || string.IsNullOrEmpty(CaseData.Source.ToString()) || CaseData.Source.ToString() == "")
                         {
                             ValidationError = 1;
-                            errorText = "Source";
+                            errors.Add("Source");
                         }
-                        //if (CaseData.AccountNumber == null || string.IsNullOrEmpty(CaseData.AccountNumber.ToString()) || CaseData.AccountNumber.ToString() == "")
-                        //{
-                        //    ValidationError = 1;
-                        //    errorText = "AccountNumber";
-                        //}
-
-
-                        if (string.Equals(CaseData.CaseType.ToString(), "Request"))
-                        {                               
-                            if (CaseData.Category == null || string.IsNullOrEmpty(CaseData.Category.ToString()) || CaseData.Category.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText = "Category";
-                            }
-                            if (CaseData.SubCategory == null || string.IsNullOrEmpty(CaseData.SubCategory.ToString()) || CaseData.SubCategory.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText = "SubCategory";
-                            }
-                        }
-
-                        if (string.Equals(CaseData.CaseType.ToString(), "Query"))
+                        if (CaseData.Category == null || string.IsNullOrEmpty(CaseData.Category.ToString()) || CaseData.Category.ToString() == "")
                         {
-                            if (CaseData.Category == null || string.IsNullOrEmpty(CaseData.Category.ToString()) || CaseData.Category.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText = "Category";
-                            }
-                            if (CaseData.SubCategory == null || string.IsNullOrEmpty(CaseData.SubCategory.ToString()) || CaseData.SubCategory.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText = "SubCategory";
-                            }
-                        }                            
-
-                        
-                        
-
+                            ValidationError = 1;
+                            errors.Add("Category");
+                        }
+                        if (CaseData.SubCategory == null || string.IsNullOrEmpty(CaseData.SubCategory.ToString()) || CaseData.SubCategory.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("SubCategory");
+                        }
+                        if (CaseData.Channel == null || string.IsNullOrEmpty(CaseData.Channel.ToString()) || CaseData.Channel.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("Channel");
+                        }
 
                         if (ValidationError == 1)
                         {
-                            this._logger.LogInformation("ValidateCreateCase", $"{errorText} is mandatory");
+                            this._logger.LogInformation("ValidateCreateCase", $"{string.Join(",", errors.ToArray())} is mandatory");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = $"{errorText} is mandatory";
+                            if (errors.Count == 1)
+                            {
+                                ldRtPrm.Message = $" {string.Join(",", errors.ToArray())} is mandatory";
+                            }
+                            if (errors.Count > 1)
+                            {
+                                ldRtPrm.Message = $" {string.Join(", ", errors.ToArray())} are mandatory";
+                            }
                         }
                         else if (await this._commonFunc.checkDuplicate(CaseData.UCIC.ToString(), CaseData.AccountNumber.ToString(), CaseData.Classification.ToString(), CaseData.Category.ToString(), CaseData.SubCategory.ToString()))
                         {
@@ -196,9 +180,7 @@ namespace ManageCase
                         else
                         {
                             ldRtPrm = await this.CreateCase(CaseData);
-                        }                       
-
-
+                        }                   
                     }
                     else
                     {

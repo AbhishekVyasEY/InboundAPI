@@ -300,8 +300,10 @@
                     if (Convert.ToInt32(responsD.searchOrUpdateDigiDedupeCustomerRes.msgBdy.EXACT_MATCH_COUNT.ToString()) > 0)
                     {
                         Dictionary<string, string> odatab = new Dictionary<string, string>();
-                        odatab.Add("eqs_leadstatus", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", "Not Onboarded"));
-                        odatab.Add("eqs_notonboardedreason", "duplicate");
+                        //odatab.Add("eqs_leadstatus", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", "Not Onboarded"));
+                        odatab.Add("eqs_leadstatus", "2");
+                        odatab.Add("statecode", "2");
+                        odatab.Add("statuscode", "136980001");
                         postDataParametr = JsonConvert.SerializeObject(odatab);
                         var LeadAccount_details = await this._queryParser.HttpApiCall($"leads({applicentDtls[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
                         ddupdgCustomerReturn.decideNL = responsD;
