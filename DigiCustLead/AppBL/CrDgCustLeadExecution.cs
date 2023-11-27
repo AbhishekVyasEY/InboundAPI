@@ -210,6 +210,7 @@
 
         public async Task<CreateCustLeadReturn> createDigiCustLeadIndv(dynamic CustLeadData)
         {
+            string Applicent_ID = "", Lead_Id = ""; 
             CreateCustLeadReturn csRtPrm = new CreateCustLeadReturn();
             CustLeadElement custLeadElement = new CustLeadElement();
             Dictionary<string, string> CRMLeadmappingFields = new Dictionary<string, string>();
@@ -217,6 +218,12 @@
             try
             {
                 var productDetails = await this._commonFunc.getProductId(CustLeadData.ProductCode.ToString());
+                if (CustLeadData.IndividualEntry.ApplicantId.ToString()!=null)
+                {
+                    var applicentDtl = await this._commonFunc.getApplicentData(CustLeadData.IndividualEntry.ApplicantId.ToString());
+                    Applicent_ID = applicentDtl[0]["eqs_accountapplicantid"].ToString();
+                    Lead_Id = applicentDtl[0]["eqs_leadid"]["leadid"].ToString();
+                }
                 string ProductId = productDetails["ProductId"];
                 string Businesscategoryid = productDetails["businesscategoryid"];
                 string Productcategoryid = productDetails["productcategory"];
@@ -274,8 +281,16 @@
                     string postDataParametr1 = JsonConvert.SerializeObject(CRMLeadmappingFields);
 
                     postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
-
-                    List<JObject> Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    List<JObject> Lead_details;
+                    if (Lead_Id=="")
+                    {
+                        Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    }
+                    else
+                    {
+                        Lead_details = await this._queryParser.HttpApiCall($"leads({Lead_Id})?$select=eqs_crmleadid", HttpMethod.Patch, postDataParametr);
+                    }
+                    
 
                     string purpose = await this._commonFunc.getPurposeID(CustLeadData.IndividualEntry.PurposeOfCreation.ToString());
 
@@ -305,13 +320,22 @@
                     if (Lead_details.Count > 0)
                     {
                         dynamic respons_code = Lead_details[0];
-                        if (respons_code.responsecode == 201)
+                        if (respons_code.responsecode == 201 || respons_code.responsecode == 200)
                         {
                             string LeadID = CommonFunction.GetIdFromPostRespons201(respons_code.responsebody, "eqs_crmleadid");
                             string Lead_ID = CommonFunction.GetIdFromPostRespons201(respons_code.responsebody, "leadid");
                             CRMCustomermappingFields.Add("eqs_leadid@odata.bind", $"leads({Lead_ID})");
                             postDataParametr = JsonConvert.SerializeObject(CRMCustomermappingFields);
-                            List<JObject> Customer_details = await this._queryParser.HttpApiCall("eqs_accountapplicants()?$select=eqs_applicantid", HttpMethod.Post, postDataParametr);
+                            List<JObject> Customer_details;
+                            if (Applicent_ID == "")
+                            {
+                                Customer_details = await this._queryParser.HttpApiCall("eqs_accountapplicants()?$select=eqs_applicantid", HttpMethod.Post, postDataParametr);
+                            }
+                            else
+                            {
+                                Customer_details = await this._queryParser.HttpApiCall($"eqs_accountapplicants({Applicent_ID})?$select=eqs_applicantid", HttpMethod.Patch, postDataParametr);
+                            }
+                            
                             
                             if (Customer_details.Count > 0)
                             {
