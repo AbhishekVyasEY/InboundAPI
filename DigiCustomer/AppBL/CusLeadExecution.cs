@@ -139,7 +139,7 @@
 
             var Customerdtl  = await this._commonFunc.getApplicentDetail(customerLeadID);
 
-            if (Customerdtl.Count > 0)
+            if (Customerdtl.Count>0)
             {
                 if (Customerdtl[0]["eqs_customertypecode"].ToString() == "789030001")
                 {
@@ -212,7 +212,7 @@
                 odatab.Add("eqs_panvalidationmode", "958570001");
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 var resp = await this._queryParser.HttpApiCall($"eqs_accountapplicants({Customerdtl[0]["eqs_accountapplicantid"].ToString()})", HttpMethod.Patch, postDataParametr);
-            }
+            }            
             else
             {
                 this._logger.LogInformation("getCustomerLead", "Applicent Detail not found");
