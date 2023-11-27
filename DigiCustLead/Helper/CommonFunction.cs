@@ -459,7 +459,7 @@
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$filter=eqs_applicantid eq '{Applicent_id}'";
+                string query_url = $"eqs_accountapplicants()?$filter=eqs_applicantid eq '{Applicent_id}' &$expand=eqs_leadid($select=leadid)";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;

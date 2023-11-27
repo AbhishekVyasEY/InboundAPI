@@ -214,11 +214,15 @@
                 odatab.Add("eqs_ddeoperatorname", LeadAccount[0]["eqs_crmleadaccountid"].ToString() + "  - Final");
                 odatab.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({LeadAccount[0]["_eqs_typeofaccountid_value"].ToString()})");
                 odatab.Add("eqs_productid@odata.bind", $"eqs_products({LeadAccount[0]["_eqs_productid_value"].ToString()})");
-               
+
 
                 /****************** General  ***********************/
 
-                odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({ await this._commonFunc.getAccountId(ddeData.General.AccountNumber.ToString())})");
+                if (ddeData.General.AccountNumber.ToString()!="")
+                {
+                    odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({await this._commonFunc.getAccountId(ddeData.General.AccountNumber.ToString())})");
+                }
+                
                 dd = ddeData.General.ApplicationDate.ToString().Substring(0, 2);
                 mm = ddeData.General.ApplicationDate.ToString().Substring(3, 2);
                 yyyy = ddeData.General.ApplicationDate.ToString().Substring(6, 4);

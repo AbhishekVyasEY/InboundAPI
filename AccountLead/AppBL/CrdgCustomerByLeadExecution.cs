@@ -150,6 +150,7 @@
                 if (AccountDDE.Count > 0)
                 {
                     dynamic responsD = "";
+                    string Lead_details = "";
                     var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString());
                    
                     if(!string.IsNullOrEmpty(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString()) && AccountDDE[0]["_eqs_leadaccountdde_value"].ToString() != "")
@@ -180,7 +181,7 @@
                             Request_Template.activateWizInstantAccountReq.msgBdy = msgBdy;
                             string wso_request = JsonConvert.SerializeObject(Request_Template);
                             string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                            string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSInstaAcct", postDataParametr);
+                            Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSInstaAcct", postDataParametr);
                             responsD = JsonConvert.DeserializeObject(Lead_details);
 
                         }
@@ -192,7 +193,7 @@
                         dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
                         dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
                         Guid ReferenceId = Guid.NewGuid();
-                        msgHdr.conversationID = ReferenceId.ToString().Replace("-", "");
+                        //msgHdr.conversationID = ReferenceId.ToString().Replace("-", "");
                         msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
                         Request_Template.createCustomerRequest.msgHdr = msgHdr;
 
@@ -205,7 +206,7 @@
                             msgBdy.individualCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
                             msgBdy.individualCustomer.address.zip = address[0]["eqs_pincode"].ToString();
                             msgBdy.individualCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
-                            msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMIL NADU";
+                            msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
                             msgBdy.individualCustomer.address.country = "IN";
                         }
 
@@ -225,7 +226,7 @@
                         msgBdy.individualCustomer.employeeId = "";
                         msgBdy.individualCustomer.nationalIdentificationCode = applicentId;
                         msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
-                        msgBdy.individualCustomer.isStaff = "";
+                        msgBdy.individualCustomer.isStaff = "Y";
                         msgBdy.individualCustomer.sex = (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") ? "M" : "F";
 
                         msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
@@ -234,7 +235,7 @@
                         Request_Template.createCustomerRequest.msgBdy = msgBdy;
                         string wso_request = JsonConvert.SerializeObject(Request_Template);
                         string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                        string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
+                        Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
                         responsD = JsonConvert.DeserializeObject(Lead_details);
                     }
                     
@@ -244,7 +245,7 @@
                         customerLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
                         customerLeadReturn.ReturnCode = "CRM-ERROR-102";
                     }
-                    else if(responsD.createCustomerResponse.msgBdy != null)
+                    else if(responsD.createCustomerResponse != null && responsD.createCustomerResponse.msgBdy != null)
                     {
                         Dictionary<string,string> fieldInput = new Dictionary<string,string>();
                         
@@ -265,8 +266,8 @@
                     }
                     else
                     {
-                        this._logger.LogInformation("CreateAccountByLead", "Create customer wso2 API has issue.");
-                        customerLeadReturn.Message = "Create customer wso2 API has issue.";
+                        this._logger.LogInformation("HttpCBSApiCall output", Lead_details);
+                        customerLeadReturn.Message = Lead_details;
                         customerLeadReturn.ReturnCode = "CRM-ERROR-101";
                     }
                 }
