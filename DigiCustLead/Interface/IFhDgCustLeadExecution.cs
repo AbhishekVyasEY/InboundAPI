@@ -9,7 +9,9 @@
         public string appkey { get; set; }
         public Task<Individual> getDigiCustLeadIndv(string applicentID);
         public Task<Corporate> getDigiCustLeadCorp(string applicentID);
-        public Task<FetchCustLeadReturn> ValidateFetchLeadDetls(dynamic CaseData);
+        public Task<FetchCustD0Return> getDigiCustD0Indv(string applicentID);
+        public Task<FetchCustD0Return> getDigiCustD0Corp(string applicentID);
+        public Task<FetchCust_LeadReturn> ValidateFetchLeadDetls(dynamic CaseData);
         public Task<string> EncriptRespons(string ResponsData);
         
 

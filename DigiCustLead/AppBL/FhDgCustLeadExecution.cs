@@ -134,7 +134,6 @@
 
         }
 
-
         public bool checkappkey(string appkey, string APIKey)
         {
             if (this._keyVaultService.ReadSecret(APIKey) == appkey)
@@ -157,23 +156,23 @@
                 {
                     string EntityType = await this._commonFunc.getEntityName(Applicant_Data[0]["_eqs_entitytypeid_value"].ToString());
                     string DDEID = await this._commonFunc.getDDEEntry(Applicant_Data[0]["eqs_accountapplicantid"].ToString(), EntityType);
-                    if (DDEID!="")
+                    if (DDEID != "")
                     {
                         FetchCustLeadReturn fetchCustLeadReturn = new FetchCustLeadReturn();
-                        
+
                         if (EntityType == "Individual")
                         {
                             fetchCustLeadReturn.individual = await this.getDigiCustLeadIndv(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
                             if (fetchCustLeadReturn.individual == null)
                             {
-                                this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
-                                csRtPrm.ReturnCode = "CRM-ERROR-102";
-                                csRtPrm.Message = "Final-DDE Entry not available.";
+                                this._logger.LogInformation("getDDEFinal", "Unable to fetch DDE Entry.");
+                                fetchCustLeadReturn.ReturnCode = "CRM-ERROR-102";
+                                fetchCustLeadReturn.Message = "Unable to fetch DDE Entry.";
                             }
                             else
                             {
-                                csRtPrm.Message = OutputMSG.Case_Success;
-                                csRtPrm.ReturnCode = "CRM-SUCCESS";
+                                fetchCustLeadReturn.Message = OutputMSG.Case_Success;
+                                fetchCustLeadReturn.ReturnCode = "CRM-SUCCESS";
                             }
                         }
                         else
@@ -181,27 +180,37 @@
                             fetchCustLeadReturn.corporate = await this.getDigiCustLeadCorp(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
                             if (fetchCustLeadReturn.corporate == null)
                             {
-                                this._logger.LogInformation("getDDEFinal", "Final-DDE Entry not available.");
-                                csRtPrm.ReturnCode = "CRM-ERROR-102";
-                                csRtPrm.Message = "Final-DDE Entry not available.";
+                                this._logger.LogInformation("getDDEFinal", "Unable to fetch DDE Entry.");
+                                fetchCustLeadReturn.ReturnCode = "CRM-ERROR-102";
+                                fetchCustLeadReturn.Message = "Unable to fetch DDE Entry.";
                             }
                             else
                             {
-                                csRtPrm.Message = OutputMSG.Case_Success;
-                                csRtPrm.ReturnCode = "CRM-SUCCESS";
+                                fetchCustLeadReturn.Message = OutputMSG.Case_Success;
+                                fetchCustLeadReturn.ReturnCode = "CRM-SUCCESS";
                             }
                         }
 
-                        csRtPrm =fetchCustLeadReturn;
+                        csRtPrm = fetchCustLeadReturn;
                     }
                     else
                     {
                         FetchCustD0Return fetchCustD0Return = new FetchCustD0Return();
 
+                        if (EntityType == "Individual")
+                        {
+                            fetchCustD0Return = await getDigiCustD0Indv(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
+                        }
+                        else
+                        {
+                            fetchCustD0Return = await getDigiCustD0Corp(Applicant_Data[0]["eqs_accountapplicantid"].ToString());
+                        }
+                        fetchCustD0Return.Message = OutputMSG.Case_Success;
+                        fetchCustD0Return.ReturnCode = "CRM-SUCCESS";
 
                         csRtPrm = fetchCustD0Return;
                     }
-                    
+
                 }
                 else
                 {
@@ -392,7 +401,7 @@
 
                     /*********** FATCA *********/
                     FATCA fATCA = new FATCA();
-                    if(!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
+                    if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
                     {
                         fATCA.TaxResident = "Tax Resident of India";
                     }
@@ -400,7 +409,7 @@
                     {
                         fATCA.TaxResident = "Tax Resident of India and other countries";
                     }
-                   // fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
+                    // fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
                     fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
 
                     FATCADetails fATCAobj = new FATCADetails();
@@ -458,7 +467,7 @@
                             fATCAobj.Address = fATCAAddress;
                         }
 
-                        fATCA.FATCADetails = fATCAobj;                       
+                        fATCA.FATCADetails = fATCAobj;
                     }
                     csRtPrm.fatca = fATCA;
 
@@ -709,7 +718,7 @@
                         }
 
                         fATCA.FATCADetails = fATCAobj;
-                        
+
                     }
 
 
@@ -786,8 +795,6 @@
             return await _queryParser.PayloadEncryption(ResponsData, Transaction_ID, this.Bank_Code);
         }
 
-
-
         private async Task<dynamic> getRequestData(dynamic inputData, string APIname)
         {
 
@@ -827,5 +834,110 @@
 
         }
 
+        public async Task<FetchCustD0Return> getDigiCustD0Indv(string applicentID)
+        {
+            FetchCustD0Return fetchCustD0Return = new FetchCustD0Return();
+            var accountApplicantDetails = await this._commonFunc.getAccountApplicantDetail(applicentID);
+
+            if (accountApplicantDetails[0]["_eqs_entitytypeid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.EntityType = accountApplicantDetails[0]["_eqs_entitytypeid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_subentity"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_subentity"]["eqs_key"].ToString()))
+                fetchCustD0Return.EntityFlagType = accountApplicantDetails[0]["eqs_subentity"]["eqs_key"].ToString();
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_productid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_productid"]["eqs_productcode"].ToString()))
+                fetchCustD0Return.ProductCode = accountApplicantDetails[0]["eqs_productid"]["eqs_productcode"].ToString();
+            fetchCustD0Return.UCIC = accountApplicantDetails[0]["eqs_customer"].ToString();
+
+            fetchCustD0Return.IndividualEntry = new IndividualEntry
+            {
+                ApplicantId = accountApplicantDetails[0]["eqs_applicantid"].ToString(),
+                Drivinglicense = accountApplicantDetails[0]["eqs_dlnumber"].ToString(),
+                FirstName = accountApplicantDetails[0]["eqs_firstname"].ToString(),
+                MiddleName = accountApplicantDetails[0]["eqs_middlename"].ToString(),
+                LastName = accountApplicantDetails[0]["eqs_lastname"].ToString(),
+                MobilePhone = accountApplicantDetails[0]["eqs_mobilenumber"].ToString(),
+                Passport = accountApplicantDetails[0]["eqs_passportnumber"].ToString(),
+                AadharReference = accountApplicantDetails[0]["eqs_aadhaarreference"].ToString(),
+                CKYCNumber = accountApplicantDetails[0]["eqs_ckycnumber"].ToString(),
+                Voterid = accountApplicantDetails[0]["eqs_voterid"].ToString(),
+                PAN = accountApplicantDetails[0]["eqs_internalpan"].ToString(),
+                Pincode = accountApplicantDetails[0]["eqs_pincode"].ToString(),
+                MotherMaidenName = accountApplicantDetails[0]["eqs_mothermaidenname"].ToString(),
+                ReasonNotApplicable = accountApplicantDetails[0]["eqs_reasonforna"].ToString()
+            };
+
+            if (accountApplicantDetails[0]["_eqs_titleid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.IndividualEntry.Title = accountApplicantDetails[0]["_eqs_titleid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_customerid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_customerid"]["eqs_shortname"].ToString()))
+                fetchCustD0Return.IndividualEntry.ShortName = accountApplicantDetails[0]["eqs_customerid"]["eqs_shortname"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_customerid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_customerid"]["fullname"].ToString()))
+                fetchCustD0Return.IndividualEntry.FullName = accountApplicantDetails[0]["eqs_customerid"]["fullname"].ToString();
+
+            if (accountApplicantDetails[0]["_eqs_purposeofcreationid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.IndividualEntry.PurposeOfCreation = accountApplicantDetails[0]["_eqs_purposeofcreationid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+
+            if (accountApplicantDetails[0]["eqs_panform60code@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.IndividualEntry.PANForm60 = accountApplicantDetails[0]["eqs_panform60code@OData.Community.Display.V1.FormattedValue"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_branchid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_branchid"]["eqs_branchidvalue"].ToString()))
+                fetchCustD0Return.BranchCode = accountApplicantDetails[0]["eqs_branchid"]["eqs_branchidvalue"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_dob"].ToString()))
+            {
+                DateTime dob = Convert.ToDateTime(accountApplicantDetails[0]["eqs_dob"]);
+                string yy = dob.Year.ToString().PadLeft(2, '0');
+                string mm = dob.Month.ToString().PadLeft(2, '0');
+                string dd = dob.Day.ToString().PadLeft(2, '0');
+                fetchCustD0Return.IndividualEntry.Dob = dd + "/" + mm + "/" + yy;
+            }
+
+            return fetchCustD0Return;
+        }
+
+        public async Task<FetchCustD0Return> getDigiCustD0Corp(string applicentID)
+        {
+            FetchCustD0Return fetchCustD0Return = new FetchCustD0Return();
+            var accountApplicantDetails = await this._commonFunc.getAccountApplicantDetail(applicentID);
+
+            if (accountApplicantDetails[0]["_eqs_entitytypeid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.EntityType = accountApplicantDetails[0]["_eqs_entitytypeid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_subentity"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_subentity"]["eqs_key"].ToString()))
+                fetchCustD0Return.EntityFlagType = accountApplicantDetails[0]["eqs_subentity"]["eqs_key"].ToString();
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_productid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_productid"]["eqs_productcode"].ToString()))
+                fetchCustD0Return.ProductCode = accountApplicantDetails[0]["eqs_productid"]["eqs_productcode"].ToString();
+            fetchCustD0Return.UCIC = accountApplicantDetails[0]["eqs_customer"].ToString();
+
+            fetchCustD0Return.CorporateEntry = new CorporateEntry
+            {
+                CompanyName = accountApplicantDetails[0]["eqs_companynamepart1"].ToString(),
+                CompanyName2 = accountApplicantDetails[0]["eqs_companynamepart2"].ToString(),
+                CompanyName3 = accountApplicantDetails[0]["eqs_companynamepart3"].ToString(),
+                PocNumber = accountApplicantDetails[0]["eqs_contactmobilenumber"].ToString(),
+                PocName = accountApplicantDetails[0]["eqs_contactperson"].ToString(),
+                CinNumber = accountApplicantDetails[0]["eqs_cinnumber"].ToString(),
+                TanNumber = accountApplicantDetails[0]["eqs_tannumber"].ToString(),
+                GstNumber = accountApplicantDetails[0]["eqs_gstnumber"].ToString(),
+                CstNumber = accountApplicantDetails[0]["eqs_cstvatnumber"].ToString(),
+                PAN = accountApplicantDetails[0]["eqs_internalpan"].ToString()
+            };
+
+            if (accountApplicantDetails[0]["_eqs_purposeofcreationid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                fetchCustD0Return.CorporateEntry.PurposeOfCreation = accountApplicantDetails[0]["_eqs_purposeofcreationid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_branchid"].ToString()) && !string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_branchid"]["eqs_branchidvalue"].ToString()))
+                fetchCustD0Return.BranchCode = accountApplicantDetails[0]["eqs_branchid"]["eqs_branchidvalue"].ToString();
+
+            if (!string.IsNullOrEmpty(accountApplicantDetails[0]["eqs_dateofincorporation"].ToString()))
+            {
+                DateTime dob = Convert.ToDateTime(accountApplicantDetails[0]["eqs_dateofincorporation"]);
+                string yy = dob.Year.ToString().PadLeft(2, '0');
+                string mm = dob.Month.ToString().PadLeft(2, '0');
+                string dd = dob.Day.ToString().PadLeft(2, '0');
+                fetchCustD0Return.CorporateEntry.DateOfIncorporation = dd + "/" + mm + "/" + yy;
+            }
+
+            return fetchCustD0Return;
+        }
     }
 }
