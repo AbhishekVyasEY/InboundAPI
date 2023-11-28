@@ -223,7 +223,7 @@
                         msgBdy.individualCustomer.name.midName = AccountDDE[0]["eqs_middlename"].ToString();
                         msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
 
-                        msgBdy.individualCustomer.employeeId = "";
+                        //msgBdy.individualCustomer.employeeId = "";
                         msgBdy.individualCustomer.nationalIdentificationCode = applicentId;
                         msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
                         msgBdy.individualCustomer.isStaff = "Y";

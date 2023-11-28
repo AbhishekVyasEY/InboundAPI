@@ -271,71 +271,73 @@
                 odatab.Add("eqs_sourceoffundcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_sourceoffundcode", ddeData.AdditionalDetails.SourceofFund.ToString()));
                 odatab.Add("eqs_othersourceoffund", ddeData.AdditionalDetails.OtherSourceoffund.ToString());
                 odatab.Add("eqs_predefinedaccountnumber", ddeData.AdditionalDetails.PredefinedAccountNumber.ToString());
-                
-               
+
+
                 //odatab.Add("eqs_accountownershipcode", this.AccountType[ddeData.accountType.ToString()]);                
                 //odatab.Add("eqs_accounttitle", ddeData.AccountTitle.ToString());
 
                 /****************** FDRD Details  ***********************/
-                
-                odatab1.Add("eqs_minimumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MinimumDepositAmount.ToString()));
-                odatab1.Add("eqs_maximumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MaximumDepositAmount.ToString()));
-                odatab.Add("eqs_compoundingfrequency", ddeData.FDRDDetails.ProductDetails.CompoundingFrequency.ToString());
-                odatab.Add("eqs_minimumtenuremonths", ddeData.FDRDDetails.ProductDetails.MinimumTenureMonths.ToString());
-                odatab.Add("eqs_maximumtenuremonths", ddeData.FDRDDetails.ProductDetails.MaximumTenureMonths.ToString());
-                odatab.Add("eqs_payoutfrequency", ddeData.FDRDDetails.ProductDetails.PayoutFrequency.ToString());
-                odatab.Add("eqs_minimumtenuredays", ddeData.FDRDDetails.ProductDetails.MinimumTenureDays.ToString());
-                odatab.Add("eqs_maximumtenuredays", ddeData.FDRDDetails.ProductDetails.MaximumTenureDays.ToString());
-                odatab.Add("eqs_interestcompoundfrequency", ddeData.FDRDDetails.ProductDetails.InterestCompoundFrequency.ToString());
+                if (ddeData.FDRDDetails!=null)
+                {
+                    odatab1.Add("eqs_minimumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MinimumDepositAmount.ToString()));
+                    odatab1.Add("eqs_maximumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MaximumDepositAmount.ToString()));
+                    odatab.Add("eqs_compoundingfrequency", ddeData.FDRDDetails.ProductDetails.CompoundingFrequency.ToString());
+                    odatab.Add("eqs_minimumtenuremonths", ddeData.FDRDDetails.ProductDetails.MinimumTenureMonths.ToString());
+                    odatab.Add("eqs_maximumtenuremonths", ddeData.FDRDDetails.ProductDetails.MaximumTenureMonths.ToString());
+                    odatab.Add("eqs_payoutfrequency", ddeData.FDRDDetails.ProductDetails.PayoutFrequency.ToString());
+                    odatab.Add("eqs_minimumtenuredays", ddeData.FDRDDetails.ProductDetails.MinimumTenureDays.ToString());
+                    odatab.Add("eqs_maximumtenuredays", ddeData.FDRDDetails.ProductDetails.MaximumTenureDays.ToString());
+                    odatab.Add("eqs_interestcompoundfrequency", ddeData.FDRDDetails.ProductDetails.InterestCompoundFrequency.ToString());
 
 
 
-                odatab1.Add("eqs_depositvariance", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositVariancePercentage.ToString()));
-                odatab1.Add("eqs_depositamount", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositAmount.ToString()));
-                odatab.Add("eqs_fromesfbaccountnumber", ddeData.FDRDDetails.DepositDetails.FromESFBAccountNumber.ToString());
-                odatab.Add("eqs_fromesfbglaccount", ddeData.FDRDDetails.DepositDetails.FromESFBGLAccount.ToString());
-                odatab.Add("eqs_currencyofdepositcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_currencyofdepositcode", ddeData.FDRDDetails.DepositDetails.CurrencyofDeposit.ToString()));
-                odatab.Add("eqs_tenureindays", ddeData.FDRDDetails.DepositDetails.tenureInDays.ToString());
-                odatab2.Add("eqs_specialinterestraterequired", (ddeData.FDRDDetails.DepositDetails.SpecialInterestRateRequired.ToString()=="Yes") ? true : false);
-                odatab.Add("eqs_specialinterestrate", ddeData.FDRDDetails.DepositDetails.SpecialInterestRate.ToString());
-                odatab.Add("eqs_specialinterestrequestid", ddeData.FDRDDetails.DepositDetails.SpecialInterestRequestID.ToString());
-                odatab.Add("eqs_branchcodegl", ddeData.FDRDDetails.DepositDetails.BranchCodeGL.ToString());
-                dd = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(0, 2);
-                mm = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(3, 2);
-                yyyy = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(6, 4);
-                odatab.Add("eqs_fdvaluedate", yyyy + "-" + mm + "-" + dd);
-                odatab.Add("eqs_tenureinmonths", ddeData.FDRDDetails.DepositDetails.TenureInMonths.ToString());
-                odatab2.Add("eqs_waivedofftds", (ddeData.FDRDDetails.DepositDetails.WaivedOffTDS.ToString() == "Yes") ? true : false);
-                //odatab.Add("eqs_transactionid", ddeData.FDRDDetails.DepositDetails.TransactionID.ToString());
+                    odatab1.Add("eqs_depositvariance", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositVariancePercentage.ToString()));
+                    odatab1.Add("eqs_depositamount", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositAmount.ToString()));
+                    odatab.Add("eqs_fromesfbaccountnumber", ddeData.FDRDDetails.DepositDetails.FromESFBAccountNumber.ToString());
+                    odatab.Add("eqs_fromesfbglaccount", ddeData.FDRDDetails.DepositDetails.FromESFBGLAccount.ToString());
+                    odatab.Add("eqs_currencyofdepositcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_currencyofdepositcode", ddeData.FDRDDetails.DepositDetails.CurrencyofDeposit.ToString()));
+                    odatab.Add("eqs_tenureindays", ddeData.FDRDDetails.DepositDetails.tenureInDays.ToString());
+                    odatab2.Add("eqs_specialinterestraterequired", (ddeData.FDRDDetails.DepositDetails.SpecialInterestRateRequired.ToString() == "Yes") ? true : false);
+                    odatab.Add("eqs_specialinterestrate", ddeData.FDRDDetails.DepositDetails.SpecialInterestRate.ToString());
+                    odatab.Add("eqs_specialinterestrequestid", ddeData.FDRDDetails.DepositDetails.SpecialInterestRequestID.ToString());
+                    odatab.Add("eqs_branchcodegl", ddeData.FDRDDetails.DepositDetails.BranchCodeGL.ToString());
+                    dd = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(0, 2);
+                    mm = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(3, 2);
+                    yyyy = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(6, 4);
+                    odatab.Add("eqs_fdvaluedate", yyyy + "-" + mm + "-" + dd);
+                    odatab.Add("eqs_tenureinmonths", ddeData.FDRDDetails.DepositDetails.TenureInMonths.ToString());
+                    odatab2.Add("eqs_waivedofftds", (ddeData.FDRDDetails.DepositDetails.WaivedOffTDS.ToString() == "Yes") ? true : false);
+                    //odatab.Add("eqs_transactionid", ddeData.FDRDDetails.DepositDetails.TransactionID.ToString());
 
 
-                odatab.Add("eqs_interestpayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_interestpayoutmode", ddeData.FDRDDetails.InterestPayoutDetails.interestPayoutMode.ToString()));
-                odatab.Add("eqs_esfbaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToESFBAccountNo.ToString());
-                odatab.Add("eqs_otherbankaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankAccountNo.ToString());
-                odatab.Add("eqs_beneficiaryaccounttypeinterest", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttypeinterest", ddeData.FDRDDetails.InterestPayoutDetails.BeneficiaryAccountType.ToString()));
-                
-                odatab.Add("eqs_beneficiarynameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBenificiaryName.ToString());
-                odatab.Add("eqs_ifsccodeinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankIFSC.ToString());
-                odatab.Add("eqs_banknameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankName.ToString());
-                odatab.Add("eqs_branchinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBranch.ToString());
-                odatab.Add("eqs_micrinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankMICR.ToString());
-                odatab.Add("eqs_issuercode_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOIssuerCode.ToString());
-                odatab.Add("eqs_payeename_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOPayeeName.ToString());
+                    odatab.Add("eqs_interestpayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_interestpayoutmode", ddeData.FDRDDetails.InterestPayoutDetails.interestPayoutMode.ToString()));
+                    odatab.Add("eqs_esfbaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToESFBAccountNo.ToString());
+                    odatab.Add("eqs_otherbankaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankAccountNo.ToString());
+                    odatab.Add("eqs_beneficiaryaccounttypeinterest", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttypeinterest", ddeData.FDRDDetails.InterestPayoutDetails.BeneficiaryAccountType.ToString()));
+
+                    odatab.Add("eqs_beneficiarynameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBenificiaryName.ToString());
+                    odatab.Add("eqs_ifsccodeinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankIFSC.ToString());
+                    odatab.Add("eqs_banknameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankName.ToString());
+                    odatab.Add("eqs_branchinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBranch.ToString());
+                    odatab.Add("eqs_micrinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankMICR.ToString());
+                    odatab.Add("eqs_issuercode_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOIssuerCode.ToString());
+                    odatab.Add("eqs_payeename_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOPayeeName.ToString());
 
 
 
-                odatab.Add("eqs_maturityinstruction", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturityinstruction", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityInstruction.ToString()));
-                odatab.Add("eqs_maturitypayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturitypayoutmode", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityPayoutMode.ToString()));
-                odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToESFBAccountNo.ToString());
-                odatab.Add("eqs_otherbankaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountNo.ToString());
-                odatab.Add("eqs_beneficiaryaccounttype_maturity", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttype_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountType.ToString()));
-                odatab.Add("eqs_beneficiaryname_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.BeneficiaryName.ToString());
-                odatab.Add("eqs_ifccodematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankIFSC.ToString());
-                odatab.Add("eqs_banknamematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankName.ToString());
-                odatab.Add("eqs_branchmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankBranch.ToString());
-                odatab.Add("eqs_micrmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankMICR.ToString());
-                odatab.Add("eqs_issuercode_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOIssuerCode.ToString());
-                odatab.Add("eqs_payeename_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOPayeeName.ToString());
+                    odatab.Add("eqs_maturityinstruction", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturityinstruction", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityInstruction.ToString()));
+                    odatab.Add("eqs_maturitypayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturitypayoutmode", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityPayoutMode.ToString()));
+                    odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToESFBAccountNo.ToString());
+                    odatab.Add("eqs_otherbankaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountNo.ToString());
+                    odatab.Add("eqs_beneficiaryaccounttype_maturity", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttype_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountType.ToString()));
+                    odatab.Add("eqs_beneficiaryname_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.BeneficiaryName.ToString());
+                    odatab.Add("eqs_ifccodematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankIFSC.ToString());
+                    odatab.Add("eqs_banknamematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankName.ToString());
+                    odatab.Add("eqs_branchmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankBranch.ToString());
+                    odatab.Add("eqs_micrmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankMICR.ToString());
+                    odatab.Add("eqs_issuercode_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOIssuerCode.ToString());
+                    odatab.Add("eqs_payeename_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOPayeeName.ToString());
+                }               
             
                 
 
