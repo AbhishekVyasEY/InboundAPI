@@ -201,6 +201,7 @@
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
                 Dictionary<string, double> odatab1 = new Dictionary<string, double>();                
                 Dictionary<string, bool> odatab2 = new Dictionary<string, bool>();
+                Dictionary<string, bool> odataTriggerField = new Dictionary<string, bool>();
 
                 // odatab.Add("eqs_applicationdate", LeadAccount[0]["eqs_applicationdate"].ToString("yyyy-MM-dd"));
                 if (!string.IsNullOrEmpty(LeadAccount[0]["eqs_ddefinalid"].ToString()))
@@ -387,8 +388,13 @@
                 {
                     var LeadAccount_details = await this._queryParser.HttpApiCall($"eqs_ddeaccounts({this.DDEId})?$select=eqs_ddeaccountid", HttpMethod.Patch, postDataParametr);
                 }
-                
-                
+
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    odataTriggerField.Add("eqs_triggervalidation", true);
+                    postDataParametr = JsonConvert.SerializeObject(odataTriggerField);
+                    var response = await this._queryParser.HttpApiCall($"eqs_ddeaccounts({this.DDEId})?", HttpMethod.Patch, postDataParametr);
+                }
 
                 return true;
             }
