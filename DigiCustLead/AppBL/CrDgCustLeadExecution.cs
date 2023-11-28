@@ -218,7 +218,7 @@
             try
             {
                 var productDetails = await this._commonFunc.getProductId(CustLeadData.ProductCode.ToString());
-                if (CustLeadData.IndividualEntry.ApplicantId.ToString()!=null)
+                if (!string.IsNullOrEmpty( CustLeadData.IndividualEntry.ApplicantId.ToString()))
                 {
                     var applicentDtl = await this._commonFunc.getApplicentData(CustLeadData.IndividualEntry.ApplicantId.ToString());
                     Applicent_ID = applicentDtl[0]["eqs_accountapplicantid"].ToString();
@@ -340,7 +340,7 @@
                             if (Customer_details.Count > 0)
                             {
                                 respons_code = Customer_details[0];
-                                if (respons_code.responsecode == 201)
+                                if (respons_code.responsecode == 201 || respons_code.responsecode == 200)
                                 {
                                     string applicantID = CommonFunction.GetIdFromPostRespons201(respons_code.responsebody, "eqs_applicantid");
                                     csRtPrm.ReturnCode = "CRM-SUCCESS";

@@ -381,9 +381,17 @@
             accountLead.accountType = await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_accountownershipcode", LeadData[0]["eqs_accountownershipcode"].ToString());
             accountLead.productCategory = LeadData[0]["_eqs_typeofaccountid_value@OData.Community.Display.V1.FormattedValue"].ToString();
             accountLead.productCode = LeadData[0]["_eqs_productid_value@OData.Community.Display.V1.FormattedValue"].ToString();
-            accountLead.accountOpeningFlow = LeadData[0]["eqs_instakitoptioncode@OData.Community.Display.V1.FormattedValue"].ToString();
+            if (!string.IsNullOrEmpty(LeadData[0]["eqs_instakitoptioncode"].ToString()))
+            {
+                accountLead.accountOpeningFlow = LeadData[0]["eqs_instakitoptioncode@OData.Community.Display.V1.FormattedValue"].ToString();
+            }
+                
             accountLead.sourceBranch = LeadData[0]["eqs_Lead"]["_eqs_branchid_value@OData.Community.Display.V1.FormattedValue"].ToString();
-            accountLead.leadsource = LeadData[0]["_eqs_leadsourceid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            if (!string.IsNullOrEmpty(LeadData[0]["_eqs_leadsourceid_value"].ToString()))
+            {
+                accountLead.leadsource = LeadData[0]["_eqs_leadsourceid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+            }
+                
             accountLead.initialDepositType = LeadData[0]["eqs_initialdepositmodecode@OData.Community.Display.V1.FormattedValue"].ToString();
             accountLead.fieldEmployeeCode = LeadData[0]["eqs_sourcebyemployeecode"].ToString();
             accountLead.applicationDate = LeadData[0]["eqs_applicationdate"].ToString();
