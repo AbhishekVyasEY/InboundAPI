@@ -316,13 +316,25 @@
 
             odatab.Add("eqs_sweepfacility", _accountLead.sweepFacility.ToString().ToLower());
 
-            odatab.Add("eqs_tenureinmonths", _accountLead.tenureInMonths);
-            odatab.Add("eqs_tenureindays", _accountLead.tenureInDays);
+            if (!string.IsNullOrEmpty(_accountLead.tenureInMonths.ToString()))
+            {
+                odatab.Add("eqs_tenureinmonths", _accountLead.tenureInMonths);
+            }
+            if (!string.IsNullOrEmpty(_accountLead.tenureInDays.ToString()))
+            {
+                odatab.Add("eqs_tenureindays", _accountLead.tenureInDays);
+            }
 
             string postDataParametr = JsonConvert.SerializeObject(odatab);
 
-            odatab1.Add("eqs_rateofinterest", Convert.ToDouble(_accountLead.rateOfInterest.ToString()));
-            odatab1.Add("eqs_depositamount", Convert.ToDouble(_accountLead.depositAmount.ToString()));
+            if (!string.IsNullOrEmpty(_accountLead.rateOfInterest.ToString()))
+            {
+                odatab1.Add("eqs_rateofinterest", Convert.ToDouble(_accountLead.rateOfInterest.ToString()));
+            }
+            if (!string.IsNullOrEmpty(_accountLead.depositAmount.ToString()))
+            {
+                odatab1.Add("eqs_depositamount", Convert.ToDouble(_accountLead.depositAmount.ToString()));
+            }
 
             string postDataParametr1 = JsonConvert.SerializeObject(odatab1);
             postDataParametr = await _commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);

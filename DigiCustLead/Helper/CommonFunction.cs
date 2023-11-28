@@ -486,8 +486,8 @@
         {
             try
             {
-                string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddeindividualcustomers()?$filter=eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value eq '{AccountNumber}'";
+                //string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
+                string query_url = $"eqs_ddeindividualcustomers()?$filter=_eqs_accountapplicantid_value eq '{AccountNumber}'";
                 var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var DDE_dtails = await this.getDataFromResponce(DDEdtails);
                 return DDE_dtails;
@@ -520,8 +520,8 @@
         {
             try
             {
-                string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddecorporatecustomers()?$filter=eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value eq '{AccountNumber}'";
+                //string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
+                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{AccountNumber}'";
                 var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var DDE_dtails = await this.getDataFromResponce(DDEdtails);
                 return DDE_dtails;
@@ -532,6 +532,22 @@
                 throw ex;
             }
 
+        }
+
+        public async Task<JArray> getAccountApplicantDetail(string AccountApplicantID)
+        {
+            try
+            {
+                string query_url = $"eqs_accountapplicants({AccountApplicantID})?$expand=eqs_productid($select=eqs_productcode),eqs_customerid($select=fullname,eqs_shortname),eqs_branchid($select=eqs_branchidvalue),eqs_subentity($select=eqs_key)";
+                var AccountApplicantDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var AccountApplicant_Details = await this.getDataFromResponce(AccountApplicantDetails);
+                return AccountApplicant_Details;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getDDEFinalCorpDetail", ex.Message);
+                throw ex;
+            }
         }
 
         public async Task<JArray> getDDEFinalAddressDetail(string DDEId, string type)

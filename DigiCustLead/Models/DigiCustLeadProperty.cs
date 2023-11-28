@@ -89,6 +89,8 @@ namespace DigiCustLead
         public string ProductCode { get; set; }
         public IndividualEntry IndividualEntry { get; set; }
         public CorporateEntry CorporateEntry { get; set; }
+        public string UCIC { get; set; }
+        public string BranchCode { get; set; }
     }
 
     public class IndividualEntry
@@ -111,7 +113,6 @@ namespace DigiCustLead
         public string PANForm60 { get; set; }
         public string PAN { get; set; }
         public string Pincode { get; set; }
-        public string BranchCode { get; set; }
         public string MotherMaidenName { get; set; }
         public string ReasonNotApplicable { get; set; }
     }
