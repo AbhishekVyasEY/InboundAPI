@@ -355,10 +355,18 @@
                   
 
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
-                string postDataParametr1 = JsonConvert.SerializeObject(odatab1);
-                postDataParametr = await _commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
-                postDataParametr1 = JsonConvert.SerializeObject(odatab2);
-                postDataParametr = await _commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+                string postDataParametr1 = string.Empty;
+                if (odatab1.Count > 0)
+                {
+                    postDataParametr1 = JsonConvert.SerializeObject(odatab1);
+                    postDataParametr = await _commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+                }
+
+                if (odatab2.Count > 0)
+                {
+                    postDataParametr1 = JsonConvert.SerializeObject(odatab2);
+                    postDataParametr = await _commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+                }
 
                 if (string.IsNullOrEmpty(this.DDEId))
                 {
