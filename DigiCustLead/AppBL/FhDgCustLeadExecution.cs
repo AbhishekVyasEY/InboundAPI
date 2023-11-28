@@ -667,16 +667,16 @@
                     /*********** FATCA *********/
 
                     FATCA fATCA = new FATCA();
-                    fATCA.TaxResident = DDEDetails[0].eqs_taxresident.ToString();
-                    fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+                    fATCA.TaxResident = DDEDetails[0].eqs_taxresidenttypecode.ToString();
+                    fATCA.CityofBirth = "";//DDEDetails[0].eqs_cityofbirth.ToString();
 
                     FATCADetails fATCAobj = new FATCADetails();
                     dynamic fatcaDetail = await this._commonFunc.getDDEFinalFatcaDetail(DDEDetails[0].eqs_ddecorporatecustomerid.ToString(), "corp");
                     foreach (var fatcaitem in fatcaDetail)
                     {
                         fATCAobj.FATCAID = fatcaitem.eqs_name.ToString();
-                        fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresident", DDEDetails[0].eqs_taxresident.ToString());
-                        fATCAobj.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+                        fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresidenttypecode", DDEDetails[0].eqs_taxresident.ToString());
+                        fATCAobj.CityofBirth = "";//DDEDetails[0].eqs_cityofbirth.ToString();
                         fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
 
 
