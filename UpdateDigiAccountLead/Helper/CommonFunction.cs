@@ -273,7 +273,21 @@ using CRMConnect;
             }
         }
 
-      
+        public async Task<JArray> getAccountLeadData(string DDEId)
+        {
+            try
+            {
+                string query_url = $"eqs_ddeaccounts({DDEId})?$select=eqs_accountnocreated";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Account_dtails = await this._queryParser.getDataFromResponce(Accountdtails);
+                return Account_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getAccountLeadData", ex.Message);
+                throw ex;
+            }
+        }
 
         public async Task<string> MeargeJsonString(string json1, string json2)
         {

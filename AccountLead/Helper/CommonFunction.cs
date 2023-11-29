@@ -281,7 +281,7 @@
             try
             {
                 string leadaccount_id = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", AccountID);
-                string query_url = $"eqs_ddeaccounts()?$select=eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_ddeoperatorname eq '{AccountID}  - Final'";
+                string query_url = $"eqs_ddeaccounts()?$select=eqs_readyforonboarding,eqs_onboardingvalidationmessage,eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_ddeoperatorname eq '{AccountID}  - Final'";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
