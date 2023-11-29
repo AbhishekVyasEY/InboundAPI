@@ -375,62 +375,65 @@ namespace ManageCase
                 }
                 else
                 {
-                    JObject items_J_Arr = (JObject)CaseData.AdditionalField;
-                    int no_Itemes = (items_J_Arr.Count) / 2;
-                    var mandatoryFields = await this._commonFunc.getMandatoryFields(csProperty.SubCategoryId);
-                    if (mandatoryFields.Count>0)
+                    if (CaseData.AdditionalField != null && CaseData.AdditionalField != "")
                     {
-                        for (int i = 1; i <= no_Itemes; i++)
+                        JObject items_J_Arr = (JObject)CaseData.AdditionalField;
+                        int no_Itemes = (items_J_Arr.Count) / 2;
+                        var mandatoryFields = await this._commonFunc.getMandatoryFields(csProperty.SubCategoryId);
+                        if (mandatoryFields.Count > 0)
                         {
-                            string keyName = CaseData.AdditionalField["FieldName" + i];
-                            string ValName = CaseData.AdditionalField["FieldValue" + i];
-                            mandatoryFields.Where(x => (x.InputField == keyName)).Single().CRMValue = ValName;
-                        }
-                    }
-                    var value = await this._queryParser.getOptionSetTextToValue("incident", "statuscode", "Researching");
-                    foreach (var field in mandatoryFields)
-                    {
-                        if (field.CRMValue != "" || !string.IsNullOrEmpty(field.CRMValue))
-                        {
-                            if (field.CRMType == "615290002")
+                            for (int i = 1; i <= no_Itemes; i++)
                             {
-                                string mandFieldID = await this._commonFunc.getIDfromMSDTable(field.CRMTable, field.IDFieldName, field.FilterField, field.CRMValue);
-                                odatab.Add(field.CRMField + "@odata.bind", $"{field.CRMTable}({mandFieldID})");
+                                string keyName = CaseData.AdditionalField["FieldName" + i];
+                                string ValName = CaseData.AdditionalField["FieldValue" + i];
+                                mandatoryFields.Where(x => (x.InputField == keyName)).Single().CRMValue = ValName;
                             }
-                            else
+                        }
+                        var value = await this._queryParser.getOptionSetTextToValue("incident", "statuscode", "Researching");
+                        foreach (var field in mandatoryFields)
+                        {
+                            if (field.CRMValue != "" || !string.IsNullOrEmpty(field.CRMValue))
                             {
-                                if (field.CRMType== "615290001")
+                                if (field.CRMType == "615290002")
                                 {
-                                    odatab.Add(field.CRMField, await this._queryParser.getOptionSetTextToValue("incident", field.CRMField, field.CRMValue));
-                                }
-                                else if (field.CRMType == "615290007")
-                                {
-                                    odatab1.Add(field.CRMField, Convert.ToDouble(field.CRMValue.ToString()));
-                                }
-                                else if (field.CRMType == "615290006")
-                                {
-                                    string dd, mm, yyyy;
-                                    dd = field.CRMValue.Substring(0,2);
-                                    mm = field.CRMValue.Substring(3,2);
-                                    yyyy = field.CRMValue.Substring(6,4);
-                                    odatab.Add(field.CRMField, yyyy + "-" + mm + "-" + dd );
+                                    string mandFieldID = await this._commonFunc.getIDfromMSDTable(field.CRMTable, field.IDFieldName, field.FilterField, field.CRMValue);
+                                    odatab.Add(field.CRMField + "@odata.bind", $"{field.CRMTable}({mandFieldID})");
                                 }
                                 else
                                 {
-                                    odatab.Add(field.CRMField, field.CRMValue);
-                                }
-                               
-                            }
-                            
-                        }
-                        else
-                        {
-                            this._logger.LogInformation("CreateCase", $"{field.CRMField} can not be null.");
-                            csRtPrm.ReturnCode = "CRM-ERROR-102";
-                            csRtPrm.Message = $"{field.CRMField} can not be null.";
-                            return csRtPrm;
-                        }
+                                    if (field.CRMType == "615290001")
+                                    {
+                                        odatab.Add(field.CRMField, await this._queryParser.getOptionSetTextToValue("incident", field.CRMField, field.CRMValue));
+                                    }
+                                    else if (field.CRMType == "615290007")
+                                    {
+                                        odatab1.Add(field.CRMField, Convert.ToDouble(field.CRMValue.ToString()));
+                                    }
+                                    else if (field.CRMType == "615290006")
+                                    {
+                                        string dd, mm, yyyy;
+                                        dd = field.CRMValue.Substring(0, 2);
+                                        mm = field.CRMValue.Substring(3, 2);
+                                        yyyy = field.CRMValue.Substring(6, 4);
+                                        odatab.Add(field.CRMField, yyyy + "-" + mm + "-" + dd);
+                                    }
+                                    else
+                                    {
+                                        odatab.Add(field.CRMField, field.CRMValue);
+                                    }
 
+                                }
+
+                            }
+                            else
+                            {
+                                this._logger.LogInformation("CreateCase", $"{field.CRMField} can not be null.");
+                                csRtPrm.ReturnCode = "CRM-ERROR-102";
+                                csRtPrm.Message = $"{field.CRMField} can not be null.";
+                                return csRtPrm;
+                            }
+
+                        }
                     }
                 }
 
