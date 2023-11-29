@@ -177,7 +177,30 @@
 
             try
             {
+               
                 this.DDEId = await this._commonFunc.getDDEFinalAccountIndvData(Applicant_Data["eqs_accountapplicantid"].ToString());
+
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    var ddeIndividualCust = await this._commonFunc.getDDEFinalIndvCustomerId(this.DDEId);
+                    if (!string.IsNullOrEmpty(ddeIndividualCust[0]["eqs_customeridcreated"].ToString()))
+                    {
+                        this._logger.LogError("createDigiCustLeadIndv", "Lead can't be onboarded because Customer Id has been already created for this Account Applicant");
+                        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                        csRtPrm.Message = "Lead can't be onboarded because Customer Id has been already created for this Account Applicant";
+                        return csRtPrm;
+                    }
+                }
+                else if (string.IsNullOrEmpty(this.DDEId))
+                {
+                    if (Applicant_Data["eqs_panvalidationmode"].ToString() != "958570001")
+                    {
+                        this._logger.LogError("createDigiCustLeadIndv", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                        return csRtPrm;
+                    }
+                }
                 string dd, mm, yyyy;
                 /*********** General *********/
                 CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid.ToString() + "  - Final");
@@ -572,6 +595,29 @@
             try
             {
                 this.DDEId = await this._commonFunc.getDDEFinalAccountCorpData(Applicant_Data["eqs_accountapplicantid"].ToString());
+
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    var ddeCorporateCust = await this._commonFunc.getDDEFinalCorpCustomerId(this.DDEId);
+                    if (!string.IsNullOrEmpty(ddeCorporateCust[0]["eqs_customeridcreated"].ToString()))
+                    {
+                        this._logger.LogError("createDigiCustLeadCorp", "Lead can't be onboarded because Customer Id has been already created for this Account Applicant");
+                        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                        csRtPrm.Message = "Lead can't be onboarded because Customer Id has been already created for this Account Applicant";
+                        return csRtPrm;
+                    }
+                }
+                else if (string.IsNullOrEmpty(this.DDEId))
+                {
+                    if (Applicant_Data["eqs_panvalidationmode"].ToString() != "958570001")
+                    {
+                        this._logger.LogError("createDigiCustLeadCorp", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                        return csRtPrm;
+                    }
+                }
+
                 string dd, mm, yyyy;
                 /*********** General *********/
                 CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid.ToString() + "  - Final");

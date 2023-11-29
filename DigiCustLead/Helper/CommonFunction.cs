@@ -499,7 +499,42 @@
             }
 
         }
-        
+
+        public async Task<JArray> getDDEFinalIndvCustomerId(string ddeId)
+        {
+            try
+            {
+                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_customeridcreated&$filter=eqs_ddeindividualcustomerid eq '{ddeId}'";
+                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var DDE_dtails = await this.getDataFromResponce(DDEdtails);
+                return DDE_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getDDEFinalIndvCustomerId", ex.Message);
+                throw ex;
+            }
+
+        }
+
+        public async Task<JArray> getDDEFinalCorpCustomerId(string ddeId)
+        {
+            try
+            {
+                string query_url = $"eqs_ddecorporatecustomers()?$select=eqs_customeridcreated&$filter=eqs_ddecorporatecustomerid eq '{ddeId}'";
+                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var DDE_dtails = await this.getDataFromResponce(DDEdtails);
+                return DDE_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getDDEFinalCorpCustomerId", ex.Message);
+                throw ex;
+            }
+
+        }
+
+
         public async Task<JArray> getkycverificationDetail(string kycverificationId)
         {
             try

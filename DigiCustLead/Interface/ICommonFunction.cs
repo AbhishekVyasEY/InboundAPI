@@ -13,6 +13,8 @@ namespace DigiCustLead
         public Task<string> getSubentitytypeText(string SubentitytypeID);
         public Task<string> getPurposeID(string Purpose);
         public Task<Dictionary<string, string>> getProductId(string ProductCode);
+        public Task<JArray> getDDEFinalIndvCustomerId(string ddeId);
+        public Task<JArray> getDDEFinalCorpCustomerId(string ddeId);
         public Task<string> getTitleId(string Title);
         public Task<string> getTitleText(string TitleID);
         public Task<string> MeargeJsonString(string json1, string json2);
