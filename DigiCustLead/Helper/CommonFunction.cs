@@ -522,7 +522,7 @@
             {
                 //string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
                 string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{AccountNumber}'";
-                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var DDE_dtails = await this.getDataFromResponce(DDEdtails);
                 return DDE_dtails;
             }
