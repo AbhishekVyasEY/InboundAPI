@@ -160,10 +160,11 @@
                     {
                         Preferences = await SetPreferencesDDE(RequestData.DirectBanking.Preferences);
                     }
-                   
 
-                    
-                    await SetNomineeDDE(RequestData.Nominee);
+                    if (!string.IsNullOrEmpty(RequestData.Nominee))
+                    {
+                        await SetNomineeDDE(RequestData.Nominee);
+                    }
                     
 
                     accountLeadReturn.ReturnCode = "CRM-SUCCESS";
@@ -247,8 +248,11 @@
                 odatab.Add("eqs_accountopeningbranchid@odata.bind", $"eqs_branchs({leadDetails[0]["_eqs_branchid_value"].ToString()})");
 
                 odatab.Add("eqs_purposeofopeningaccountcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_purposeofopeningaccountcode", ddeData.General.PurposeofOpeningAccount.ToString()));
-                odatab.Add("eqs_purposeofopeningaaccountothers", ddeData.General.PurposeOfOpeningAccountOthers.ToString());
-                odatab.Add("eqs_modeofoperationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_modeofoperationcode", ddeData.General.ModeofOperation.ToString()));
+                if (!string.IsNullOrEmpty(ddeData.General.PurposeOfOpeningAccountOthers))
+                {
+                    odatab.Add("eqs_purposeofopeningaaccountothers", ddeData.General.PurposeOfOpeningAccountOthers.ToString());
+                }
+                    odatab.Add("eqs_modeofoperationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_modeofoperationcode", ddeData.General.ModeofOperation.ToString()));
                 odatab.Add("eqs_accountownershipcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_accountownershipcode", ddeData.General.AccountOwnership.ToString()));  //has prob in convarting
                 odatab.Add("eqs_initialdepositmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_initialdepositmodecode", ddeData.General.InitialDepositMode.ToString()));  //has prob in convarting
                 dd = ddeData.General.TransactionDate.ToString().Substring(0, 2);
