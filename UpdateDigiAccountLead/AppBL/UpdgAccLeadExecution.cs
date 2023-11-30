@@ -147,8 +147,8 @@
             if (_leadDetails.Count>0)
             {
                 List<string> Preferences;
-                
-                if (await SetLeadAccountDDE(_leadDetails, RequestData))
+                string errorMessage = await SetLeadAccountDDE(_leadDetails, RequestData);
+                if (string.IsNullOrEmpty(errorMessage))
                 {
                     
                     if (RequestData.documents != null && RequestData.documents.Count > 0)
@@ -172,9 +172,9 @@
                 }
                 else
                 {
-                    this._logger.LogInformation("FetLeadAccount", "Error occured  while creating AccountDDE");
+                    this._logger.LogInformation("FetLeadAccount", errorMessage);
                     accountLeadReturn.ReturnCode = "CRM-ERROR-102";
-                    accountLeadReturn.Message = "Error occured  while creating AccountDDE";
+                    accountLeadReturn.Message = errorMessage;
                 }
             }
             else
@@ -193,7 +193,7 @@
 
     
 
-        private async Task<bool> SetLeadAccountDDE(JArray LeadAccount, dynamic ddeData)
+        private async Task<string> SetLeadAccountDDE(JArray LeadAccount, dynamic ddeData)
         {
             try
             {
@@ -201,11 +201,18 @@
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
                 Dictionary<string, double> odatab1 = new Dictionary<string, double>();                
                 Dictionary<string, bool> odatab2 = new Dictionary<string, bool>();
-
+                Dictionary<string, bool> odataTriggerField = new Dictionary<string, bool>();
+                
                 // odatab.Add("eqs_applicationdate", LeadAccount[0]["eqs_applicationdate"].ToString("yyyy-MM-dd"));
                 if (!string.IsNullOrEmpty(LeadAccount[0]["eqs_ddefinalid"].ToString()))
                 {
                     this.DDEId = LeadAccount[0]["eqs_ddefinalid"].ToString();
+
+                    var AccountDDE = await this._commonFunc.getAccountLeadData(DDEId);
+                    if (AccountDDE.Count > 0 && !string.IsNullOrEmpty(AccountDDE[0]["eqs_accountnocreated"].ToString()))
+                    {
+                        return "Lead cannot be onboarded because account has been already created for this Lead Account.";
+                    }
                 }
                 
                 odatab.Add("eqs_leadaccountid@odata.bind", $"eqs_leadaccounts({LeadAccount[0]["eqs_leadaccountid"].ToString()})");
@@ -377,7 +384,7 @@
                     if (this.DDEId == null)
                     {
                         this._logger.LogError("SetLeadAccountDDE", JsonConvert.SerializeObject(LeadAccount_details), postDataParametr);                        
-                        return false;
+                        return "Error occured  while creating AccountDDE";
                     }
                     odatab.Add("eqs_ddefinalid", ddeid);
                     postDataParametr = JsonConvert.SerializeObject(odatab);
@@ -387,14 +394,19 @@
                 {
                     var LeadAccount_details = await this._queryParser.HttpApiCall($"eqs_ddeaccounts({this.DDEId})?$select=eqs_ddeaccountid", HttpMethod.Patch, postDataParametr);
                 }
-                
-                
 
-                return true;
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    odataTriggerField.Add("eqs_triggervalidation", true);
+                    postDataParametr = JsonConvert.SerializeObject(odataTriggerField);
+                    var response = await this._queryParser.HttpApiCall($"eqs_ddeaccounts({this.DDEId})?", HttpMethod.Patch, postDataParametr);
+                }
+
+                return string.Empty;
             }
             catch (Exception ex)
             {
-                return false;
+                return "Error occured  while creating AccountDDE";
             }
 
         }

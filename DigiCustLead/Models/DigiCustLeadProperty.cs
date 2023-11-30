@@ -191,7 +191,7 @@ namespace DigiCustLead
         public KYCVerification kycverification { get; set; }
         public List<Address> address { get; set; }
         public RMDetails RMDetails { get; set; }
-        public FATCA fatca { get; set; }   
+        public CorpFATCA fatca { get; set; }   
         public PointOfContact pointOfContact { get; set; }
         public List<BODetails> boDetails { get; set; }
         public List<CPDetails> cpDetails { get; set; }
@@ -376,6 +376,16 @@ namespace DigiCustLead
     {
         public string TaxResident { get; set; }
         public string CityofBirth { get; set; }
+
+        public FATCADetails FATCADetails { get; set; }
+    }
+
+    public class CorpFATCA
+    {
+        public string TaxResidentType { get; set; }
+        public string FinancialType { get; set; }
+        public string CityOfIncorporation { get; set; }
+        public string CountryOfIncorporation { get; set; }
 
         public FATCADetails FATCADetails { get; set; }
     }

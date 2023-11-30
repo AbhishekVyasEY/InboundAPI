@@ -1,4 +1,4 @@
-﻿namespace AccountLead
+namespace AccountLead
 {
 
     using Microsoft.Extensions.Caching.Memory;

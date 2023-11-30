@@ -1,4 +1,4 @@
-﻿namespace AccountLead
+namespace AccountLead
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;

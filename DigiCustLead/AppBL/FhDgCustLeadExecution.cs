@@ -666,19 +666,39 @@
 
                     /*********** FATCA *********/
 
-                    FATCA fATCA = new FATCA();
-                    fATCA.TaxResident = DDEDetails[0].eqs_taxresident.ToString();
-                    fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+                    //FATCA fATCA = new FATCA();
+                    //fATCA.TaxResident = DDEDetails[0].eqs_taxresidenttypecode.ToString();
+                    //fATCA.CityofBirth = "";//DDEDetails[0].eqs_cityofbirth.ToString();
+
+                    CorpFATCA fATCA = new CorpFATCA();
+                    if (DDEDetails[0]["eqs_taxresidenttypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        fATCA.TaxResidentType = DDEDetails[0]["eqs_taxresidenttypecode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_financialtype@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        fATCA.FinancialType = DDEDetails[0]["eqs_financialtype@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_cityofincorporation@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        fATCA.TaxResidentType = DDEDetails[0]["eqs_cityofincorporation@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["_eqs_countryofincorporationid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        fATCA.CountryOfIncorporation = DDEDetails[0]["_eqs_countryofincorporationid_value@OData.Community.Display.V1.FormattedValue"];
+                    }
 
                     FATCADetails fATCAobj = new FATCADetails();
                     dynamic fatcaDetail = await this._commonFunc.getDDEFinalFatcaDetail(DDEDetails[0].eqs_ddecorporatecustomerid.ToString(), "corp");
                     foreach (var fatcaitem in fatcaDetail)
                     {
                         fATCAobj.FATCAID = fatcaitem.eqs_name.ToString();
-                        fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresident", DDEDetails[0].eqs_taxresident.ToString());
-                        fATCAobj.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+                        if (DDEDetails[0]["eqs_taxresidenttypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                        {
+                            fATCAobj.TaxResident = DDEDetails[0]["eqs_taxresidenttypecode@OData.Community.Display.V1.FormattedValue"];
+                        }
+                        //fATCAobj.CityofBirth = "";//DDEDetails[0].eqs_cityofbirth.ToString();
                         fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
-
 
                         fATCAobj.Country = await this._commonFunc.getCountryText(fatcaDetail[0]._eqs_countryid_value.ToString());
                         fATCAobj.OtherIdentificationNumber = fatcaitem.eqs_otheridentificationnumber.ToString();
