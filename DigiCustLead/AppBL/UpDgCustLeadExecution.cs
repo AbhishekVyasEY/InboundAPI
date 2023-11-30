@@ -191,16 +191,16 @@
                         return csRtPrm;
                     }
                 }
-                else if (string.IsNullOrEmpty(this.DDEId))
-                {
-                    if (Applicant_Data["eqs_panvalidationmode"].ToString() != "958570001")
-                    {
-                        this._logger.LogError("createDigiCustLeadIndv", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
-                        csRtPrm.ReturnCode = "CRM-ERROR-101";
-                        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
-                        return csRtPrm;
-                    }
-                }
+                //else if (string.IsNullOrEmpty(this.DDEId))
+                //{
+                //    if (Applicant_Data["eqs_panvalidationmode"].ToString() != "958570001")
+                //    {
+                //        this._logger.LogError("createDigiCustLeadIndv", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                //        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                //        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                //        return csRtPrm;
+                //    }
+                //}
                 string dd, mm, yyyy;
                 /*********** General *********/
                 CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid.ToString() + "  - Final");
@@ -230,8 +230,8 @@
                 CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"].ToString());
                 CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"].ToString());
 
-                mm = Applicant_Data["eqs_dob"].ToString().Substring(0, 2);
-                dd = Applicant_Data["eqs_dob"].ToString().Substring(3, 2);
+                dd = Applicant_Data["eqs_dob"].ToString().Substring(0, 2);
+                mm = Applicant_Data["eqs_dob"].ToString().Substring(3, 2);
                 yyyy = Applicant_Data["eqs_dob"].ToString().Substring(6, 4);
 
                 CRMDDEmappingFields.Add("eqs_dob", yyyy + "-" + mm + "-" + dd);
