@@ -141,7 +141,7 @@
             {               
 
                 string Token = await this._queryParser.getAccessToken();
-                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"string\",\"userID\":\"IBUSER\",\"token\":\"string\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20140708\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"9834\",\"area\":\"91\",\"number\":\"9100778899\",\"extn\":\"2342\"},\"address\":{\"line1\":\"myaddress1\",\"line2\":\"myaddress2\",\"line3\":\"myaddress3\"},\"emailId\":\"nominee@gmail.com\",\"name\":\"Bibhar\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"9100778899\"},\"address\":{\"line1\":\"myaddress1\",\"line2\":\"myaddress2\",\"line3\":\"myaddress3\",\"line4\":\"string\",\"city\":\"PERUNGUDIS.O-CHENNAIREGION\",\"state\":\"TAMIL NADU\",\"country\":\"IN\",\"zip\":\"332298\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Subodh\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMIL NADU\",\"zip\":\"332298\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"8340097\",\"customerName\":\"MohammedSaleemuddin\",\"relation\":\"SOW\"}],\"customerID\":\"8340097\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"transactionType\":\"A\",\"minorAcctStatus\":false,\"productCode\":1053,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"termMonths\":0}}}}";
+                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"WIZARDAUTH3\",\"token\":\"1001\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20161104\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"9834\",\"area\":\"91\",\"number\":\"916345343425\",\"extn\":\"2342\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\"},\"emailId\":\"sjfjg@hgsd.com\",\"name\":\"PAAVAI\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"916352673569\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\",\"line4\":\"string\",\"city\":\"Erode\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"638103\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Podiya\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMILNADU\",\"zip\":\"638103\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"137770003\",\"customerName\":\"IlangoSelvam\",\"relation\":\"SOW\"}],\"customerID\":\"137770003\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"transactionType\":\"A\",\"minorAcctStatus\":false,\"productCode\":2005,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"termMonths\":0}}}}";
                 dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                 dynamic msgHdr = Request_Template.createAccountRequest.msgHdr;
                 dynamic msgBdy = Request_Template.createAccountRequest.msgBdy;
@@ -216,6 +216,10 @@
 
                         msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
                     }
+                    else
+                    {
+                        msgBdy.Remove("accountNominee");
+                    }
 
                     List<ApplicentRelation> relationList = new List<ApplicentRelation>();
                     foreach (var item in AccApplicent)
@@ -232,11 +236,25 @@
                         relationList.Add(applicentRelation);
                     }
 
+                    string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
+
                     msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
                     msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
                     msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
 
+                    if (productCat == "PCAT04")
+                    {
+                        msgBdy.Remove("tdaccountPayinRequest");
+                    }
+                    else if (productCat == "PCAT05")
+                    {
+                        msgBdy.Remove("rdaccountPayinRequest");
+                    }
+
                     Request_Template.createAccountRequest.msgBdy = msgBdy;
+
+                    
+
                     string input_payload = JsonConvert.SerializeObject(Request_Template);
                     string postDataParametr = await EncriptRespons(input_payload, "FI0060");
                     string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateAccount", postDataParametr);

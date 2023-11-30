@@ -13,6 +13,7 @@ namespace AccountLead
         public Task<JArray> getAccountNominee(string leadaccountid);
         public Task<JArray> getAccountApplicd(string leadaccountid);
         public Task<string> getProductCode(string ProductId);
+        public Task<string> getProductCategory(string CategoryId);
         public Task<string> getRelationshipId(string Relationship_code);
         public Task<string> getLeadSourceId(string LeadSource_code);
 
