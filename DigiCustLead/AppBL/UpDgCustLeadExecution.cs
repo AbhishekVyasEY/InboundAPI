@@ -314,17 +314,17 @@
                     CRMDDEmappingFields.Add("eqs_visatypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_visatypecode", CustIndvData.NRIDetails?.VisaType?.ToString()));
                     if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaIssuedDate.ToString()))
                     {
-                        dd = CustIndvData.IdentificationDetails?.VisaIssuedDate?.ToString()?.Substring(0, 2);
-                        mm = CustIndvData.IdentificationDetails?.VisaIssuedDate?.ToString()?.Substring(3, 2);
-                        yyyy = CustIndvData.IdentificationDetails?.VisaIssuedDate?.ToString()?.Substring(6, 4);
+                        dd = CustIndvData.NRIDetails?.VisaIssuedDate?.ToString()?.Substring(0, 2);
+                        mm = CustIndvData.NRIDetails?.VisaIssuedDate?.ToString()?.Substring(3, 2);
+                        yyyy = CustIndvData.NRIDetails?.VisaIssuedDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_visaissueddate", yyyy + "-" + mm + "-" + dd);
                     }
 
                     if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()))
                     {
-                        dd = CustIndvData.IdentificationDetails?.VisaExpiryDate?.ToString()?.Substring(0, 2);
-                        mm = CustIndvData.IdentificationDetails?.VisaExpiryDate?.ToString()?.Substring(3, 2);
-                        yyyy = CustIndvData.IdentificationDetails?.VisaExpiryDate?.ToString()?.Substring(6, 4);
+                        dd = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(0, 2);
+                        mm = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(3, 2);
+                        yyyy = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_visaexpirydate", yyyy + "-" + mm + "-" + dd);
                     }
                     CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString());
@@ -340,16 +340,16 @@
 
                     if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()))
                     {
-                        dd = CustIndvData.IdentificationDetails?.PassportIssuedDate?.ToString()?.Substring(0, 2);
-                        mm = CustIndvData.IdentificationDetails?.PassportIssuedDate?.ToString()?.Substring(3, 2);
-                        yyyy = CustIndvData.IdentificationDetails?.PassportIssuedDate?.ToString()?.Substring(6, 4);
+                        dd = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(0, 2);
+                        mm = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(3, 2);
+                        yyyy = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_passportissuedate", yyyy + "-" + mm + "-" + dd);
                     }
                     if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()))
                     {
-                        dd = CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()?.Substring(0, 2);
-                        mm = CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()?.Substring(3, 2);
-                        yyyy = CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()?.Substring(6, 4);
+                        dd = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(0, 2);
+                        mm = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(3, 2);
+                        yyyy = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_passportexpirydate", yyyy + "-" + mm + "-" + dd);
                     }
                 }
@@ -766,14 +766,14 @@
                     CRMDDEmappingFields.Add("eqs_cinregisterednumber", CustCorpData.IdentificationDetails?.RegisteredNumber?.ToString());
 
                     CRMDDEmappingFields.Add("eqs_kycverificationmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_kycverificationmodecode", CustCorpData.IdentificationDetails?.KYCVerificationMode?.ToString()));
-                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.VerificationDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()))
                     {
                         dd = CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()?.Substring(0, 2);
                         mm = CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()?.Substring(3, 2);
                         yyyy = CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_ckycupdateddate", yyyy + "-" + mm + "-" + dd);
                     }
-                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.VerificationDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.KYCVerificationDate?.ToString()))
                     {
                         dd = CustCorpData.IdentificationDetails?.KYCVerificationDate?.ToString()?.Substring(0, 2);
                         mm = CustCorpData.IdentificationDetails?.KYCVerificationDate?.ToString()?.Substring(3, 2);
