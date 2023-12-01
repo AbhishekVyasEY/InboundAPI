@@ -244,7 +244,14 @@
                     custLeadElement.eqs_internalpan = CustLeadData.IndividualEntry.PAN;
 
                     CRMLeadmappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("lead", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
-                  //  CRMLeadmappingFields.Add("eqs_pan", "**********");
+
+                    if (!string.IsNullOrEmpty(CustLeadData?.IndividualEntry?.PAN?.ToString()) && !string.IsNullOrEmpty(CustLeadData?.IndividualEntry?.PANForm60?.ToString()))
+                    {
+                        if(CustLeadData.IndividualEntry.PANForm60.ToString() == "PAN Card")
+                        {
+                            CRMLeadmappingFields.Add("eqs_pan", "**********");
+                        }
+                    }
                     CRMLeadmappingFields.Add("eqs_titleid@odata.bind", $"eqs_titles({TitleId})");
                     CRMLeadmappingFields.Add("eqs_productid@odata.bind", $"eqs_products({ProductId})");
                     CRMLeadmappingFields.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({Productcategoryid})");
@@ -421,7 +428,12 @@
                     CRMLeadmappingFields.Add("lastname", CustLeadData.CorporateEntry.CompanyName2.ToString());
                    // CRMLeadmappingFields.Add("yomifullname", CustLeadData.eqs_companynamepart1 + " " + CustLeadData.eqs_companynamepart2);
                     CRMLeadmappingFields.Add("eqs_panform60code", "615290000");
-                   // CRMLeadmappingFields.Add("eqs_pan", "**********");
+
+                    if (!string.IsNullOrEmpty(CustLeadData?.CorporateEntry?.PAN?.ToString())) {
+
+                        CRMLeadmappingFields.Add("eqs_pan", "**********");
+                    }
+                    
                     CRMLeadmappingFields.Add("eqs_productid@odata.bind", $"eqs_products({ProductId})");
                     CRMLeadmappingFields.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({Productcategoryid})");
                     CRMLeadmappingFields.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({Businesscategoryid})");
