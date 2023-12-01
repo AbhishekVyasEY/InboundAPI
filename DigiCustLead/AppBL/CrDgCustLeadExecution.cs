@@ -311,6 +311,13 @@
                     CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
                   //  CRMCustomermappingFields.Add("eqs_pan", "**********");
                     CRMCustomermappingFields.Add("eqs_internalpan", custLeadElement.eqs_internalpan);
+                    if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()) && !string.IsNullOrEmpty(CustLeadData.IndividualEntry?.PANForm60?.ToString()))
+                    {
+                        if (CustLeadData.IndividualEntry?.PANForm60?.ToString() == "PAN Card")
+                        {
+                            CRMCustomermappingFields.Add("eqs_pan", "**********");
+                        }
+                    }
                     CRMCustomermappingFields.Add("eqs_passportnumber", custLeadElement.eqs_passportnumber);
                     CRMCustomermappingFields.Add("eqs_voterid", custLeadElement.eqs_voterid);
                     CRMCustomermappingFields.Add("eqs_dlnumber", custLeadElement.eqs_dlnumber);
@@ -473,6 +480,12 @@
                     CRMCustomermappingFields.Add("eqs_panform60code", "615290000");
                   //  CRMCustomermappingFields.Add("eqs_pan", "**********");
                     CRMCustomermappingFields.Add("eqs_internalpan", custLeadElement.eqs_internalpan);
+
+                    if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()))
+                    {
+
+                        CRMCustomermappingFields.Add("eqs_pan", "**********");
+                    }
 
                     if (!string.IsNullOrEmpty(purpose) && purpose != "")
                     {
