@@ -102,7 +102,7 @@
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
                         
-                        if (!string.IsNullOrEmpty(RequestData.General.AccountLeadId.ToString()))
+                        if (!string.IsNullOrEmpty(RequestData.General?.AccountLeadId?.ToString()))
                         {
                             ldRtPrm = await this.CreateDDELeadAccount(RequestData);
                         }
@@ -143,7 +143,7 @@
         {
             UpAccountLeadReturn accountLeadReturn = new UpAccountLeadReturn();
 
-            var _leadDetails  = await this._commonFunc.getLeadAccountDetails(RequestData.General.AccountLeadId.ToString());
+            var _leadDetails  = await this._commonFunc.getLeadAccountDetails(RequestData.General?.AccountLeadId.ToString());
             if (_leadDetails.Count>0)
             {
                 List<string> Preferences;
@@ -156,14 +156,15 @@
                         await SetDocumentDDE(RequestData.documents);
                     }
 
-                    if (RequestData.DirectBanking.Preferences != null && RequestData.DirectBanking.Preferences.Count > 0)
+                    if (RequestData.DirectBanking?.Preferences != null && RequestData.DirectBanking?.Preferences.Count > 0)
                     {
-                        Preferences = await SetPreferencesDDE(RequestData.DirectBanking.Preferences);
+                        Preferences = await SetPreferencesDDE(RequestData.DirectBanking?.Preferences);
                     }
-                   
 
-                    
-                    await SetNomineeDDE(RequestData.Nominee);
+                    if (!string.IsNullOrEmpty(RequestData.Nominee?.ToString()))
+                    {
+                        await SetNomineeDDE(RequestData.Nominee);
+                    }
                     
 
                     accountLeadReturn.ReturnCode = "CRM-SUCCESS";
@@ -225,17 +226,17 @@
 
                 /****************** General  ***********************/
 
-                if (ddeData.General.AccountNumber.ToString()!="")
+                if (ddeData.General?.AccountNumber.ToString()!="")
                 {
-                    odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({await this._commonFunc.getAccountId(ddeData.General.AccountNumber.ToString())})");
+                    odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({await this._commonFunc.getAccountId(ddeData.General?.AccountNumber?.ToString())})");
                 }
                 
-                dd = ddeData.General.ApplicationDate.ToString().Substring(0, 2);
-                mm = ddeData.General.ApplicationDate.ToString().Substring(3, 2);
-                yyyy = ddeData.General.ApplicationDate.ToString().Substring(6, 4);
+                dd = ddeData.General?.ApplicationDate?.ToString()?.Substring(0, 2);
+                mm = ddeData.General?.ApplicationDate?.ToString()?.Substring(3, 2);
+                yyyy = ddeData.General?.ApplicationDate?.ToString()?.Substring(6, 4);
                 odatab.Add("eqs_applicationdate", yyyy + "-" + mm + "-" + dd);
-                odatab.Add("eqs_instakitcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_instakitcode", ddeData.General.InstaKit.ToString()));
-                odatab.Add("eqs_instakitaccountnumber", ddeData.General.InstaKitAccountNumber.ToString());
+                odatab.Add("eqs_instakitcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_instakitcode", ddeData.General?.InstaKit?.ToString()));
+                odatab.Add("eqs_instakitaccountnumber", ddeData.General?.InstaKitAccountNumber?.ToString());
 
                 var leadDetails = await this._commonFunc.getLeadDetails(LeadAccount[0]["_eqs_lead_value"].ToString());
                 odatab.Add("eqs_leadnumber", leadDetails[0]["eqs_crmleadid"].ToString());
@@ -246,21 +247,24 @@
                 odatab.Add("eqs_sourcebranchterritoryid@odata.bind", $"eqs_branchs({leadDetails[0]["_eqs_branchid_value"].ToString()})");
                 odatab.Add("eqs_accountopeningbranchid@odata.bind", $"eqs_branchs({leadDetails[0]["_eqs_branchid_value"].ToString()})");
 
-                odatab.Add("eqs_purposeofopeningaccountcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_purposeofopeningaccountcode", ddeData.General.PurposeofOpeningAccount.ToString()));
-                odatab.Add("eqs_purposeofopeningaaccountothers", ddeData.General.PurposeOfOpeningAccountOthers.ToString());
-                odatab.Add("eqs_modeofoperationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_modeofoperationcode", ddeData.General.ModeofOperation.ToString()));
-                odatab.Add("eqs_accountownershipcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_accountownershipcode", ddeData.General.AccountOwnership.ToString()));  //has prob in convarting
-                odatab.Add("eqs_initialdepositmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_initialdepositmodecode", ddeData.General.InitialDepositMode.ToString()));  //has prob in convarting
-                dd = ddeData.General.TransactionDate.ToString().Substring(0, 2);
-                mm = ddeData.General.TransactionDate.ToString().Substring(3, 2);
-                yyyy = ddeData.General.TransactionDate.ToString().Substring(6, 4);
+                odatab.Add("eqs_purposeofopeningaccountcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_purposeofopeningaccountcode", ddeData.General?.PurposeofOpeningAccount.ToString()));
+                if (!string.IsNullOrEmpty(ddeData.General?.PurposeOfOpeningAccountOthers?.ToString()))
+                {
+                    odatab.Add("eqs_purposeofopeningaaccountothers", ddeData.General?.PurposeOfOpeningAccountOthers?.ToString());
+                }
+                    odatab.Add("eqs_modeofoperationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_modeofoperationcode", ddeData.General?.ModeofOperation?.ToString()));
+                odatab.Add("eqs_accountownershipcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_accountownershipcode", ddeData.General?.AccountOwnership?.ToString()));  //has prob in convarting
+                odatab.Add("eqs_initialdepositmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_initialdepositmodecode", ddeData.General?.InitialDepositMode?.ToString()));  //has prob in convarting
+                dd = ddeData.General?.TransactionDate?.ToString()?.Substring(0, 2);
+                mm = ddeData.General?.TransactionDate?.ToString()?.Substring(3, 2);
+                yyyy = ddeData.General?.TransactionDate?.ToString()?.Substring(6, 4);
                 odatab.Add("eqs_transactiondate", yyyy + "-" + mm + "-" + dd);
-                odatab.Add("eqs_transactionid", ddeData.General.TransactionID.ToString());
-                odatab.Add("eqs_fundingchequebank", ddeData.General.Fundingchequebank.ToString());
-                odatab.Add("eqs_fundingchequenumber", ddeData.General.FundingchequeNumber.ToString());
-                odatab2.Add("eqs_sweepfacility", (ddeData.General.SweepFacility.ToString()== "Yes") ? true :false);  
-                odatab.Add("eqs_lgcode", ddeData.General.LGCode.ToString());
-                odatab.Add("eqs_lccode", ddeData.General.LCCode.ToString());
+                odatab.Add("eqs_transactionid", ddeData.General?.TransactionID?.ToString());
+                odatab.Add("eqs_fundingchequebank", ddeData.General?.Fundingchequebank?.ToString());
+                odatab.Add("eqs_fundingchequenumber", ddeData.General?.FundingchequeNumber?.ToString());
+                odatab2.Add("eqs_sweepfacility", (ddeData.General?.SweepFacility?.ToString()== "Yes") ? true :false);  
+                odatab.Add("eqs_lgcode", ddeData.General?.LGCode?.ToString());
+                odatab.Add("eqs_lccode", ddeData.General?.LCCode?.ToString());
 
 
                 //odatab.Add("eqs_isnomineedisplay", (Convert.ToBoolean(ddeData.IsNomineeDisplay)) ? "789030001" : "789030000");
@@ -271,13 +275,13 @@
 
                 /****************** Additional Details  ***********************/
 
-                odatab.Add("eqs_accounttitle", ddeData.AdditionalDetails.AccountTitle.ToString());
-                odatab.Add("eqs_lobtypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_lobtypecode", ddeData.AdditionalDetails.LOBType.ToString()));
-                odatab.Add("eqs_aobotypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_aobotypecode", ddeData.AdditionalDetails.AOBO.ToString()));
-                odatab.Add("eqs_modeofoperationremarks", ddeData.AdditionalDetails.ModeofOperationRemarks.ToString());
-                odatab.Add("eqs_sourceoffundcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_sourceoffundcode", ddeData.AdditionalDetails.SourceofFund.ToString()));
-                odatab.Add("eqs_othersourceoffund", ddeData.AdditionalDetails.OtherSourceoffund.ToString());
-                odatab.Add("eqs_predefinedaccountnumber", ddeData.AdditionalDetails.PredefinedAccountNumber.ToString());
+                odatab.Add("eqs_accounttitle", ddeData.AdditionalDetails?.AccountTitle?.ToString());
+                odatab.Add("eqs_lobtypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_lobtypecode", ddeData.AdditionalDetails?.LOBType?.ToString()));
+                odatab.Add("eqs_aobotypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_aobotypecode", ddeData.AdditionalDetails?.AOBO?.ToString()));
+                odatab.Add("eqs_modeofoperationremarks", ddeData.AdditionalDetails?.ModeofOperationRemarks?.ToString());
+                odatab.Add("eqs_sourceoffundcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_sourceoffundcode", ddeData.AdditionalDetails?.SourceofFund?.ToString()));
+                odatab.Add("eqs_othersourceoffund", ddeData.AdditionalDetails?.OtherSourceoffund?.ToString());
+                odatab.Add("eqs_predefinedaccountnumber", ddeData.AdditionalDetails?.PredefinedAccountNumber?.ToString());
 
 
                 //odatab.Add("eqs_accountownershipcode", this.AccountType[ddeData.accountType.ToString()]);                
@@ -286,64 +290,64 @@
                 /****************** FDRD Details  ***********************/
                 if (ddeData.FDRDDetails!=null)
                 {
-                    odatab1.Add("eqs_minimumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MinimumDepositAmount.ToString()));
-                    odatab1.Add("eqs_maximumdepositamount", Convert.ToDouble(ddeData.FDRDDetails.ProductDetails.MaximumDepositAmount.ToString()));
-                    odatab.Add("eqs_compoundingfrequency", ddeData.FDRDDetails.ProductDetails.CompoundingFrequency.ToString());
-                    odatab.Add("eqs_minimumtenuremonths", ddeData.FDRDDetails.ProductDetails.MinimumTenureMonths.ToString());
-                    odatab.Add("eqs_maximumtenuremonths", ddeData.FDRDDetails.ProductDetails.MaximumTenureMonths.ToString());
-                    odatab.Add("eqs_payoutfrequency", ddeData.FDRDDetails.ProductDetails.PayoutFrequency.ToString());
-                    odatab.Add("eqs_minimumtenuredays", ddeData.FDRDDetails.ProductDetails.MinimumTenureDays.ToString());
-                    odatab.Add("eqs_maximumtenuredays", ddeData.FDRDDetails.ProductDetails.MaximumTenureDays.ToString());
-                    odatab.Add("eqs_interestcompoundfrequency", ddeData.FDRDDetails.ProductDetails.InterestCompoundFrequency.ToString());
+                    odatab1.Add("eqs_minimumdepositamount", Convert.ToDouble(ddeData.FDRDDetails?.ProductDetails?.MinimumDepositAmount?.ToString()));
+                    odatab1.Add("eqs_maximumdepositamount", Convert.ToDouble(ddeData.FDRDDetails?.ProductDetails?.MaximumDepositAmount?.ToString()));
+                    odatab.Add("eqs_compoundingfrequency", ddeData.FDRDDetails?.ProductDetails?.CompoundingFrequency?.ToString());
+                    odatab.Add("eqs_minimumtenuremonths", ddeData.FDRDDetails?.ProductDetails?.MinimumTenureMonths?.ToString());
+                    odatab.Add("eqs_maximumtenuremonths", ddeData.FDRDDetails?.ProductDetails?.MaximumTenureMonths?.ToString());
+                    odatab.Add("eqs_payoutfrequency", ddeData.FDRDDetails?.ProductDetails?.PayoutFrequency?.ToString());
+                    odatab.Add("eqs_minimumtenuredays", ddeData.FDRDDetails?.ProductDetails?.MinimumTenureDays?.ToString());
+                    odatab.Add("eqs_maximumtenuredays", ddeData.FDRDDetails?.ProductDetails?.MaximumTenureDays?.ToString());
+                    odatab.Add("eqs_interestcompoundfrequency", ddeData.FDRDDetails?.ProductDetails?.InterestCompoundFrequency?.ToString());
 
 
 
-                    odatab1.Add("eqs_depositvariance", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositVariancePercentage.ToString()));
-                    odatab1.Add("eqs_depositamount", Convert.ToDouble(ddeData.FDRDDetails.DepositDetails.DepositAmount.ToString()));
-                    odatab.Add("eqs_fromesfbaccountnumber", ddeData.FDRDDetails.DepositDetails.FromESFBAccountNumber.ToString());
-                    odatab.Add("eqs_fromesfbglaccount", ddeData.FDRDDetails.DepositDetails.FromESFBGLAccount.ToString());
-                    odatab.Add("eqs_currencyofdepositcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_currencyofdepositcode", ddeData.FDRDDetails.DepositDetails.CurrencyofDeposit.ToString()));
-                    odatab.Add("eqs_tenureindays", ddeData.FDRDDetails.DepositDetails.tenureInDays.ToString());
-                    odatab2.Add("eqs_specialinterestraterequired", (ddeData.FDRDDetails.DepositDetails.SpecialInterestRateRequired.ToString() == "Yes") ? true : false);
-                    odatab.Add("eqs_specialinterestrate", ddeData.FDRDDetails.DepositDetails.SpecialInterestRate.ToString());
-                    odatab.Add("eqs_specialinterestrequestid", ddeData.FDRDDetails.DepositDetails.SpecialInterestRequestID.ToString());
-                    odatab.Add("eqs_branchcodegl", ddeData.FDRDDetails.DepositDetails.BranchCodeGL.ToString());
-                    dd = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(0, 2);
-                    mm = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(3, 2);
-                    yyyy = ddeData.FDRDDetails.DepositDetails.FDValueDate.ToString().Substring(6, 4);
+                    odatab1.Add("eqs_depositvariance", Convert.ToDouble(ddeData.FDRDDetails?.DepositDetails?.DepositVariancePercentage?.ToString()));
+                    odatab1.Add("eqs_depositamount", Convert.ToDouble(ddeData.FDRDDetails?.DepositDetails?.DepositAmount?.ToString()));
+                    odatab.Add("eqs_fromesfbaccountnumber", ddeData.FDRDDetails?.DepositDetails?.FromESFBAccountNumber?.ToString());
+                    odatab.Add("eqs_fromesfbglaccount", ddeData.FDRDDetails?.DepositDetails?.FromESFBGLAccount?.ToString());
+                    odatab.Add("eqs_currencyofdepositcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_currencyofdepositcode", ddeData.FDRDDetails?.DepositDetails?.CurrencyofDeposit?.ToString()));
+                    odatab.Add("eqs_tenureindays", ddeData.FDRDDetails?.DepositDetails?.tenureInDays?.ToString());
+                    odatab2.Add("eqs_specialinterestraterequired", (ddeData.FDRDDetails?.DepositDetails?.SpecialInterestRateRequired?.ToString() == "Yes") ? true : false);
+                    odatab.Add("eqs_specialinterestrate", ddeData.FDRDDetails?.DepositDetails?.SpecialInterestRate?.ToString());
+                    odatab.Add("eqs_specialinterestrequestid", ddeData.FDRDDetails?.DepositDetails?.SpecialInterestRequestID?.ToString());
+                    odatab.Add("eqs_branchcodegl", ddeData.FDRDDetails?.DepositDetails?.BranchCodeGL?.ToString());
+                    dd = ddeData.FDRDDetails?.DepositDetails?.FDValueDate?.ToString()?.Substring(0, 2);
+                    mm = ddeData.FDRDDetails?.DepositDetails?.FDValueDate?.ToString()?.Substring(3, 2);
+                    yyyy = ddeData.FDRDDetails?.DepositDetails?.FDValueDate?.ToString()?.Substring(6, 4);
                     odatab.Add("eqs_fdvaluedate", yyyy + "-" + mm + "-" + dd);
-                    odatab.Add("eqs_tenureinmonths", ddeData.FDRDDetails.DepositDetails.TenureInMonths.ToString());
-                    odatab2.Add("eqs_waivedofftds", (ddeData.FDRDDetails.DepositDetails.WaivedOffTDS.ToString() == "Yes") ? true : false);
-                    //odatab.Add("eqs_transactionid", ddeData.FDRDDetails.DepositDetails.TransactionID.ToString());
+                    odatab.Add("eqs_tenureinmonths", ddeData.FDRDDetails?.DepositDetails?.TenureInMonths?.ToString());
+                    odatab2.Add("eqs_waivedofftds", (ddeData.FDRDDetails?.DepositDetails?.WaivedOffTDS?.ToString() == "Yes") ? true : false);
+                    //odatab.Add("eqs_transactionid", ddeData.FDRDDetails?.DepositDetails?.TransactionID.ToString());
 
 
-                    odatab.Add("eqs_interestpayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_interestpayoutmode", ddeData.FDRDDetails.InterestPayoutDetails.interestPayoutMode.ToString()));
-                    odatab.Add("eqs_esfbaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToESFBAccountNo.ToString());
-                    odatab.Add("eqs_otherbankaccountnumber_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankAccountNo.ToString());
-                    odatab.Add("eqs_beneficiaryaccounttypeinterest", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttypeinterest", ddeData.FDRDDetails.InterestPayoutDetails.BeneficiaryAccountType.ToString()));
+                    odatab.Add("eqs_interestpayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_interestpayoutmode", ddeData.FDRDDetails?.InterestPayoutDetails?.interestPayoutMode?.ToString()));
+                    odatab.Add("eqs_esfbaccountnumber_interest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToESFBAccountNo?.ToString());
+                    odatab.Add("eqs_otherbankaccountnumber_interest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankAccountNo?.ToString());
+                    odatab.Add("eqs_beneficiaryaccounttypeinterest", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttypeinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.BeneficiaryAccountType?.ToString()));
 
-                    odatab.Add("eqs_beneficiarynameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBenificiaryName.ToString());
-                    odatab.Add("eqs_ifsccodeinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankIFSC.ToString());
-                    odatab.Add("eqs_banknameinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankName.ToString());
-                    odatab.Add("eqs_branchinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankBranch.ToString());
-                    odatab.Add("eqs_micrinterest", ddeData.FDRDDetails.InterestPayoutDetails.iPayToOtherBankMICR.ToString());
-                    odatab.Add("eqs_issuercode_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOIssuerCode.ToString());
-                    odatab.Add("eqs_payeename_interest", ddeData.FDRDDetails.InterestPayoutDetails.iPByDDPOPayeeName.ToString());
+                    odatab.Add("eqs_beneficiarynameinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankBenificiaryName?.ToString());
+                    odatab.Add("eqs_ifsccodeinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankIFSC?.ToString());
+                    odatab.Add("eqs_banknameinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankName?.ToString());
+                    odatab.Add("eqs_branchinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankBranch?.ToString());
+                    odatab.Add("eqs_micrinterest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPayToOtherBankMICR?.ToString());
+                    odatab.Add("eqs_issuercode_interest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPByDDPOIssuerCode?.ToString());
+                    odatab.Add("eqs_payeename_interest", ddeData.FDRDDetails?.InterestPayoutDetails?.iPByDDPOPayeeName?.ToString());
 
 
 
-                    odatab.Add("eqs_maturityinstruction", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturityinstruction", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityInstruction.ToString()));
-                    odatab.Add("eqs_maturitypayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturitypayoutmode", ddeData.FDRDDetails.MaturityInstructionDetails.MaturityPayoutMode.ToString()));
-                    odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToESFBAccountNo.ToString());
-                    odatab.Add("eqs_otherbankaccountnumber_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountNo.ToString());
-                    odatab.Add("eqs_beneficiaryaccounttype_maturity", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttype_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankAccountType.ToString()));
-                    odatab.Add("eqs_beneficiaryname_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.BeneficiaryName.ToString());
-                    odatab.Add("eqs_ifccodematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankIFSC.ToString());
-                    odatab.Add("eqs_banknamematurity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankName.ToString());
-                    odatab.Add("eqs_branchmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankBranch.ToString());
-                    odatab.Add("eqs_micrmaturity", ddeData.FDRDDetails.MaturityInstructionDetails.MICreditToOtherBankMICR.ToString());
-                    odatab.Add("eqs_issuercode_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOIssuerCode.ToString());
-                    odatab.Add("eqs_payeename_maturity", ddeData.FDRDDetails.MaturityInstructionDetails.MIByDDPOPayeeName.ToString());
+                    odatab.Add("eqs_maturityinstruction", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturityinstruction", ddeData.FDRDDetails?.MaturityInstructionDetails?.MaturityInstruction?.ToString()));
+                    odatab.Add("eqs_maturitypayoutmode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_maturitypayoutmode", ddeData.FDRDDetails?.MaturityInstructionDetails?.MaturityPayoutMode?.ToString()));
+                    odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString());
+                    odatab.Add("eqs_otherbankaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankAccountNo?.ToString());
+                    odatab.Add("eqs_beneficiaryaccounttype_maturity", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_beneficiaryaccounttype_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankAccountType?.ToString()));
+                    odatab.Add("eqs_beneficiaryname_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.BeneficiaryName?.ToString());
+                    odatab.Add("eqs_ifccodematurity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankIFSC?.ToString());
+                    odatab.Add("eqs_banknamematurity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankName?.ToString());
+                    odatab.Add("eqs_branchmaturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankBranch?.ToString());
+                    odatab.Add("eqs_micrmaturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankMICR?.ToString());
+                    odatab.Add("eqs_issuercode_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MIByDDPOIssuerCode?.ToString());
+                    odatab.Add("eqs_payeename_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MIByDDPOPayeeName?.ToString());
                 }               
             
                 
@@ -353,11 +357,11 @@
 
 
 
-                odatab2.Add("eqs_issuedinstakit", (ddeData.DirectBanking.IssuedInstaKit.ToString()=="No") ? false : true);
-                odatab2.Add("eqs_chequebookrequired", (ddeData.DirectBanking.ChequeBookRequired.ToString() == "No") ? false : true);
-                odatab.Add("eqs_numberofchequebook", ddeData.DirectBanking.NumberChequeBook.ToString());
-                odatab.Add("eqs_numberofchequeleavescode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_numberofchequeleavescode", ddeData.DirectBanking.NumberofChequeLeaves.ToString()));
-                odatab.Add("eqs_dispatchmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dispatchmodecode", ddeData.DirectBanking.DispatchMode.ToString()));
+                odatab2.Add("eqs_issuedinstakit", (ddeData.DirectBanking?.IssuedInstaKit?.ToString()=="No") ? false : true);
+                odatab2.Add("eqs_chequebookrequired", (ddeData.DirectBanking?.ChequeBookRequired?.ToString() == "No") ? false : true);
+                odatab.Add("eqs_numberofchequebook", ddeData.DirectBanking?.NumberChequeBook?.ToString());
+                odatab.Add("eqs_numberofchequeleavescode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_numberofchequeleavescode", ddeData.DirectBanking?.NumberofChequeLeaves?.ToString()));
+                odatab.Add("eqs_dispatchmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dispatchmodecode", ddeData.DirectBanking?.DispatchMode?.ToString()));
 
                   
 
@@ -503,49 +507,49 @@
                 
                     Dictionary<string, string> odatab = new Dictionary<string, string>();
                     
-                    odatab.Add("eqs_nomineename", ddeNominee.name.ToString());
-                    odatab.Add("eqs_nomineedob", ddeNominee.DOB.ToString());
-                    odatab.Add("eqs_nomineerelationshipwithaccountholder@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee.NomineeRelationship.ToString())})");
-                    //odatab.Add("eqs_nomineeage", ddeNominee.age.ToString());
-                    odatab.Add("eqs_nomineeucic", ddeNominee.nomineeUCICIfCustomer.ToString());
-                    odatab.Add("eqs_nomineedisplayname", ddeNominee.NomineeDisplayName.ToString());
-                    odatab.Add("eqs_nomineeaddresssameasprospectcurrentaddres", (Convert.ToBoolean(ddeNominee.AddresssameasProspects.ToString())) ? "true" : "false");
-                    odatab.Add("eqs_emailid", ddeNominee.email.ToString());
-                    odatab.Add("eqs_mobile", ddeNominee.mobile.ToString());
-                    odatab.Add("eqs_landlinenumber", ddeNominee.Landline.ToString());
+                    odatab.Add("eqs_nomineename", ddeNominee?.name?.ToString());
+                    odatab.Add("eqs_nomineedob", ddeNominee?.DOB?.ToString());
+                    odatab.Add("eqs_nomineerelationshipwithaccountholder@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee?.NomineeRelationship?.ToString())})");
+                    //odatab.Add("eqs_nomineeage", ddeNominee?.age?.ToString());
+                    odatab.Add("eqs_nomineeucic", ddeNominee?.nomineeUCICIfCustomer?.ToString());
+                    odatab.Add("eqs_nomineedisplayname", ddeNominee?.NomineeDisplayName?.ToString());
+                    odatab.Add("eqs_nomineeaddresssameasprospectcurrentaddres", (Convert.ToBoolean(ddeNominee?.AddresssameasProspects?.ToString())) ? "true" : "false");
+                    odatab.Add("eqs_emailid", ddeNominee?.email?.ToString());
+                    odatab.Add("eqs_mobile", ddeNominee?.mobile?.ToString());
+                    odatab.Add("eqs_landlinenumber", ddeNominee?.Landline?.ToString());
 
-                    odatab.Add("eqs_addressline1", ddeNominee.Address1.ToString());
-                    odatab.Add("eqs_addressline2", ddeNominee.Address2.ToString());
-                    odatab.Add("eqs_addressline3", ddeNominee.Address3.ToString());
-                    odatab.Add("eqs_pincode", ddeNominee.Pin.ToString());
-                    odatab.Add("eqs_district", ddeNominee.District.ToString());
-                    odatab.Add("eqs_pobox", ddeNominee.PO.ToString());
-                    odatab.Add("eqs_landmark", ddeNominee.Landmark.ToString());
+                    odatab.Add("eqs_addressline1", ddeNominee?.Address1?.ToString());
+                    odatab.Add("eqs_addressline2", ddeNominee?.Address2?.ToString());
+                    odatab.Add("eqs_addressline3", ddeNominee?.Address3?.ToString());
+                    odatab.Add("eqs_pincode", ddeNominee?.Pin?.ToString());
+                    odatab.Add("eqs_district", ddeNominee?.District?.ToString());
+                    odatab.Add("eqs_pobox", ddeNominee?.PO?.ToString());
+                    odatab.Add("eqs_landmark", ddeNominee?.Landmark?.ToString());
 
                     odatab.Add("eqs_leadaccountddeid@odata.bind", $"eqs_ddeaccounts({this.DDEId})");
                     
-                    odatab.Add("eqs_city@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee.CityCode.ToString())})");
-                    odatab.Add("eqs_state@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee.State.ToString())})");
-                    odatab.Add("eqs_country@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee.CountryCode.ToString())})");
+                    odatab.Add("eqs_city@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee?.CityCode?.ToString())})");
+                    odatab.Add("eqs_state@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee?.State?.ToString())})");
+                    odatab.Add("eqs_country@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee?.CountryCode?.ToString())})");
 
-                if (ddeNominee.Guardian.Name != null)
+                if (ddeNominee?.Guardian?.Name != null)
                 {
-                    odatab.Add("eqs_guardianname", ddeNominee.Guardian.Name.ToString());
-                    odatab.Add("eqs_guardianucic", ddeNominee.Guardian.GuardianUCIC.ToString());
-                    odatab.Add("eqs_guardianmobile", ddeNominee.Guardian.GuardianMobile.ToString());
-                    odatab.Add("eqs_guardianlandlinenumber", ddeNominee.Guardian.GuardianLandline.ToString());
-                    odatab.Add("eqs_guardianaddressline1", ddeNominee.Guardian.GuardianAddress1.ToString());
-                    odatab.Add("eqs_guardianaddressline2", ddeNominee.Guardian.GuardianAddress2.ToString());
-                    odatab.Add("eqs_guardianaddressline3", ddeNominee.Guardian.GuardianAddress3.ToString());
-                    odatab.Add("eqs_guardianpincode", ddeNominee.Guardian.GuardianPin.ToString());
-                    odatab.Add("eqs_guardiandistrict", ddeNominee.Guardian.GuardianDistrict.ToString());
-                    odatab.Add("eqs_guardianpobox", ddeNominee.Guardian.GuardianPO.ToString());
-                    odatab.Add("eqs_guardianlandmark", ddeNominee.Guardian.GuardianLandmark.ToString());
+                    odatab.Add("eqs_guardianname", ddeNominee?.Guardian?.Name?.ToString());
+                    odatab.Add("eqs_guardianucic", ddeNominee?.Guardian?.GuardianUCIC?.ToString());
+                    odatab.Add("eqs_guardianmobile", ddeNominee?.Guardian?.GuardianMobile?.ToString());
+                    odatab.Add("eqs_guardianlandlinenumber", ddeNominee?.Guardian?.GuardianLandline?.ToString());
+                    odatab.Add("eqs_guardianaddressline1", ddeNominee?.Guardian?.GuardianAddress1?.ToString());
+                    odatab.Add("eqs_guardianaddressline2", ddeNominee?.Guardian?.GuardianAddress2?.ToString());
+                    odatab.Add("eqs_guardianaddressline3", ddeNominee?.Guardian?.GuardianAddress3?.ToString());
+                    odatab.Add("eqs_guardianpincode", ddeNominee?.Guardian?.GuardianPin?.ToString());
+                    odatab.Add("eqs_guardiandistrict", ddeNominee?.Guardian?.GuardianDistrict?.ToString());
+                    odatab.Add("eqs_guardianpobox", ddeNominee?.Guardian?.GuardianPO?.ToString());
+                    odatab.Add("eqs_guardianlandmark", ddeNominee?.Guardian?.GuardianLandmark?.ToString());
 
-                    odatab.Add("eqs_guardianrelationshiptominor@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee.Guardian.RelationshipToMinor.ToString())})");
-                    odatab.Add("eqs_guardiancity@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee.Guardian.GuardianCityCode.ToString())})");
-                    odatab.Add("eqs_guardiancountry@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee.Guardian.GuardianCountryCode.ToString())})");
-                    odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee.Guardian.GuardianState.ToString())})");
+                    odatab.Add("eqs_guardianrelationshiptominor@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee?.Guardian?.RelationshipToMinor?.ToString())})");
+                    odatab.Add("eqs_guardiancity@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee?.Guardian?.GuardianCityCode?.ToString())})");
+                    odatab.Add("eqs_guardiancountry@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee?.Guardian?.GuardianCountryCode?.ToString())})");
+                    odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee?.Guardian?.GuardianState?.ToString())})");
                 }
                 
 
