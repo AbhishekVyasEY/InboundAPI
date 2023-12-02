@@ -252,6 +252,23 @@ namespace CreateLeads
 
         }
 
+        public async Task<JArray> getRegexForLead()
+        {
+            try
+            {
+                string query_url = $"eqs_regularexpressions()?$select=eqs_count,eqs_name,eqs_tablename,eqs_validateon,eqs_value,eqs_errormessage,eqs_fieldname,eqs_validateon&$filter=contains(eqs_name,'Regex-Lead')";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var regexDetail = await this.getDataFromResponce(responsdtails);
+                return regexDetail;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getProductId", ex.Message);
+                throw ex;
+            }
+
+        }
+
         public async Task<string> MeargeJsonString(string json1, string json2)
         {
             string first = json1.Remove(json1.Length - 1, 1);

@@ -6,13 +6,19 @@ using System.Net.Http;
 using System.Xml.Linq;
 using CRMConnect;
 using System.Xml;
+using System.Text;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CreateLeads
 {
-    public class CreateLeadExecution: ICreateLeadExecution
+    public class CreateLeadExecution : ICreateLeadExecution
     {
 
-        public ILoggers _logger;       
+        public ILoggers _logger;
         public IQueryParser _queryParser;
         public string Bank_Code { set; get; }
 
@@ -56,19 +62,20 @@ namespace CreateLeads
         }
 
         private readonly IKeyVaultService _keyVaultService;
-       
+
         Dictionary<string, int> LeadStatus = new Dictionary<string, int>();
         private ICommonFunction _commonFunc;
+        private Dictionary<string, object> regexLeadData = new Dictionary<string, object>();
 
         public CreateLeadExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
-        {            
-           
+        {
+
             this._logger = logger;
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
 
-           
+
             this.LeadStatus.Add("Open", 0);
             this.LeadStatus.Add("Onboarded", 1);
             this.LeadStatus.Add("Not Onboarded", 2);
@@ -82,8 +89,8 @@ namespace CreateLeads
             LeadReturnParam ldRtPrm = new LeadReturnParam();
             try
             {
-                
-                string channel = LeadData.ChannelType; 
+
+                string channel = LeadData.ChannelType;
 
                 if (!string.IsNullOrEmpty(this.Transaction_ID) && !string.IsNullOrEmpty(this.Channel_ID) && !string.IsNullOrEmpty(this.appkey) && this.appkey != "" && checkappkey(this.appkey))
                 {
@@ -114,7 +121,7 @@ namespace CreateLeads
                                 ValidationError = 1;
                                 errorText = "ProductCode";
                             }
-                            
+
 
                         }
                         else if (string.Equals(LeadData.ChannelType.ToString(), "Internet Banking") || string.Equals(LeadData.ChannelType.ToString(), "Mobile Banking"))
@@ -163,7 +170,7 @@ namespace CreateLeads
 
 
                         if (ValidationError == 1)
-                        {                           
+                        {
                             this._logger.LogInformation("ValidateLeade", $"{errorText} is mandatory");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
                             ldRtPrm.Message = $"{errorText} is mandatory";
@@ -171,7 +178,7 @@ namespace CreateLeads
                         else
                         {
                             ldRtPrm = await this.CreateLead(LeadData);
-                        }                      
+                        }
 
 
                     }
@@ -198,7 +205,7 @@ namespace CreateLeads
                 ldRtPrm.Message = OutputMSG.Resource_n_Found;
                 return ldRtPrm;
             }
-            
+
         }
 
         public bool checkappkey(string appkey)
@@ -213,14 +220,14 @@ namespace CreateLeads
             }
         }
 
-        
+
 
         public async Task<LeadReturnParam> CreateLead(dynamic LeadData)
         {
             LeadReturnParam ldRtPrm = new LeadReturnParam();
             LeadMsdProperty lead_Property = new LeadMsdProperty();
             LeadProperty ldProperty = new LeadProperty();
-            Dictionary<string,string> odatab= new Dictionary<string,string>();
+            Dictionary<string, string> odatab = new Dictionary<string, string>();
             string postDataParametr, postDataParametr1;
             List<JObject> Lead_details = new List<JObject>();
 
@@ -228,7 +235,7 @@ namespace CreateLeads
             try
             {
                 if (string.Equals(LeadData.ChannelType.ToString(), "ESFB Website"))
-                {                
+                {
                     var productDetails = await this._commonFunc.getProductId(LeadData.ProductCode.ToString());
                     ldProperty.ProductId = productDetails["ProductId"];
                     ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
@@ -258,7 +265,7 @@ namespace CreateLeads
 
 
                         if (LeadData.CustomerID != null && LeadData.CustomerID.ToString() != "")
-                        {                            
+                        {
                             var Customer_Detail = await this._commonFunc.getCustomerDetail(LeadData.CustomerID.ToString());
                             if (Customer_Detail.Count > 0)
                             {
@@ -302,7 +309,7 @@ namespace CreateLeads
                             odatab.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityTypeId})");
                             odatab.Add("eqs_subentitytypeid@odata.bind", $"eqs_subentitytypes({SubEntityTypeId})");
                         }
-                        
+
 
                         if (LeadData.Pincode != null && LeadData.Pincode.ToString() != "")
                             lead_Property.eqs_pincode = LeadData.Pincode;
@@ -318,7 +325,15 @@ namespace CreateLeads
 
                         postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
 
-                        Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                        string errorMessage = await ValidateFields(lead_Property);
+                        if (string.IsNullOrEmpty(errorMessage))
+                            Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                        else
+                        {
+                            ldRtPrm.ReturnCode = "CRM-ERROR-101";
+                            ldRtPrm.Message = "Validation Result: " + errorMessage;
+                            return ldRtPrm;
+                        }
                     }
                     else
                     {
@@ -360,7 +375,8 @@ namespace CreateLeads
                             odatab.Add("eqs_branchid@odata.bind", $"eqs_branchs({ldProperty.BranchId})");
 
                         var Customer_Detail = await this._commonFunc.getCustomerDetail(LeadData.CustomerID.ToString());
-                        if (Customer_Detail.Count > 0) {
+                        if (Customer_Detail.Count > 0)
+                        {
                             ldProperty.ETBCustomerID = Customer_Detail[0]["contactid"];
                             lead_Property.firstname = Customer_Detail[0]["firstname"];
                             lead_Property.lastname = Customer_Detail[0]["lastname"];
@@ -369,7 +385,7 @@ namespace CreateLeads
                             if (!string.IsNullOrEmpty(Customer_Detail[0]["_eqs_businesstypeid_value"].ToString()))
                             {
                                 odatab.Add("eqs_businesstypeid@odata.bind", $"eqs_businesstypes({Customer_Detail[0]["_eqs_businesstypeid_value"]})");
-                            }                            
+                            }
 
                             lead_Property.eqs_companynamepart1 = Customer_Detail[0]["eqs_companyname"];
                             lead_Property.eqs_companynamepart2 = Customer_Detail[0]["eqs_companyname2"];
@@ -406,7 +422,15 @@ namespace CreateLeads
 
                             postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
 
-                            Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                            string errorMessage = await ValidateFields(lead_Property);
+                            if (string.IsNullOrEmpty(errorMessage))
+                                Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                            else
+                            {
+                                ldRtPrm.ReturnCode = "CRM-ERROR-101";
+                                ldRtPrm.Message = "Validation Result: " + errorMessage;
+                                return ldRtPrm;
+                            }
                         }
                         else
                         {
@@ -415,7 +439,7 @@ namespace CreateLeads
                             ldRtPrm.Message = OutputMSG.Incorrect_Input;
                         }
 
-                        
+
                     }
                     else
                     {
@@ -464,7 +488,7 @@ namespace CreateLeads
                             odatab.Add("eqs_branchid@odata.bind", $"eqs_branchs({ldProperty.BranchId})");
                     }
 
-                                        
+
                     if (LeadData.CustomerID != null && LeadData.CustomerID.ToString() != "")
                     {
                         var Customer_Detail = await this._commonFunc.getCustomerDetail(LeadData.CustomerID.ToString());
@@ -512,7 +536,7 @@ namespace CreateLeads
                         odatab.Add("eqs_subentitytypeid@odata.bind", $"eqs_subentitytypes({SubEntityTypeId})");
                     }
 
-                   
+
                     lead_Property.description = LeadData.Transcript;
 
                     if (LeadData.Pincode != null && LeadData.Pincode.ToString() != "")
@@ -528,8 +552,15 @@ namespace CreateLeads
 
                     postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
 
-                    Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
-
+                    string errorMessage = await ValidateFields(lead_Property);
+                    if (string.IsNullOrEmpty(errorMessage))
+                        Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    else
+                    {
+                        ldRtPrm.ReturnCode = "CRM-ERROR-101";
+                        ldRtPrm.Message = "Validation Result: " + errorMessage;
+                        return ldRtPrm;
+                    }
                 }
                 else if (string.Equals(LeadData.ChannelType.ToString(), "Email"))
                 {
@@ -547,7 +578,7 @@ namespace CreateLeads
 
                     if (LeadData.ProductCode != null && LeadData.ProductCode.ToString() != "")
                     {
-                        
+
                     }
                     else
                     {
@@ -565,13 +596,13 @@ namespace CreateLeads
 
                     }
 
-                   
+
 
                     if (LeadData.CityCode != null && LeadData.CityCode.ToString() != "")
                     {
                         ldProperty.CityId = await this._commonFunc.getCityId(LeadData.CityCode.ToString());
                         if (ldProperty.CityId != null && ldProperty.CityId != "")
-                           odatab.Add("eqs_cityid@odata.bind", $"eqs_cities({ldProperty.CityId})");
+                            odatab.Add("eqs_cityid@odata.bind", $"eqs_cities({ldProperty.CityId})");
                     }
                     if (LeadData.BranchCode != null && LeadData.BranchCode.ToString() != "")
                     {
@@ -640,10 +671,18 @@ namespace CreateLeads
 
                     postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
 
-                    Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    string errorMessage = await ValidateFields(lead_Property);
+                    if (string.IsNullOrEmpty(errorMessage))
+                        Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    else
+                    {
+                        ldRtPrm.ReturnCode = "CRM-ERROR-101";
+                        ldRtPrm.Message = "Validation Result: " + errorMessage;
+                        return ldRtPrm;
+                    }
                 }
 
-                if (Lead_details.Count >0 )
+                if (Lead_details.Count > 0)
                 {
                     dynamic respons_code = Lead_details[0];
                     if (respons_code.responsecode == 204)
@@ -688,7 +727,91 @@ namespace CreateLeads
             return ldRtPrm;
         }
 
+        private async Task<string> ValidateFields(LeadMsdProperty lead)
+        {
+            StringBuilder msg = new StringBuilder();
+            await GetRegexForLead();
+            Dictionary<string, string> fields = ConvertClassToDictionary(lead);
+            foreach (var field in fields)
+            {
+                switch (field.Key)
+                {
+                    case "mobilephone":
+                    case "emailaddress1":
+                    case "eqs_jointcallername":
+                    case "firstname":
+                    case "lastname":
+                    case "middlename":
+                    case "eqs_pincode":
+                    case "eqs_mothermaidenname":
+                    case "eqs_ckycnumber":
+                    case "eqs_voterid":
+                    case "eqs_dlnumber":
+                    case "eqs_contactperson":
+                    case "eqs_cinnumber":
+                    case "eqs_cstvatnumber":
+                    case "eqs_gstnumber":
+                    case "eqs_loanamount":
+                    case "eqs_tannumber":
+                    case "eqs_contactmobile":
+                    case "eqs_contactpersonmobile":
+                    case "eqs_village":
+                    case "eqs_employeeid":
+                        ValidateFieldRegex(field.Key, field.Value, ref msg);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return msg.ToString().Trim().Trim(',');
+        }
 
+        private void ValidateFieldRegex(string field, string value, ref StringBuilder msg)
+        {
+            if (!string.IsNullOrEmpty(value) && regexLeadData.ContainsKey(field))
+            {
+                dynamic regexdata = regexLeadData[field];
+                string errormessage = regexdata.eqs_errormessage.ToString();
+                string pattern = regexdata.eqs_value.ToString();
+                if (pattern != null)
+                {
+                    if (Regex.IsMatch(value, pattern))
+                    {
+                        if (!string.IsNullOrEmpty(regexdata.eqs_count.ToString()) && value.Length > Convert.ToInt32(regexdata.eqs_count.ToString()))
+                        {
+                            msg.Append(errormessage + ", ");
+                        }
+                    }
+                    else
+                    {
+                        msg.Append(errormessage + ", ");
+                    }
+                }
+            }
+        }
+
+        private async Task GetRegexForLead()
+        {
+            var regexData = await this._commonFunc.getRegexForLead();
+            if (regexData.Count > 0)
+            {
+                foreach (dynamic regex in regexData)
+                {
+                    regexLeadData[regex.eqs_fieldname.ToString()] = regex;
+                }
+            }
+        }
+
+        public Dictionary<string, string> ConvertClassToDictionary(LeadMsdProperty lead)
+        {
+            Dictionary<string, string> fields = new Dictionary<string, string>();
+            foreach (PropertyInfo prp in lead.GetType().GetProperties())
+            {
+                object value = prp.GetValue(lead, new object[] { });
+                fields.Add(prp.Name, Convert.ToString(value));
+            }
+            return fields;
+        }
 
         public async Task<string> EncriptRespons(string ResponsData)
         {

@@ -149,11 +149,13 @@
                 var AccountDDE = await this._commonFunc.getApplicentData(applicentId);
                 if (AccountDDE.Count > 0)
                 {
-                    dynamic responsD = "";
+                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
+                    {
+                        dynamic responsD = "";
                     string Lead_details = "";
                     var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString());
-                   
-                    if(!string.IsNullOrEmpty(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString()) && AccountDDE[0]["_eqs_leadaccountdde_value"].ToString() != "")
+
+                    if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString()) && AccountDDE[0]["_eqs_leadaccountdde_value"].ToString() != "")
                     {
                         var ddeaccountdtails = await this._commonFunc.getInstrakitStatus(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString());
                         if (ddeaccountdtails["eqs_instakitcode"] == "Insta Kit")
@@ -185,7 +187,7 @@
                             responsD = JsonConvert.DeserializeObject(Lead_details);
 
                         }
-                    }                   
+                    }
                     else
                     {
                         string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMIL NADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
@@ -238,19 +240,19 @@
                         Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
                         responsD = JsonConvert.DeserializeObject(Lead_details);
                     }
-                    
-                    
-                    if(responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
+
+
+                    if (responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
                     {
                         customerLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
                         customerLeadReturn.ReturnCode = "CRM-ERROR-102";
                     }
-                    else if(responsD.createCustomerResponse != null && responsD.createCustomerResponse.msgBdy != null)
+                    else if (responsD.createCustomerResponse != null && responsD.createCustomerResponse.msgBdy != null)
                     {
-                        Dictionary<string,string> fieldInput = new Dictionary<string,string>();
-                        
+                        Dictionary<string, string> fieldInput = new Dictionary<string, string>();
+
                         customerLeadReturn.customerId = responsD.createCustomerResponse.msgBdy.customerId.ToString();
-                        if(!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
+                        if (!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
                         {
                             fieldInput.Add("eqs_customeridcreated", customerLeadReturn.customerId);
                             string postDataParametr = JsonConvert.SerializeObject(fieldInput);
@@ -262,12 +264,18 @@
                             customerLeadReturn.Message = OutputMSG.Case_Success;
                             customerLeadReturn.ReturnCode = "CRM-SUCCESS";
                         }
-                        
+
                     }
                     else
                     {
                         this._logger.LogInformation("HttpCBSApiCall output", Lead_details);
                         customerLeadReturn.Message = Lead_details;
+                        customerLeadReturn.ReturnCode = "CRM-ERROR-101";
+                    }
+                }
+                    else
+                    {
+                        customerLeadReturn.Message = "Lead cannot be onboarded. " + AccountDDE[0]["eqs_onboardingvalidationmessage"].ToString();
                         customerLeadReturn.ReturnCode = "CRM-ERROR-101";
                     }
                 }

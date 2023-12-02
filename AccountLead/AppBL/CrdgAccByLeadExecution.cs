@@ -1,4 +1,4 @@
-﻿namespace AccountLead
+namespace AccountLead
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
@@ -155,141 +155,149 @@
                 var AccountDDE = await this._commonFunc.getAccountLeadData(accountLead);
                 if (AccountDDE.Count > 0)
                 {
-                    var Nominee = await this._commonFunc.getAccountNominee(AccountDDE[0]["eqs_ddeaccountid"].ToString());
-                    var AccApplicent = await this._commonFunc.getAccountApplicd(AccountDDE[0]["_eqs_leadaccountid_value"].ToString());
-
-                    if (Nominee.Count > 0)
+					if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
                     {
-                        if (!string.IsNullOrEmpty(Nominee[0]["_eqs_city_value"].ToString()))
-                        {
-                          //  msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
-                        }
+						var Nominee = await this._commonFunc.getAccountNominee(AccountDDE[0]["eqs_ddeaccountid"].ToString());
+						var AccApplicent = await this._commonFunc.getAccountApplicd(AccountDDE[0]["_eqs_leadaccountid_value"].ToString());
+						
+						
+						if (Nominee.Count > 0)
+						{
+							if (!string.IsNullOrEmpty(Nominee[0]["_eqs_city_value"].ToString()))
+							{
+							  //  msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
+							}
 
-                        if (!string.IsNullOrEmpty(Nominee[0]["_eqs_state_value"].ToString()))
-                        {
-                            msgBdy.accountNominee.state = "TAMIL NADU";  //await this._commonFunc.getStateName(Nominee[0]["_eqs_state_value"].ToString());
-                        }
+							if (!string.IsNullOrEmpty(Nominee[0]["_eqs_state_value"].ToString()))
+							{
+								msgBdy.accountNominee.state = "TAMIL NADU";  //await this._commonFunc.getStateName(Nominee[0]["_eqs_state_value"].ToString());
+							}
 
-                        if (!string.IsNullOrEmpty(Nominee[0]["_eqs_country_value"].ToString()))
-                        {
-                            msgBdy.accountNominee.country = "IN";    //await this._commonFunc.getCountryName(Nominee[0]["_eqs_country_value"].ToString());
-                        }
+							if (!string.IsNullOrEmpty(Nominee[0]["_eqs_country_value"].ToString()))
+							{
+								msgBdy.accountNominee.country = "IN";    //await this._commonFunc.getCountryName(Nominee[0]["_eqs_country_value"].ToString());
+							}
 
-                        string dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
-                        string mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
-                        string yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
-                        msgBdy.accountNominee.dateOfBirth = yy + mm + dd;
-                        msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
+							string dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
+							string mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
+							string yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
+							msgBdy.accountNominee.dateOfBirth = yy + mm + dd;
+							msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
 
-                        msgBdy.accountNominee.nominee.address.line1 = Nominee[0]["eqs_addressline1"].ToString();
-                        msgBdy.accountNominee.nominee.address.line2 = Nominee[0]["eqs_addressline2"].ToString();
-                        msgBdy.accountNominee.nominee.address.line3 = Nominee[0]["eqs_addressline3"].ToString();
+							msgBdy.accountNominee.nominee.address.line1 = Nominee[0]["eqs_addressline1"].ToString();
+							msgBdy.accountNominee.nominee.address.line2 = Nominee[0]["eqs_addressline2"].ToString();
+							msgBdy.accountNominee.nominee.address.line3 = Nominee[0]["eqs_addressline3"].ToString();
 
-                        msgBdy.accountNominee.nominee.emailId = Nominee[0]["eqs_emailid"].ToString();
-                        msgBdy.accountNominee.nominee.name = Nominee[0]["eqs_nomineename"].ToString();
+							msgBdy.accountNominee.nominee.emailId = Nominee[0]["eqs_emailid"].ToString();
+							msgBdy.accountNominee.nominee.name = Nominee[0]["eqs_nomineename"].ToString();
 
-                        if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianname"].ToString()))
-                        {
-                            msgBdy.accountNominee.guardian.name = Nominee[0]["eqs_guardianname"].ToString();
-                            msgBdy.accountNominee.guardian.phone.number = Nominee[0]["eqs_guardianmobile"].ToString();
+							if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianname"].ToString()))
+							{
+								msgBdy.accountNominee.guardian.name = Nominee[0]["eqs_guardianname"].ToString();
+								msgBdy.accountNominee.guardian.phone.number = Nominee[0]["eqs_guardianmobile"].ToString();
 
-                            msgBdy.accountNominee.guardian.address.line1 = Nominee[0]["eqs_guardianaddressline1"].ToString();
-                            msgBdy.accountNominee.guardian.address.line2 = Nominee[0]["eqs_guardianaddressline2"].ToString();
-                            msgBdy.accountNominee.guardian.address.line3 = Nominee[0]["eqs_guardianaddressline3"].ToString();
+								msgBdy.accountNominee.guardian.address.line1 = Nominee[0]["eqs_guardianaddressline1"].ToString();
+								msgBdy.accountNominee.guardian.address.line2 = Nominee[0]["eqs_guardianaddressline2"].ToString();
+								msgBdy.accountNominee.guardian.address.line3 = Nominee[0]["eqs_guardianaddressline3"].ToString();
 
-                            if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardiancity_value"].ToString()))
-                            {
-                                msgBdy.accountNominee.guardian.address.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_guardiancity_value"].ToString());
-                            }
+								if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardiancity_value"].ToString()))
+								{
+									msgBdy.accountNominee.guardian.address.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_guardiancity_value"].ToString());
+								}
 
-                            if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardianstate_value"].ToString()))
-                            {
-                                msgBdy.accountNominee.guardian.address.state = "TAMIL NADU"; //await this._commonFunc.getStateName(Nominee[0]["_eqs_guardianstate_value"].ToString());
-                            }
+								if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardianstate_value"].ToString()))
+								{
+									msgBdy.accountNominee.guardian.address.state = "TAMIL NADU"; //await this._commonFunc.getStateName(Nominee[0]["_eqs_guardianstate_value"].ToString());
+								}
 
-                            if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardiancountry_value"].ToString()))
-                            {
-                                msgBdy.accountNominee.guardian.address.country = "IN";   //await this._commonFunc.getCountryName(Nominee[0]["_eqs_guardiancountry_value"].ToString());
-                            }
-                            msgBdy.accountNominee.guardian.address.zip = Nominee[0]["eqs_guardianpincode"].ToString();
-                        }
+								if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardiancountry_value"].ToString()))
+								{
+									msgBdy.accountNominee.guardian.address.country = "IN";   //await this._commonFunc.getCountryName(Nominee[0]["_eqs_guardiancountry_value"].ToString());
+								}
+								msgBdy.accountNominee.guardian.address.zip = Nominee[0]["eqs_guardianpincode"].ToString();
+							}
 
-                        msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
-                    }
+							msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
+						}
+						else
+						{
+							msgBdy.Remove("accountNominee");
+						}
+
+						List<ApplicentRelation> relationList = new List<ApplicentRelation>();
+						foreach (var item in AccApplicent)
+						{
+							ApplicentRelation applicentRelation = new ApplicentRelation();
+							applicentRelation.customerId = item["eqs_customer"].ToString();
+							applicentRelation.customerName = item["eqs_name"].ToString();
+							applicentRelation.relation = await this._commonFunc.getAccountRelation(item["_eqs_accountrelationship_value"].ToString());
+
+							if (item["eqs_isprimaryholder"].ToString() == "789030001")
+							{
+								msgBdy.customerID = item["eqs_customer"].ToString();
+							}
+							relationList.Add(applicentRelation);
+						}
+
+						string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
+
+						msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
+						msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
+						msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
+
+						if (productCat == "PCAT04")
+						{                       
+							msgBdy.Remove("rdaccountPayinRequest");
+						}
+						else if (productCat == "PCAT05")
+						{
+							msgBdy.Remove("tdaccountPayinRequest");
+						}
+						else
+						{
+							msgBdy.Remove("tdaccountPayinRequest");
+							msgBdy.Remove("rdaccountPayinRequest");
+
+						}
+
+						Request_Template.createAccountRequest.msgBdy = msgBdy;
+
+						
+
+						string input_payload = JsonConvert.SerializeObject(Request_Template);
+						string postDataParametr = await EncriptRespons(input_payload, "FI0060");
+						string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateAccount", postDataParametr);
+						dynamic responsD = JsonConvert.DeserializeObject(Lead_details);
+						
+						if(responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
+						{
+							accountLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
+							accountLeadReturn.ReturnCode = "CRM-ERROR-102";
+						}
+						else if(responsD.createAccountResponse!= null && responsD.createAccountResponse.msgBdy != null)
+						{
+							Dictionary<string,string> fieldInput = new Dictionary<string,string>();
+							
+							accountLeadReturn.AccountNo = responsD.createAccountResponse.msgBdy.accountNo.ToString();
+							fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
+							postDataParametr = JsonConvert.SerializeObject(fieldInput);
+
+							await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
+							
+							accountLeadReturn.Message = OutputMSG.Case_Success;
+							accountLeadReturn.ReturnCode = "CRM-SUCCESS";
+						}
+						else
+						{
+							accountLeadReturn.Message = Lead_details;
+							accountLeadReturn.ReturnCode = "CRM-ERROR-101";
+						}
+					}
                     else
                     {
-                        msgBdy.Remove("accountNominee");
-                    }
-
-                    List<ApplicentRelation> relationList = new List<ApplicentRelation>();
-                    foreach (var item in AccApplicent)
-                    {
-                        ApplicentRelation applicentRelation = new ApplicentRelation();
-                        applicentRelation.customerId = item["eqs_customer"].ToString();
-                        applicentRelation.customerName = item["eqs_name"].ToString();
-                        applicentRelation.relation = await this._commonFunc.getAccountRelation(item["_eqs_accountrelationship_value"].ToString());
-
-                        if (item["eqs_isprimaryholder"].ToString() == "789030001")
-                        {
-                            msgBdy.customerID = item["eqs_customer"].ToString();
-                        }
-                        relationList.Add(applicentRelation);
-                    }
-
-                    string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
-
-                    msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
-                    msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
-                    msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
-
-                    if (productCat == "PCAT04")
-                    {                       
-                        msgBdy.Remove("rdaccountPayinRequest");
-                    }
-                    else if (productCat == "PCAT05")
-                    {
-                        msgBdy.Remove("tdaccountPayinRequest");
-                    }
-                    else
-                    {
-                        msgBdy.Remove("tdaccountPayinRequest");
-                        msgBdy.Remove("rdaccountPayinRequest");
-
-                    }
-
-                    Request_Template.createAccountRequest.msgBdy = msgBdy;
-
-                    
-
-                    string input_payload = JsonConvert.SerializeObject(Request_Template);
-                    string postDataParametr = await EncriptRespons(input_payload, "FI0060");
-                    string Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateAccount", postDataParametr);
-                    dynamic responsD = JsonConvert.DeserializeObject(Lead_details);
-                    
-                    if(responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
-                    {
-                        accountLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
-                        accountLeadReturn.ReturnCode = "CRM-ERROR-102";
-                    }
-                    else if(responsD.createAccountResponse!= null && responsD.createAccountResponse.msgBdy != null)
-                    {
-                        Dictionary<string,string> fieldInput = new Dictionary<string,string>();
-                        
-                        accountLeadReturn.AccountNo = responsD.createAccountResponse.msgBdy.accountNo.ToString();
-                        fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
-                        postDataParametr = JsonConvert.SerializeObject(fieldInput);
-
-                        await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
-                        
-                        accountLeadReturn.Message = OutputMSG.Case_Success;
-                        accountLeadReturn.ReturnCode = "CRM-SUCCESS";
-                    }
-                    else
-                    {
-                        accountLeadReturn.Message = Lead_details;
+                        accountLeadReturn.Message = "Lead cannot be onboarded. " + AccountDDE[0]["eqs_onboardingvalidationmessage"].ToString().Replace("\r\n", ", ").Trim().Trim(',');
                         accountLeadReturn.ReturnCode = "CRM-ERROR-101";
                     }
-
                 }
                 else
                 {
