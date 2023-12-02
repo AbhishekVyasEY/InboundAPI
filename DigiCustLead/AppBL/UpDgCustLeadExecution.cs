@@ -196,16 +196,19 @@
                         return csRtPrm;
                     }
                 }
-                //else if (string.IsNullOrEmpty(this.DDEId))
-                //{
-                //    if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
-                //    {
-                //        this._logger.LogError("createDigiCustLeadIndv", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
-                //        csRtPrm.ReturnCode = "CRM-ERROR-101";
-                //        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
-                //        return csRtPrm;
-                //    }
-                //}
+                else if (string.IsNullOrEmpty(this.DDEId))
+                {
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                    {
+                        if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
+                        {
+                            this._logger.LogError("createDigiCustLeadIndv", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                            csRtPrm.ReturnCode = "CRM-ERROR-101";
+                            csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                            return csRtPrm;
+                        }
+                    }
+                }
                 string dd, mm, yyyy;
                 /*********** General *********/
                 CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
@@ -686,16 +689,16 @@
                         return csRtPrm;
                     }
                 }
-                //else if (string.IsNullOrEmpty(this.DDEId))
-                //{
-                //    if (Applicant_Data["eqs_panvalidationmode"].ToString() != "958570001")
-                //    {
-                //        this._logger.LogError("createDigiCustLeadCorp", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
-                //        csRtPrm.ReturnCode = "CRM-ERROR-101";
-                //        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
-                //        return csRtPrm;
-                //    }
-                //}
+                if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                {
+                    if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
+                    {
+                        this._logger.LogError("createDigiCustLeadCorp", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                        csRtPrm.ReturnCode = "CRM-ERROR-101";
+                        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                        return csRtPrm;
+                    }
+                }
 
                 string dd, mm, yyyy;
                 /*********** General *********/
