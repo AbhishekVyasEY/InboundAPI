@@ -762,7 +762,7 @@
                     /*********** CP Details *********/
 
                     dynamic cpDetail = await this._commonFunc.getDDEFinalCPDetail(DDEDetails[0].eqs_ddecorporatecustomerid.ToString());
-
+                    csRtPrm.cpDetails = new List<CPDetails>();
                     foreach (var cpitem in cpDetail)
                     {
                         CPDetails cp = new CPDetails();
@@ -778,7 +778,7 @@
 
 
                     dynamic boDetail = await this._commonFunc.getDDEFinalBODetail(DDEDetails[0].eqs_ddecorporatecustomerid.ToString());
-
+                    csRtPrm.boDetails = new List<BODetails>();
                     foreach (var boitem in boDetail)
                     {
                         BODetails bo = new BODetails();
