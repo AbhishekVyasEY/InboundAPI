@@ -1,4 +1,4 @@
-namespace AccountLead
+﻿namespace AccountLead
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
@@ -243,12 +243,18 @@ namespace AccountLead
                     msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
 
                     if (productCat == "PCAT04")
-                    {
-                        msgBdy.Remove("tdaccountPayinRequest");
+                    {                       
+                        msgBdy.Remove("rdaccountPayinRequest");
                     }
                     else if (productCat == "PCAT05")
                     {
+                        msgBdy.Remove("tdaccountPayinRequest");
+                    }
+                    else
+                    {
+                        msgBdy.Remove("tdaccountPayinRequest");
                         msgBdy.Remove("rdaccountPayinRequest");
+
                     }
 
                     Request_Template.createAccountRequest.msgBdy = msgBdy;
