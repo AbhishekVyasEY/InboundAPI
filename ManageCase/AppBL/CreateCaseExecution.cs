@@ -375,7 +375,7 @@ namespace ManageCase
                 }
                 else
                 {
-                    if (CaseData.AdditionalField != null && CaseData.AdditionalField != "")
+                    if (CaseData.AdditionalField != null)
                     {
                         JObject items_J_Arr = (JObject)CaseData.AdditionalField;
                         int no_Itemes = (items_J_Arr.Count) / 2;
