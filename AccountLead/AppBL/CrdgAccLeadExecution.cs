@@ -97,24 +97,37 @@
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
-                        if (this.ValidateAccountLead(RequestData.accountLead) && this.ValidateAccountApplicent(RequestData.CustomerAccountLeadRelation))
+                        string Fieldvalidation = this.ValidateAccountLead(RequestData.accountLead);
+                        string ApplicentValidation = this.ValidateAccountApplicent(RequestData.CustomerAccountLeadRelation);
+                        
+                        if (Fieldvalidation=="ok")
                         {
-                            if (await this.ValidateUCIC())
+                            if (ApplicentValidation == "ok")
                             {
-                                ldRtPrm = await this.CreateAccountLead();
+                                string ucic_validation = await this.ValidateUCIC();
+                                if (ucic_validation=="ok")
+                                {
+                                    ldRtPrm = await this.CreateAccountLead();
+                                }
+                                else
+                                {
+                                    this._logger.LogInformation("ValidateLeadtInput", ucic_validation);
+                                    ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                                    ldRtPrm.Message = ucic_validation;
+                                }
                             }
                             else
                             {
-                                this._logger.LogInformation("ValidateLeadtInput", "Input UCIC are incorrect");
                                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                                ldRtPrm.Message = "Input UCIC are incorrect";
+                                ldRtPrm.Message = ApplicentValidation;
                             }
+                            
                         }
                         else
                         {
-                            this._logger.LogInformation("ValidateLeadtInput", "AccountLead or AccountApplicent is incorrect");
+                            this._logger.LogInformation("ValidateLeadtInput", Fieldvalidation + " field can not be null.");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = "AccountLead or AccountApplicent is incorrect";
+                            ldRtPrm.Message = Fieldvalidation + " field can not be null.";
                         }
                     }
                     else
@@ -149,7 +162,8 @@
             {
                 if (await LeadAccountCreation())
                 {
-                    if (await AddAccountApplicent())
+                    string applicant = await AddAccountApplicent();
+                    if (applicant=="ok")
                     {
                         accountLeadReturn.AccountLeadId = _leadParam.LeadAccount_id;
                         accountLeadReturn.Applicants = this.applicents;
@@ -158,9 +172,9 @@
                     }
                     else
                     {
-                        this._logger.LogInformation("CreateAccountLead", "Account Applicent creation fail.");
+                        this._logger.LogInformation("CreateAccountLead", applicant);
                         accountLeadReturn.ReturnCode = "CRM-ERROR-102";
-                        accountLeadReturn.Message = "Account Applicent creation fail.";
+                        accountLeadReturn.Message = applicant;
                     }
                 }
                 else
@@ -223,7 +237,9 @@
                 if (!string.IsNullOrEmpty(appitem.dob))
                     odatab.Add("eqs_dob", appitem.dob);
 
-                odatab.Add("eqs_gendercode", appitem.gender);
+                if (!string.IsNullOrEmpty(appitem.gender))
+                    odatab.Add("eqs_gendercode", appitem.gender);
+
                 odatab.Add("eqs_createdfromonline", "true");
                 if (!string.IsNullOrEmpty(_accountLead.leadsource.ToString()))
                 {
@@ -295,26 +311,53 @@
             odatab.Add("eqs_accountownershipcode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_accountownershipcode", _accountLead.accountType.ToString()));
 
             if (!string.IsNullOrEmpty(_leadParam.branchid))
+            {
                 odatab.Add("eqs_branchid@odata.bind", $"eqs_branchs({_leadParam.branchid})");
+            }
+            if (!string.IsNullOrEmpty(_accountLead.accountOpeningFlow.ToString()))
+            {
+                odatab.Add("eqs_instakitoptioncode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_instakitoptioncode", _accountLead.accountOpeningFlow.ToString()));
+            }
+            if (!string.IsNullOrEmpty(_accountLead.initialDepositType.ToString()))
+            {
+                odatab.Add("eqs_initialdepositmodecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_initialdepositmodecode", _accountLead.initialDepositType.ToString()));
+            }
+            if (!string.IsNullOrEmpty(_accountLead.fieldEmployeeCode))
+            {
+                odatab.Add("eqs_sourcebyemployeecode", _accountLead.fieldEmployeeCode);
+            }
+                        
+
+            if (!string.IsNullOrEmpty(_accountLead.applicationDate))
+            {
+                odatab.Add("eqs_applicationdate", _accountLead.applicationDate);
+            }
+            if (!string.IsNullOrEmpty(_accountLead.fundsTobeDebitedFrom))
+            {
+                odatab.Add("eqs_fundstobedebitedfrom", _accountLead.fundsTobeDebitedFrom);
+            }
+            if (!string.IsNullOrEmpty(_accountLead.applicationDate))
+            {
+                odatab.Add("eqs_modeofoperationremarks", _accountLead.mopRemarks);
+            }
 
 
-            odatab.Add("eqs_instakitoptioncode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_instakitoptioncode", _accountLead.accountOpeningFlow.ToString()));
-            odatab.Add("eqs_initialdepositmodecode",  await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_initialdepositmodecode", _accountLead.initialDepositType.ToString()));
+            if (!string.IsNullOrEmpty(_accountLead.initialDeposit))
+            {
+                odatab.Add("eqs_initialdepositamountcode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_initialdepositamountcode", _accountLead.initialDeposit.ToString()));
+            }
+           
 
-            odatab.Add("eqs_sourcebyemployeecode", _accountLead.fieldEmployeeCode);
-
-            if(!string.IsNullOrEmpty(_accountLead.applicationDate))
-                odatab.Add("eqs_applicationdate", _accountLead.applicationDate);            
-
-            odatab.Add("eqs_fundstobedebitedfrom", _accountLead.fundsTobeDebitedFrom);           
-            odatab.Add("eqs_modeofoperationremarks", _accountLead.mopRemarks);
-
-            odatab.Add("eqs_initialdepositamountcode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_initialdepositamountcode", _accountLead.initialDeposit.ToString()));
 
             if (!string.IsNullOrEmpty(_accountLead.fdAccOpeningDate))
+            {
                 odatab.Add("eqs_fdvaluedate", _accountLead.fdAccOpeningDate);
-
-            odatab.Add("eqs_sweepfacility", _accountLead.sweepFacility.ToString().ToLower());
+            }
+            if (!string.IsNullOrEmpty(_accountLead.sweepFacility.ToString()))
+            {
+                odatab.Add("eqs_sweepfacility", _accountLead.sweepFacility.ToString().ToLower());
+            }
+                       
 
             if (!string.IsNullOrEmpty(_accountLead.tenureInMonths.ToString()))
             {
@@ -362,17 +405,28 @@
 
         }
 
-        private async Task<bool> AddAccountApplicent()
+        private async Task<string> AddAccountApplicent()
         {           
             foreach (var applicant in _accountApplicants)
             {
+                int hasError = 0;
+                List<string> errors = new List<string>();
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
 
                 odatab.Add("eqs_leadaccountid@odata.bind", $"eqs_leadaccounts({_leadParam.LeadAccountid})");
                 odatab.Add("eqs_ucic", applicant.UCIC);
                 odatab.Add("eqs_customer", applicant.UCIC);
                 odatab.Add("eqs_customerid@odata.bind", $"contacts({applicant.contactid})");
-                odatab.Add("eqs_titleid@odata.bind", $"eqs_titles({applicant.title})");
+                if (!string.IsNullOrEmpty(applicant.contactid))
+                {
+                    odatab.Add("eqs_titleid@odata.bind", $"eqs_titles({applicant.title})");
+                }
+                else
+                {
+                    hasError = 1;
+                    errors.Add(applicant.UCIC + " Title");
+                }
+               
                 odatab.Add("eqs_leadchannel", "15");
 
                 odatab.Add("eqs_firstname", applicant.firstname);
@@ -380,7 +434,11 @@
                 odatab.Add("eqs_name", applicant.firstname + " " + applicant.lastname);
                 odatab.Add("eqs_emailaddress", applicant.customerEmailID);
                 odatab.Add("eqs_mobilenumber", applicant.customerPhoneNumber);
-                odatab.Add("eqs_gendercode", applicant.gender);
+                if (!string.IsNullOrEmpty(applicant.gender))
+                {
+                    odatab.Add("eqs_gendercode", applicant.gender);
+                }
+                
                 odatab.Add("eqs_dob", applicant.dob);
                 odatab.Add("eqs_pan", applicant.pan);
               
@@ -403,15 +461,41 @@
                 odatab.Add("eqs_accountrelationship@odata.bind", $"eqs_accountrelationships({await this._commonFunc.getAccRelationshipId(applicant.customerAccountRelation)})");
                 odatab.Add("eqs_isprimaryholder", (applicant.isPrimaryHolder == true) ? "789030001" : "789030000");
 
-                odatab.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({applicant.entityType})");
-                odatab.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({applicant.subentityType})");
+                if (!string.IsNullOrEmpty(applicant.entityType))
+                {
+                    odatab.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({applicant.entityType})");
+                }
+                else
+                {
+                    hasError = 1;
+                    errors.Add(applicant.UCIC + " EntityType");
+                }
+                if (!string.IsNullOrEmpty(applicant.subentityType))
+                {
+                    odatab.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({applicant.subentityType})");
+                }
+                else
+                {
+                    hasError = 1;
+                    errors.Add(applicant.UCIC + " SubentityType");
+                }
+               
+               
 
                if (applicant.isPrimaryHolder == false && !string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
                 {
-
                     odatab.Add("eqs_relationship@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationshipId(applicant.relationToPrimaryHolder)})");
                 }
+                else
+                {
+                    hasError = 1;
+                    errors.Add(applicant.UCIC + " RelationToPrimaryHolder");
+                }
 
+                if (hasError==1)
+                {
+                    return string.Join(",", errors) + " ,could not be null.";
+                }
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 var Applicent_details = await this._queryParser.HttpApiCall("eqs_accountapplicants()?$select=eqs_applicantid", HttpMethod.Post, postDataParametr);
                 dynamic respons_code = Applicent_details[0];
@@ -419,7 +503,7 @@
             }
 
        
-            return true;
+            return "ok";
 
         }
 
@@ -436,9 +520,10 @@
         }
 
                
-        private async Task<bool> ValidateUCIC()
+        private async Task<string> ValidateUCIC()
         {
             int nuid = _accountApplicants.Count;
+            List<string> Errucic = new List<string>();
             if (nuid>0)
             {
                 string query_url = $"contacts()?$select=contactid,eqs_customerid,_eqs_titleid_value,firstname,lastname,eqs_companyname,eqs_companyname2,eqs_companyname3,eqs_pan,mobilephone,eqs_gender,emailaddress1,birthdate,eqs_dateofincorporation,_eqs_entitytypeid_value,_eqs_subentitytypeid_value&$filter=";
@@ -453,48 +538,67 @@
                 query_url = query_url.Substring(0, query_url.Length-4);
                 var Applicantdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Applicant_dtails = await this._commonFunc.getDataFromResponce(Applicantdtails);
-                if (Applicant_dtails.Count == nuid)
-                {
+                
                     List<AccountApplicant> accountApplicants1 = new List<AccountApplicant>();
-                    foreach (var item in Applicant_dtails)
+                    foreach (var appitem in _accountApplicants)
+                    //foreach (var item in Applicant_dtails)
                     {
-                       var appitem = _accountApplicants.Where(x => x.UCIC == item["eqs_customerid"].ToString()).FirstOrDefault();
+                        //var appitem = _accountApplicants.Where(x => x.UCIC == item["eqs_customerid"].ToString()).FirstOrDefault();
+                        var item = Applicant_dtails.Where(X => X["eqs_customerid"].ToString() == appitem.UCIC).FirstOrDefault();
+                        if (item != null)
+                        {
+                            appitem.pan = item["eqs_pan"].ToString();
+                            appitem.customerPhoneNumber = item["mobilephone"].ToString();
+                            appitem.customerEmailID = item["emailaddress1"].ToString();
+                            appitem.dob = item["birthdate"].ToString();
+                            appitem.gender = item["eqs_gender"].ToString();
+                            appitem.entityType = item["_eqs_entitytypeid_value"].ToString();
+                            appitem.subentityType = item["_eqs_subentitytypeid_value"].ToString();
+
+                            appitem.contactid = item["contactid"].ToString();
+                            appitem.title = item["_eqs_titleid_value"].ToString();
+                            appitem.firstname = item["firstname"].ToString();
+                            appitem.lastname = item["lastname"].ToString();
+                            appitem.eqs_companynamepart1 = item["eqs_companyname"].ToString();
+                            appitem.eqs_companynamepart2 = item["eqs_companyname2"].ToString();
+                            appitem.eqs_companynamepart3 = item["eqs_companyname3"].ToString();
+                            appitem.eqs_dateofincorporation = item["eqs_dateofincorporation"].ToString();
+
+
+                            accountApplicants1.Add(appitem);
+                        }
+                        else
+                        {
+                            Errucic.Add(appitem.UCIC);
+                        }
                        
-                        appitem.pan = item["eqs_pan"].ToString();
-                        appitem.customerPhoneNumber = item["mobilephone"].ToString();
-                        appitem.customerEmailID = item["emailaddress1"].ToString();
-                        appitem.dob = item["birthdate"].ToString();
-                        appitem.gender = item["eqs_gender"].ToString();
-                        appitem.entityType = item["_eqs_entitytypeid_value"].ToString();
-                        appitem.subentityType = item["_eqs_subentitytypeid_value"].ToString();
-
-                        appitem.contactid = item["contactid"].ToString();
-                        appitem.title = item["_eqs_titleid_value"].ToString();
-                        appitem.firstname = item["firstname"].ToString();
-                        appitem.lastname = item["lastname"].ToString();
-                        appitem.eqs_companynamepart1 = item["eqs_companyname"].ToString();
-                        appitem.eqs_companynamepart2 = item["eqs_companyname2"].ToString();
-                        appitem.eqs_companynamepart3 = item["eqs_companyname3"].ToString();
-                        appitem.eqs_dateofincorporation = item["eqs_dateofincorporation"].ToString();
-
-
-                        accountApplicants1.Add(appitem);
                     }
                     _accountApplicants = accountApplicants1;
+
+                if (_accountApplicants.Count == nuid)
+                {
+                    return "ok";
                 }
                 else
                 {
-                    return false;
+                    return string.Join(",", Errucic) + " incorrect UCIC";
                 }
             }
-            return true;
+            else
+            {
+                return "No AccountLeadRelation found";
+            }
+            
         }
 
-        private bool ValidateAccountLead(dynamic AccountData)
+        private string ValidateAccountLead(dynamic AccountData)
         {
+            int ValidationError = 0;
+            List<string> errorText = new List<string>();
             if (string.IsNullOrEmpty(AccountData.accountType.ToString()))
             {
-                return false;                
+                ValidationError = 1;
+                errorText.Add("AccountType");
             }
             else
             {
@@ -503,7 +607,8 @@
 
             if (string.IsNullOrEmpty(AccountData.leadsource.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("Leadsource");
             }
             else
             {
@@ -512,7 +617,8 @@
 
             if (string.IsNullOrEmpty(AccountData.productCode.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("ProductCode");
             }
             else
             {
@@ -521,7 +627,8 @@
 
             if (string.IsNullOrEmpty(AccountData.sourceBranch.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("SourceBranch");
             }
             else
             {
@@ -530,7 +637,8 @@
             
             if (string.IsNullOrEmpty(AccountData.accountOpeningFlow.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("AccountOpeningFlow");
             }
             else
             {
@@ -539,7 +647,8 @@
 
             if (string.IsNullOrEmpty(AccountData.depositAmount.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("DepositAmount");
             }
             else
             {
@@ -548,7 +657,8 @@
 
             if (string.IsNullOrEmpty(AccountData.initialDepositType.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("InitialDepositType");
             }
             else
             {
@@ -557,7 +667,8 @@
 
             if (string.IsNullOrEmpty(AccountData.InitialDeposit.ToString()))
             {
-                return false;
+                ValidationError = 1;
+                errorText.Add("InitialDeposit");
             }
             else
             {
@@ -575,7 +686,8 @@
 
                 if (string.IsNullOrEmpty(AccountData.tenureInMonths.ToString()))
                 {
-                    return false;
+                    ValidationError = 1;
+                    errorText.Add("TenureInMonths");
                 }
                 else
                 {
@@ -584,7 +696,8 @@
 
                 if (string.IsNullOrEmpty(AccountData.tenureInDays.ToString()))
                 {
-                    return false;
+                    ValidationError = 1;
+                    errorText.Add("TenureInDays");
                 }
                 else
                 {
@@ -603,12 +716,19 @@
             _accountLead.mopRemarks = AccountData.mopRemarks;
             _accountLead.fdAccOpeningDate = AccountData.fdAccOpeningDate;
             _accountLead.sweepFacility = AccountData.sweepFacility;
-            
 
-            return true;
+            if (ValidationError > 0)
+            {
+                return string.Join(",", errorText);
+            }
+            else
+            {
+                return "ok";
+            }
+            
         }
 
-        private bool ValidateAccountApplicent(dynamic ApplicentData)
+        private string ValidateAccountApplicent(dynamic ApplicentData)
         {
             try
             {
@@ -616,10 +736,13 @@
                 {
                     foreach (var item in ApplicentData)
                     {
+                        int ValidationError = 0;
+                        List<string> errorText = new List<string>();
                         AccountApplicant accountApplicant = new AccountApplicant();
                         if (string.IsNullOrEmpty(item.UCIC.ToString()))
                         {
-                            return false;
+                            ValidationError = 1;
+                            errorText.Add("UCIC");
                         }
                         else
                         {
@@ -628,7 +751,8 @@
 
                         if (string.IsNullOrEmpty(item.customerAccountRelation.ToString()))
                         {
-                            return false;
+                            ValidationError = 1;
+                            errorText.Add("CustomerAccountRelation");
                         }
                         else
                         {
@@ -637,7 +761,8 @@
 
                         if (string.IsNullOrEmpty(item.isPrimaryHolder.ToString()))
                         {
-                            return false;
+                            ValidationError = 1;
+                            errorText.Add("isPrimaryHolder");
                         }
                         else
                         {
@@ -648,7 +773,9 @@
                         {
                             if (string.IsNullOrEmpty(item.relationToPrimaryHolder.ToString()))
                             {
-                                return false;
+
+                                ValidationError = 1;
+                                errorText.Add("relationToPrimaryHolder");
                             }
                             else
                             {
@@ -657,26 +784,31 @@
 
                         }
 
-
-                        _accountApplicants.Add(accountApplicant);
+                        if(ValidationError > 0)
+                        {
+                            return string.Join(",", errorText) + " fields can not be null.";
+                        }
+                        else
+                        {
+                            _accountApplicants.Add(accountApplicant);
+                        }
+                       
                     }
-                    return true;
+                    return "ok";
                 }
                 else
                 {
-                    return false;
+                    return "No AccountLeadRelation found";
                 }
             }
             catch(Exception ex) {
-                return false;
+                return "AccountLeadRelation is incorrect";
             }
             
            
         }
 
-        
-
-       
+               
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
