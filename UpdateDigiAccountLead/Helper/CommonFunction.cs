@@ -206,6 +206,14 @@ using CRMConnect;
         {
             return await this.getIDfromMSDTable("eqs_accounts", "eqs_accountid", "eqs_accountno", accountNo);
         }
+        public async Task<string> getProductId(string ProductCode)
+        {
+            return await this.getIDfromMSDTable("eqs_products", "eqs_productid", "eqs_productcode", ProductCode);
+        }
+        public async Task<string> getProductCategoryId(string CategoryCode)
+        {
+            return await this.getIDfromMSDTable("eqs_productcategories", "eqs_productcategoryid", "eqs_productcategorycode",  CategoryCode);
+        }
 
         public async Task<JArray> getLeadAccountDetails(string LdApplicantId)
         {
