@@ -17,6 +17,8 @@ namespace UpdateAccountLead
         public Task<string> getCityId(string City_code);
         public Task<string> getCuntryId(string cuntry_code);
         public Task<string> getStateId(string state_code);
+        public Task<string> getProductId(string ProductCode);
+        public Task<string> getProductCategoryId(string CategoryCode);
 
         public Task<JArray> getLeadDetails(string contact_id);
         public Task<JArray> getAccountLeadData(string DDEId);
