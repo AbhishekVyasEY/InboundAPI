@@ -316,7 +316,7 @@
         {
             try
             {
-                string query_url = $"contacts()?$filter={filterkey} eq '{filtervalue}'";
+                string query_url = $"contacts()?$expand=eqs_rmemployeeid($select=eqs_name,eqs_emprolelabel,eqs_emprole,eqs_rmempidslot,eqs_area,eqs_branch,eqs_branchcodeslot,eqs_cluster,eqs_department,eqs_division,eqs_emailid,eqs_empcategory,eqs_empphonenumber,eqs_emprolelabel,eqs_empstatus,eqs_region,eqs_resignedflagtwo,eqs_state,eqs_supervisoremailid,eqs_supervisorempidslot,eqs_supervisorname,eqs_zone)&$filter={filterkey} eq '{filtervalue}'";
                 var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
                 return Customer_dtails;

@@ -8,10 +8,39 @@ namespace FetchAccountLead
         public GeneralDetails General { get; set; }
         public CustomerPreferences CustomerPreferences { get; set; }
         public List<ServiceDetails> DSBServiceDetails { get; set; }
+        public RMDetails RMDetails { get; set; }
         public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
+
+    }
+
+    public class RMDetails
+    {
+        public string RMCode { get; set; }
+        public string RMName { get; set; }
+        public string RMRole { get; set; }
+        public string RMType { get; set; }
+
+        public string Area { get; set; }
+        public string Branch { get; set; }
+        public string BranchCode { get; set; }
+        public string Cluster { get; set; }
+        public string EmpRoleLabel { get; set; }
+        public string Department { get; set; }
+        public string Divison { get; set; }
+        public string EmailID { get; set; }
+        public string EmpCategory { get; set; }
+        public string EmpPhoneNumber { get; set; }
+        public string EmpStatus { get; set; }
+        public string Region { get; set; }
+        public string ResignedFlag { get; set; }
+        public string State { get; set; }
+        public string SupervisorEmailID { get; set; }
+        public string SupervisorEmpID { get; set; }
+        public string SupervisorName { get; set; }
+        public string Zone { get; set; }
 
     }
 

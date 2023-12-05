@@ -187,6 +187,36 @@
                 if (CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"] != null)
                     customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
 
+                if (!string.IsNullOrEmpty(CuatomerDetails[0]["eqs_rmemployeeid"].ToString()))
+                {
+                    customerDetailReturn.RMDetails = new RMDetails();
+
+                    customerDetailReturn.RMDetails.RMCode = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_rmempidslot"].ToString();
+                    customerDetailReturn.RMDetails.RMName = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_name"].ToString();
+                    customerDetailReturn.RMDetails.RMRole = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emprole"].ToString();
+                    customerDetailReturn.RMDetails.RMType = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emprolelabel"].ToString();
+
+                    customerDetailReturn.RMDetails.Area = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_area"].ToString();
+                    customerDetailReturn.RMDetails.Branch = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_branch"].ToString();
+                    customerDetailReturn.RMDetails.BranchCode = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_branchcodeslot"].ToString();
+                    customerDetailReturn.RMDetails.Cluster = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_cluster"].ToString();
+                    customerDetailReturn.RMDetails.EmpRoleLabel = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_department"].ToString();
+                    customerDetailReturn.RMDetails.Department = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_division"].ToString();
+                    customerDetailReturn.RMDetails.Divison = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emailid"].ToString();
+                    customerDetailReturn.RMDetails.EmailID = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empcategory"].ToString();
+                    customerDetailReturn.RMDetails.EmpCategory = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empphonenumber"].ToString();
+                    customerDetailReturn.RMDetails.EmpPhoneNumber = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emprolelabel"].ToString();
+                    customerDetailReturn.RMDetails.EmpStatus = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empstatus"].ToString();
+                    customerDetailReturn.RMDetails.Region = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_region"].ToString();
+                    customerDetailReturn.RMDetails.ResignedFlag = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_resignedflagtwo"].ToString();
+                    customerDetailReturn.RMDetails.State = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_state"].ToString();
+                    customerDetailReturn.RMDetails.SupervisorEmailID = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_supervisoremailid"].ToString();
+                    customerDetailReturn.RMDetails.SupervisorEmpID = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_supervisorempidslot"].ToString();
+                    customerDetailReturn.RMDetails.SupervisorName = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_supervisorname"].ToString();
+                    customerDetailReturn.RMDetails.Zone = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_zone"].ToString();
+
+                }
+
                 if (!string.IsNullOrEmpty(AccountNumber))
                 {
                     var AccountRelDetails = await this._commonFunc.getAccountRelationshipDetails(CustomerID, AccountNumber);
