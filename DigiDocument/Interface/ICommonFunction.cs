@@ -16,6 +16,7 @@ namespace DigiDocument
         public Task<string> getDocumentID(string Documentid);
 
         public Task<List<Document>> getDocumentList(string query_url);
+        public Task<List<MasterConfiguration>> getDocumentDateConfig();
 
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);

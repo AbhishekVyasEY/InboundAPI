@@ -15,9 +15,9 @@ namespace DigiDocument
     }
 
     public class UpdateDgDocDtlReturn
-    {       
-        public List<string> DocumentIDs { get; set; }
-        public string ReturnCode { get; set; } 
+    {
+        public List<DocUpdateStatus> DocUpdateStatus { get; set; }
+        public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
@@ -44,4 +44,17 @@ namespace DigiDocument
         public string MappedServiceRequest { get; set; }
     }
 
+    public class DocUpdateStatus
+    {
+        public string SubCategoryCode { get; set; }
+        public string DocId { get; set; }
+        public string Status { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
+    public class MasterConfiguration
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
 }
