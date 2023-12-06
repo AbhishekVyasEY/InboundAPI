@@ -30,7 +30,9 @@ namespace AccountLead
         public Task<string> getStateName(string StateId);
         public Task<string> getCountryName(string CountryId);
         public Task<string> getAccountRelation(string accRelationId);
-        public Task<JArray> getApplicentData(string ApplicentID);
+        public Task<JArray> getApplicentData(string ApplicantID);
+        public Task<JArray> getApplicantIndivDDE(string ApplicantID);
+        public Task<JArray> getApplicantCorpDDE(string ApplicantID);
         public Task<Dictionary<string, string>> getInstrakitStatus(string leadaccountdde_ID);
 
     }
