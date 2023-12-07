@@ -294,21 +294,56 @@ namespace AccountLead
             }
         }
 
-        public async Task<JArray> getApplicentData(string ApplicentID)
+        public async Task<JArray> getApplicentData(string ApplicantID)
         {
             try
             {
-                string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicentID);
-                string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
-
-                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_ddeindividualcustomerid,eqs_readyforonboarding,eqs_onboardingvalidationmessage,_eqs_accountapplicantid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_shortname,eqs_mobilenumber,eqs_emailid,eqs_dob,eqs_mothermaidenname,_eqs_sourcebranchid_value,eqs_gendercode,_eqs_leadaccountdde_value&$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq {DataEntryStage}";
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string query_url = $"eqs_accountapplicants()?$select=_eqs_entitytypeid_value&$filter=eqs_applicantid eq '{ApplicantID}'";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
             }
             catch (Exception ex)
             {
                 this._logger.LogError("getApplicentData", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getApplicantIndivDDE(string ApplicantID)
+        {
+            try
+            {
+                string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicantID);
+                //string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
+
+                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_ddeindividualcustomerid,eqs_readyforonboarding,eqs_onboardingvalidationmessage,_eqs_accountapplicantid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_shortname,eqs_mobilenumber,eqs_emailid,eqs_dob,eqs_mothermaidenname,_eqs_sourcebranchid_value,eqs_gendercode,_eqs_leadaccountdde_value&$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Account_dtails = await this.getDataFromResponce(Accountdtails);
+                return Account_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getApplicentIndivDDE", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getApplicantCorpDDE(string ApplicantID)
+        {
+            try
+            {
+                string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicantID);
+                //string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
+
+                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Account_dtails = await this.getDataFromResponce(Accountdtails);
+                return Account_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getApplicentIndivDDE", ex.Message);
                 throw ex;
             }
         }

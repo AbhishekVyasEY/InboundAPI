@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Diagnostics.Metrics;
     using CRMConnect;
+    using System.Reflection.Metadata;
 
 
     public class CommonFunction : ICommonFunction
@@ -303,6 +304,33 @@ using System.Diagnostics.Metrics;
             }
         }
 
+        public async Task<List<MasterConfiguration>> getDocumentDateConfig()
+        {
+            try
+            {
+                List<MasterConfiguration> masterConfiguration = new List<MasterConfiguration>();
+                string query_url = $"eqs_masterconfigurations()?$select=eqs_key,eqs_value&$filter=eqs_key eq 'docid_issue_expirydate' or eqs_key eq 'docid_issuedat'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var entities = await this._queryParser.getDataFromResponce(responsdtails);
+
+                foreach (var entity in entities)
+                {
+                    MasterConfiguration configuration = new MasterConfiguration();
+
+                    configuration.Key = entity["eqs_key"].ToString();
+                    configuration.Value = entity["eqs_value"].ToString();
+                    masterConfiguration.Add(configuration);
+                }
+
+                return masterConfiguration;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getDocumentDateConfig", ex.Message);
+                throw ex;
+            }
+
+        }
         public async Task<string> MeargeJsonString(string json1, string json2)
         {
             string first = json1.Remove(json1.Length - 1, 1);

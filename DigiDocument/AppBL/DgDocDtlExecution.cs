@@ -49,64 +49,128 @@
 
         public string appkey { set; get; }
 
-        public string API_Name { set
+        public string API_Name
+        {
+            set
             {
                 _logger.API_Name = value;
             }
         }
-        public string Input_payload { set {
+        public string Input_payload
+        {
+            set
+            {
                 _logger.Input_payload = value;
-            } 
+            }
         }
 
         private readonly IKeyVaultService _keyVaultService;
 
-                
+
         private ICommonFunction _commonFunc;
 
         public DgDocDtlExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
         {
-                    
+
             this._logger = logger;
-            
+
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
-           
-           
+
+
         }
 
 
         public async Task<UpdateDgDocDtlReturn> ValidateDocumentInput(dynamic RequestData)
         {
             UpdateDgDocDtlReturn ldRtPrm = new UpdateDgDocDtlReturn();
+            List<DocUpdateStatus> updateDocumentReturn = new List<DocUpdateStatus>();
             RequestData = await this.getRequestData(RequestData, "UpdateDigiDocumentDetails");
             try
             {
-               
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "UpdateDigiDocumentappkey"))
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
-                        List<string> Documents = new List<string>();
-                        foreach (var item in RequestData.Document)
+                        if (RequestData.Document.Count > 0)
                         {
-                            string documentID = "";
-                            if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
+                            var catId = await this._commonFunc.getDocumentDateConfig();
+                            var expirydateCategories = (from c in catId where c.Key == "docid_issue_expirydate" select c.Value)?.FirstOrDefault()?.ToString();
+                            var issuedateCategories = (from c in catId where c.Key == "docid_issuedat" select c.Value)?.FirstOrDefault()?.ToString();
+
+                            foreach (var item in RequestData.Document)
                             {
-                                documentID = await this.UpdateDocument(item);
+                                DocUpdateStatus updateDocument = new DocUpdateStatus();
+                                updateDocument.SubCategoryCode = item.SubcategoryCode?.ToString();
+                                updateDocument.DocId = item.CRMDocumentID?.ToString();
+                                if (expirydateCategories.Contains(item.SubcategoryCode.ToString()) || issuedateCategories.Contains(item.SubcategoryCode.ToString()))
+                                {
+                                    if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) || (string.IsNullOrEmpty(item.IssueDate.ToString()))))
+                                    {
+                                        if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) && (string.IsNullOrEmpty(item.IssueDate.ToString()))))
+                                        {
+                                            updateDocument.Status = "Error";
+                                            updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate && IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
+                                        }
+                                        else
+                                        {
+                                            if (string.IsNullOrEmpty(item.ExpiryDate.ToString()))
+                                            {
+                                                updateDocument.Status = "Error";
+                                                updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
+                                            }
+                                            if (string.IsNullOrEmpty(item.IssueDate.ToString()))
+                                            {
+                                                updateDocument.Status = "Error";
+                                                updateDocument.ErrorMessage += $"Document can't be updated as IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
+                                            }
+                                        }
+                                        updateDocumentReturn.Add(updateDocument);
+                                    }
+                                    else if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) &&  (string.IsNullOrEmpty(item.IssueDate.ToString()))))
+                                    {
+                                        updateDocument.Status = "Error";
+                                        updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate && IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
+                                        updateDocumentReturn.Add(updateDocument);
+                                    }
+                                    else
+                                    {
+                                        if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
+                                        {
+                                            updateDocument = await this.UpdateDocument(item);
+                                        }
+                                        else
+                                        {
+                                            updateDocument = await this.CreateDocument(item);
+                                        }
+                                        updateDocumentReturn.Add(updateDocument);
+                                    }
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
+                                    {
+                                        updateDocument = await this.UpdateDocument(item);
+                                    }
+                                    else
+                                    {
+                                        updateDocument = await this.CreateDocument(item);
+                                    }
+                                    updateDocumentReturn.Add(updateDocument);
+                                }
                             }
-                            else
-                            {
-                                documentID = await this.CreateDocument(item);
-                            }
-                            Documents.Add(documentID);
+                            ldRtPrm.DocUpdateStatus = updateDocumentReturn;
+                            ldRtPrm.ReturnCode = "CRM-SUCCESS";
+                            ldRtPrm.Message = OutputMSG.Case_Success;
+
                         }
-
-                        ldRtPrm.DocumentIDs = Documents;
-                        ldRtPrm.ReturnCode = "CRM-SUCCESS";
-                        ldRtPrm.Message = OutputMSG.Case_Success;
-
+                        else
+                        {
+                            this._logger.LogInformation("ValidateDocumentInput", "Documents data is incorrect.");
+                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                            ldRtPrm.Message = "Documents data is incorrect.";
+                        }
                     }
                     else
                     {
@@ -122,7 +186,7 @@
                     ldRtPrm.Message = "Appkey is incorrect";
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -149,9 +213,10 @@
             }
         }
 
-        private async Task<string> CreateDocument(dynamic documentdtl)
+        private async Task<DocUpdateStatus> CreateDocument(dynamic documentdtl)
         {
             Dictionary<string, string> odatab = new Dictionary<string, string>();
+            DocUpdateStatus createDocument = new DocUpdateStatus();
             try
             {
                 string catId = await this._commonFunc.getDocCategoryId(documentdtl.CategoryCode.ToString());
@@ -211,27 +276,27 @@
                 }
 
                 string leadid = await this._commonFunc.getLeadId(documentdtl.MappedCustomerLead.ToString());
-                if (!string.IsNullOrEmpty(validateby))
+                if (!string.IsNullOrEmpty(leadid))
                 {
                     odatab.Add("eqs_leadid@odata.bind", $"leads({leadid})");
                 }
                 string LeadAccount = await this._commonFunc.getLeadAccountId(documentdtl.MappedAccountLead.ToString());
-                if (!string.IsNullOrEmpty(validateby))
+                if (!string.IsNullOrEmpty(LeadAccount))
                 {
                     odatab.Add("eqs_leadaccountid@odata.bind", $"eqs_leadaccounts({LeadAccount})");
                 }
                 string customerid = await this._commonFunc.getCustomerId(documentdtl.MappedUCIC.ToString());
-                if (!string.IsNullOrEmpty(validateby))
+                if (!string.IsNullOrEmpty(customerid))
                 {
                     odatab.Add("eqs_ucicid@odata.bind", $"contacts({customerid})");
                 }
                 string accountid = await this._commonFunc.getAccountId(documentdtl.MappedAccount.ToString());
-                if (!string.IsNullOrEmpty(validateby))
+                if (!string.IsNullOrEmpty(accountid))
                 {
                     odatab.Add("eqs_accountnumberid@odata.bind", $"eqs_accounts({accountid})");
                 }
                 string caseid = await this._commonFunc.getCaseId(documentdtl.MappedServiceRequest.ToString());
-                if (!string.IsNullOrEmpty(validateby))
+                if (!string.IsNullOrEmpty(caseid))
                 {
                     odatab.Add("eqs_CaseId@odata.bind", $"incidents({caseid})");
                 }
@@ -239,7 +304,11 @@
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 var Document_details = await this._queryParser.HttpApiCall($"eqs_leaddocuments()?$select=eqs_documentid", HttpMethod.Post, postDataParametr);
                 var Documentid = CommonFunction.GetIdFromPostRespons201(Document_details[0]["responsebody"], "eqs_documentid");
-                return Documentid;
+                createDocument.DocId = Documentid.ToString();
+                createDocument.SubCategoryCode = documentdtl.SubcategoryCode.ToString();
+                createDocument.Status = "Success";
+                return createDocument;
+
             }
             catch (Exception ex)
             {
@@ -249,10 +318,11 @@
 
         }
 
-        private async Task<string> UpdateDocument(dynamic documentdtl)
+        private async Task<DocUpdateStatus> UpdateDocument(dynamic documentdtl)
         {
             try
             {
+                DocUpdateStatus updateDocument = new DocUpdateStatus();
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
                 string DocumentID = await this._commonFunc.getDocumentID(documentdtl.CRMDocumentID.ToString());
                 if (!string.IsNullOrEmpty(DocumentID))
@@ -313,38 +383,37 @@
                     }
 
                     string leadid = await this._commonFunc.getLeadId(documentdtl.MappedCustomerLead.ToString());
-                    if (!string.IsNullOrEmpty(validateby))
+                    if (!string.IsNullOrEmpty(leadid))
                     {
                         odatab.Add("eqs_leadid@odata.bind", $"leads({leadid})");
                     }
                     string LeadAccount = await this._commonFunc.getLeadAccountId(documentdtl.MappedAccountLead.ToString());
-                    if (!string.IsNullOrEmpty(validateby))
+                    if (!string.IsNullOrEmpty(LeadAccount))
                     {
                         odatab.Add("eqs_leadaccountid@odata.bind", $"eqs_leadaccounts({LeadAccount})");
                     }
                     string customerid = await this._commonFunc.getCustomerId(documentdtl.MappedUCIC.ToString());
-                    if (!string.IsNullOrEmpty(validateby))
+                    if (!string.IsNullOrEmpty(customerid))
                     {
                         odatab.Add("eqs_ucicid@odata.bind", $"contacts({customerid})");
                     }
                     string accountid = await this._commonFunc.getAccountId(documentdtl.MappedAccount.ToString());
-                    if (!string.IsNullOrEmpty(validateby))
+                    if (!string.IsNullOrEmpty(accountid))
                     {
                         odatab.Add("eqs_accountnumberid@odata.bind", $"eqs_accounts({accountid})");
                     }
                     string caseid = await this._commonFunc.getCaseId(documentdtl.MappedServiceRequest.ToString());
-                    if (!string.IsNullOrEmpty(validateby))
+                    if (!string.IsNullOrEmpty(caseid))
                     {
                         odatab.Add("eqs_CaseId@odata.bind", $"incidents({caseid})");
                     }
 
-
-
-
                     string postDataParametr = JsonConvert.SerializeObject(odatab);
                     var Document_details = await this._queryParser.HttpApiCall($"eqs_leaddocuments({DocumentID})", HttpMethod.Patch, postDataParametr);
-
-                    return documentdtl.CRMDocumentID.ToString();
+                    updateDocument.DocId = documentdtl.CRMDocumentID.ToString();
+                    updateDocument.SubCategoryCode = documentdtl.SubcategoryCode.ToString();
+                    updateDocument.Status = "Success";
+                    return updateDocument;
                 }
                 else
                 {
@@ -362,7 +431,7 @@
         public async Task<GetDgDocDtlReturn> GetDocumentList(dynamic RequestData)
         {
             GetDgDocDtlReturn ldRtPrm = new GetDgDocDtlReturn();
-           
+
             RequestData = await this.getRequestData(RequestData, "GetDigiDocumentDetails");
             try
             {
@@ -377,7 +446,7 @@
                             string LeadId = await this._commonFunc.getLeadId(RequestData.CustomerLead.ToString());
                             if (!string.IsNullOrEmpty(LeadId))
                             {
-                                IdExist = 1;                                
+                                IdExist = 1;
                                 query_url = query_url + $"_eqs_leadid_value eq '{LeadId}'";
                             }
                         }
@@ -386,7 +455,7 @@
                             string LeadAcc = await this._commonFunc.getLeadAccountId(RequestData.AccountLead.ToString());
                             if (!string.IsNullOrEmpty(LeadAcc))
                             {
-                                IdExist = 1;                                
+                                IdExist = 1;
                                 query_url = query_url + $"_eqs_leadaccountid_value eq '{LeadAcc}'";
                             }
                         }
@@ -395,7 +464,7 @@
                             string custonerId = await this._commonFunc.getCustomerId(RequestData.UCIC.ToString());
                             if (!string.IsNullOrEmpty(custonerId))
                             {
-                                IdExist = 1;                                
+                                IdExist = 1;
                                 query_url = query_url + $"_eqs_ucicid_value eq '{custonerId}'";
                             }
                         }
@@ -404,7 +473,7 @@
                             string AccountId = await this._commonFunc.getAccountId(RequestData.AccountNumbe.ToString());
                             if (!string.IsNullOrEmpty(AccountId))
                             {
-                                IdExist = 1;                                
+                                IdExist = 1;
                                 query_url = query_url + $"_eqs_accountnumberid_value eq '{AccountId}'";
 
                             }
@@ -414,7 +483,7 @@
                             string caseId = await this._commonFunc.getCaseId(RequestData.CaseNumber.ToString());
                             if (!string.IsNullOrEmpty(caseId))
                             {
-                                IdExist = 1;                                
+                                IdExist = 1;
                                 query_url = query_url + $"_eqs_caseid_value eq '{caseId}'";
                             }
                         }
@@ -437,7 +506,7 @@
                         {
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
                             ldRtPrm.Message = OutputMSG.Incorrect_Input;
-                        }                        
+                        }
 
                     }
                     else
@@ -461,11 +530,11 @@
                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
                 ldRtPrm.Message = OutputMSG.Incorrect_Input;
             }
-            
+
             return ldRtPrm;
         }
 
-       
+
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
