@@ -182,7 +182,7 @@
 
             try
             {
-
+                string dd, mm, yyyy;
                 this.DDEId = await this._commonFunc.getDDEFinalAccountIndvData(Applicant_Data["eqs_accountapplicantid"]?.ToString());
 
                 if (!string.IsNullOrEmpty(this.DDEId))
@@ -208,114 +208,281 @@
                             return csRtPrm;
                         }
                     }
+                    CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
+                    CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_sourcebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.SourceBranch?.ToString())})");
+                    CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
+                    CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_firstname", Applicant_Data["eqs_firstname"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"]?.ToString());
+
+                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_dob"]?.ToString()))
+                    {
+                        dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 2);
+                        mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(3, 2);
+                        yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(6, 4);
+                        CRMDDEmappingFields.Add("eqs_dob", yyyy + "-" + mm + "-" + dd);
+                    }
+
+                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
+                    {
+                        CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
+                    {
+                        CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
+                    }
+
+                    string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
+                    CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
+                    CRMDDEmappingFields.Add("eqs_mobilenumber", Applicant_Data["eqs_mobilenumber"]?.ToString());
                 }
-                string dd, mm, yyyy;
+                
+
+         
                 /*********** General *********/
-                CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
-                CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
-                CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
 
-                CRMDDEmappingFields.Add("eqs_sourcebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.SourceBranch?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_custpreferredbranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.CustomerspreferredBranch?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_lgcode", CustIndvData.General?.LGCode?.ToString());
-                CRMDDEmappingFields.Add("eqs_lccode", CustIndvData.General?.LCCode?.ToString());
-                CRMDDEmappingFields.Add("eqs_residencytypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_residencytypecode", CustIndvData.General?.ResidencyType?.ToString()));
-                CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
-                CRMDDEmappingFields.Add("eqs_relationshiptoprimaryholder@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationshipID(CustIndvData.General?.RelationshiptoPrimaryHolder?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_AccountRelationship@odata.bind", $"eqs_accountrelationshipses({await this._commonFunc.getAccRelationshipID(CustIndvData.General?.AccountRelationship?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_purposeofcreationId@odata.bind", $"eqs_purposeofcreations({await this._commonFunc.getPurposeID(CustIndvData.General?.PurposeofCreation?.ToString())})");
-
-                CRMDDEmappingFields.Add("eqs_physicalaornumber", CustIndvData.General?.PhysicalAOFnumber?.ToString());
-
-                CRMDDEmappingFields1.Add("eqs_ismficustomer", Convert.ToBoolean(CustIndvData.General?.IsMFICustomer?.ToString()));
-                CRMDDEmappingFields.Add("eqs_deferralcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_deferralcode", CustIndvData.General?.IsDeferral?.ToString()));
-                CRMDDEmappingFields1.Add("eqs_isdeferral", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isdeferral", CustIndvData.General?.Deferral?.ToString()) == "1") ? true : false);
-                CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustIndvData.General?.IsPermAddrAndCurrAddrSame?.ToString()));
+                if (CustIndvData.General != null)
+                {
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.CustomerspreferredBranch?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_custpreferredbranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.CustomerspreferredBranch?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.LGCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lgcode", CustIndvData.General?.LGCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.LCCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lccode", CustIndvData.General?.LCCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.RelationshiptoPrimaryHolder?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_relationshiptoprimaryholder@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationshipID(CustIndvData.General?.RelationshiptoPrimaryHolder?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.ResidencyType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_residencytypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_residencytypecode", CustIndvData.General?.ResidencyType?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.AccountRelationship?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_AccountRelationship@odata.bind", $"eqs_accountrelationshipses({await this._commonFunc.getAccRelationshipID(CustIndvData.General?.AccountRelationship?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.PurposeofCreation?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_purposeofcreationId@odata.bind", $"eqs_purposeofcreations({await this._commonFunc.getPurposeID(CustIndvData.General?.PurposeofCreation?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.PhysicalAOFnumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_physicalaornumber", CustIndvData.General?.PhysicalAOFnumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.IsMFICustomer?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_ismficustomer", Convert.ToBoolean(CustIndvData.General?.IsMFICustomer?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.IsDeferral?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_deferralcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_deferralcode", CustIndvData.General?.IsDeferral?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.Deferral?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_isdeferral", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isdeferral", CustIndvData.General?.Deferral?.ToString()) == "1") ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.IsPermAddrAndCurrAddrSame?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustIndvData.General?.IsPermAddrAndCurrAddrSame?.ToString()));
+                    }
+                   
+                    
+                }
 
                 /*********** Prospect Details *********/
-                CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
-                CRMDDEmappingFields.Add("eqs_firstname", Applicant_Data["eqs_firstname"]?.ToString());
-                CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"]?.ToString());
-                CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"]?.ToString());
-
-                if (!string.IsNullOrEmpty(Applicant_Data["eqs_dob"]?.ToString()))
+                if (CustIndvData.ProspectDetails != null)
                 {
-                    dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 2);
-                    mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(3, 2);
-                    yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(6, 4);
-                    CRMDDEmappingFields.Add("eqs_dob", yyyy + "-" + mm + "-" + dd);
-                }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EmailID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_emailid", CustIndvData.ProspectDetails?.EmailID?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.NationalityID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_nationalityId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.NationalityID?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.CountryIDofbirth?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_countryofbirthId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.CountryIDofbirth?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.FathersName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_fathername", CustIndvData.ProspectDetails?.FathersName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.MothersMaidenName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_mothermaidenname", CustIndvData.ProspectDetails?.MothersMaidenName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.SpouseName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_spousename", CustIndvData.ProspectDetails?.SpouseName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.CountryID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_countryId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.CountryID?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Program?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_programcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_programcode", CustIndvData.ProspectDetails?.Program?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Education?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_educationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_educationcode", CustIndvData.ProspectDetails?.Education?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.MaritalStatus?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_maritalstatuscode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_maritalstatuscode", CustIndvData.ProspectDetails?.MaritalStatus?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Profession.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_professioncode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_professioncode", CustIndvData.ProspectDetails?.Profession.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.AnnualIncomeBand.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_annualincomebandcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_annualincomebandcode", CustIndvData.ProspectDetails?.AnnualIncomeBand.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EmployerType.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_employertypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_employertypecode", CustIndvData.ProspectDetails?.EmployerType.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EmployerName.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_empname", CustIndvData.ProspectDetails?.EmployerName.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.OfficePhone.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_officephone", CustIndvData.ProspectDetails?.OfficePhone.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EstimatedAgriculturalIncome.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_agriculturalincome", CustIndvData.ProspectDetails?.EstimatedAgriculturalIncome.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EstimatedNonAgriculturalIncome.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_nonagriculturalincome", CustIndvData.ProspectDetails?.EstimatedNonAgriculturalIncome.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.IsStaff.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_isstaffcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isstaffcode", CustIndvData.ProspectDetails?.IsStaff.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.EquitasStaffCode.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_equitasstaffcode", CustIndvData.ProspectDetails?.EquitasStaffCode.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Language.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_languagecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_languagecode", CustIndvData.ProspectDetails?.Language.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_ispep", Convert.ToBoolean(CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.LOBCode.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lobcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_lobcode", CustIndvData.ProspectDetails?.LOBCode.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.AOBusinessOperation.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_aobocode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_aobocode", CustIndvData.ProspectDetails?.AOBusinessOperation.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Category.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_communitycode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_communitycode", CustIndvData.ProspectDetails?.Category.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.AdditionalInformation.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_additionalinformationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_additionalinformationcode", CustIndvData.ProspectDetails?.AdditionalInformation.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.WorkplaceAddress.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_corporatecompanyid@odata.bind", $"eqs_corporatemasters({await this._commonFunc.getcorporatemasterID(CustIndvData.ProspectDetails?.WorkplaceAddress.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Designation.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_designationid@odata.bind", $"eqs_designationmasters({await this._commonFunc.getdesignationmasterID(CustIndvData.ProspectDetails?.Designation.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.IsPhysicallyChallenged.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_isphysicallychallenged", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isphysicallychallenged", CustIndvData.ProspectDetails?.IsPhysicallyChallenged.ToString()));
+                    }           
+                    
+                    
 
-                if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
-                {
-                    CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
                 }
-                if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
-                {
-                    CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
-                }
-
-                string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
-                CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
-                CRMDDEmappingFields.Add("eqs_mobilenumber", Applicant_Data["eqs_mobilenumber"]?.ToString());
-                CRMDDEmappingFields.Add("eqs_emailid", CustIndvData.ProspectDetails?.EmailID?.ToString());
-                CRMDDEmappingFields.Add("eqs_nationalityId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.NationalityID?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_countryofbirthId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.CountryIDofbirth?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_fathername", CustIndvData.ProspectDetails?.FathersName?.ToString());
-                CRMDDEmappingFields.Add("eqs_mothermaidenname", CustIndvData.ProspectDetails?.MothersMaidenName?.ToString());
-                CRMDDEmappingFields.Add("eqs_spousename", CustIndvData.ProspectDetails?.SpouseName?.ToString());
-                CRMDDEmappingFields.Add("eqs_countryId@odata.bind", $"eqs_countries({await this._commonFunc.getCountryID(CustIndvData.ProspectDetails?.CountryID?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_programcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_programcode", CustIndvData.ProspectDetails?.Program?.ToString()));
-                CRMDDEmappingFields.Add("eqs_educationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_educationcode", CustIndvData.ProspectDetails?.Education?.ToString()));
-                CRMDDEmappingFields.Add("eqs_maritalstatuscode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_maritalstatuscode", CustIndvData.ProspectDetails?.MaritalStatus?.ToString()));
-                CRMDDEmappingFields.Add("eqs_professioncode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_professioncode", CustIndvData.ProspectDetails?.Profession.ToString()));
-                CRMDDEmappingFields.Add("eqs_annualincomebandcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_annualincomebandcode", CustIndvData.ProspectDetails?.AnnualIncomeBand.ToString()));
-                CRMDDEmappingFields.Add("eqs_employertypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_employertypecode", CustIndvData.ProspectDetails?.EmployerType.ToString()));
-                CRMDDEmappingFields.Add("eqs_empname", CustIndvData.ProspectDetails?.EmployerName.ToString());
-                CRMDDEmappingFields.Add("eqs_officephone", CustIndvData.ProspectDetails?.OfficePhone.ToString());
-                CRMDDEmappingFields.Add("eqs_agriculturalincome", CustIndvData.ProspectDetails?.EstimatedAgriculturalIncome.ToString());
-                CRMDDEmappingFields.Add("eqs_nonagriculturalincome", CustIndvData.ProspectDetails?.EstimatedNonAgriculturalIncome.ToString());
-                CRMDDEmappingFields.Add("eqs_isstaffcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isstaffcode", CustIndvData.ProspectDetails?.IsStaff.ToString()));
-                CRMDDEmappingFields.Add("eqs_equitasstaffcode", CustIndvData.ProspectDetails?.EquitasStaffCode.ToString());
-                CRMDDEmappingFields.Add("eqs_languagecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_languagecode", CustIndvData.ProspectDetails?.Language.ToString()));
-                CRMDDEmappingFields1.Add("eqs_ispep", Convert.ToBoolean(CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()));
-                CRMDDEmappingFields.Add("eqs_lobcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_lobcode", CustIndvData.ProspectDetails?.LOBCode.ToString()));
-                CRMDDEmappingFields.Add("eqs_aobocode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_aobocode", CustIndvData.ProspectDetails?.AOBusinessOperation.ToString()));
-                CRMDDEmappingFields.Add("eqs_communitycode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_communitycode", CustIndvData.ProspectDetails?.Category.ToString()));
-                CRMDDEmappingFields.Add("eqs_additionalinformationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_additionalinformationcode", CustIndvData.ProspectDetails?.AdditionalInformation.ToString()));
-                CRMDDEmappingFields.Add("eqs_corporatecompanyid@odata.bind", $"eqs_corporatemasters({await this._commonFunc.getcorporatemasterID(CustIndvData.ProspectDetails?.WorkplaceAddress.ToString())})");
-                CRMDDEmappingFields.Add("eqs_designationid@odata.bind", $"eqs_designationmasters({await this._commonFunc.getdesignationmasterID(CustIndvData.ProspectDetails?.Designation.ToString())})");
-                CRMDDEmappingFields.Add("eqs_isphysicallychallenged", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_isphysicallychallenged", CustIndvData.ProspectDetails?.IsPhysicallyChallenged.ToString()));
 
                 /*********** Identification Details *********/
                 // CRMDDEmappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_panform60code", CustIndvData.IdentificationDetails?.PanForm60.ToString()));               
                 // CRMDDEmappingFields.Add("eqs_passportnumber", CustIndvData.IdentificationDetails?.PassportNumber.ToString());
                 // CRMDDEmappingFields.Add("ReasonforNotApplicable", CustIndvData.IdentificationDetails?.ReasonforNotApplicable.ToString());
-                CRMDDEmappingFields.Add("eqs_ckycreferencenumber", CustIndvData.IdentificationDetails?.CKYCreferenceNumber.ToString());
-                CRMDDEmappingFields.Add("eqs_kycverificationmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_kycverificationmodecode", CustIndvData.IdentificationDetails?.KYCVerificationMode.ToString()));
-
-                if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.VerificationDate?.ToString()))
+                if (CustIndvData.IdentificationDetails != null)
                 {
-                    dd = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(0, 2);
-                    mm = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(3, 2);
-                    yyyy = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(6, 4);
-                    CRMDDEmappingFields.Add("eqs_verificationdate", yyyy + "-" + mm + "-" + dd);
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.CKYCreferenceNumber.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_ckycreferencenumber", CustIndvData.IdentificationDetails?.CKYCreferenceNumber.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.KYCVerificationMode.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverificationmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_kycverificationmodecode", CustIndvData.IdentificationDetails?.KYCVerificationMode.ToString()));
+                    }
+
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.VerificationDate?.ToString()))
+                    {
+                        dd = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(0, 2);
+                        mm = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(3, 2);
+                        yyyy = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(6, 4);
+                        CRMDDEmappingFields.Add("eqs_verificationdate", yyyy + "-" + mm + "-" + dd);
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.OtherIdentificationNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_othertaxnumber", CustIndvData.IdentificationDetails?.OtherIdentificationNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportIssuedAt?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_passportissuedat", CustIndvData.IdentificationDetails?.PassportIssuedAt?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.ТахТуре?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_taxtype", CustIndvData.IdentificationDetails?.ТахТуре?.ToString());
+                    }
+                    
+
                 }
-
-
+               
                 /*********** FATCA *********/
-                if (!string.IsNullOrEmpty(CustIndvData.FATCA?.ToString()))
+                if (CustIndvData.FATCA!=null)
                 {
-
-                    CRMDDEmappingFields1.Add("eqs_taxresident", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_taxresident", CustIndvData.FATCA?.TaxResident.ToString()) == "1") ? true : false);
-                    CRMDDEmappingFields.Add("eqs_cityofbirth", CustIndvData.FATCA?.CityofBirth.ToString());
+                    if (!string.IsNullOrEmpty(CustIndvData.FATCA?.TaxResident.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_taxresident", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_taxresident", CustIndvData.FATCA?.TaxResident.ToString()) == "1") ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.FATCA?.CityofBirth.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_cityofbirth", CustIndvData.FATCA?.CityofBirth.ToString());
+                    }                   
                 }
 
                 /*********** NRI Details *********/
-                if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.ToString()))
+                if (CustIndvData.NRIDetails != null)
                 {
-                    CRMDDEmappingFields.Add("eqs_visatypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_visatypecode", CustIndvData.NRIDetails?.VisaType?.ToString()));
-                    if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaIssuedDate.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_visatypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_visatypecode", CustIndvData.NRIDetails?.VisaType?.ToString()));
+                    }
+                    
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaIssuedDate.ToString()))
                     {
                         dd = CustIndvData.NRIDetails?.VisaIssuedDate?.ToString()?.Substring(0, 2);
                         mm = CustIndvData.NRIDetails?.VisaIssuedDate?.ToString()?.Substring(3, 2);
@@ -323,32 +490,44 @@
                         CRMDDEmappingFields.Add("eqs_visaissueddate", yyyy + "-" + mm + "-" + dd);
                     }
 
-                    if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()))
                     {
                         dd = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(0, 2);
                         mm = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(3, 2);
                         yyyy = CustIndvData.NRIDetails?.VisaExpiryDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_visaexpirydate", yyyy + "-" + mm + "-" + dd);
                     }
-                    CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_othertaxnumber", CustIndvData.IdentificationDetails?.OtherIdentificationNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_passportissuedat", CustIndvData.IdentificationDetails?.PassportIssuedAt?.ToString());
-                    CRMDDEmappingFields.Add("eqs_taxtype", CustIndvData.IdentificationDetails?.ТахТуре?.ToString());
 
-                    CRMDDEmappingFields1.Add("eqs_kycmode", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_kycmode", CustIndvData.NRIDetails?.KYCMode?.ToString()) == "1") ? true : false);
-                    CRMDDEmappingFields1.Add("eqs_seafarer", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_seafarer", CustIndvData.NRIDetails?.Seafarer?.ToString()) == "1") ? true : false);
-                    CRMDDEmappingFields.Add("eqs_residencestatuscode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_residencestatuscode", CustIndvData.NRIDetails?.ResidenceStatus?.ToString()));
-                    CRMDDEmappingFields.Add("eqs_visanumber", CustIndvData.NRIDetails?.VISAOCICDCNumber?.ToString());
-                    CRMDDEmappingFields1.Add("eqs_mobilepreference", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_mobilepreference", CustIndvData.NRIDetails?.SMSOTPMobilepreference?.ToString()) == "1") ? true : false);
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.KYCMode?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_kycmode", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_kycmode", CustIndvData.NRIDetails?.KYCMode?.ToString()) == "1") ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.Seafarer?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_seafarer", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_seafarer", CustIndvData.NRIDetails?.Seafarer?.ToString()) == "1") ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.ResidenceStatus?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_residencestatuscode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_residencestatuscode", CustIndvData.NRIDetails?.ResidenceStatus?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.VISAOCICDCNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_visanumber", CustIndvData.NRIDetails?.VISAOCICDCNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.SMSOTPMobilepreference?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_mobilepreference", (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_mobilepreference", CustIndvData.NRIDetails?.SMSOTPMobilepreference?.ToString()) == "1") ? true : false);
+                    }
+                                       
 
-                    if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()))
                     {
                         dd = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(0, 2);
                         mm = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(3, 2);
                         yyyy = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_passportissuedate", yyyy + "-" + mm + "-" + dd);
                     }
-                    if (CustIndvData.NRIDetails != null && !string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()))
                     {
                         dd = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(0, 2);
                         mm = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(3, 2);
@@ -359,17 +538,36 @@
 
 
                 /*********** RM Details *********/
-                if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ToString()))
+                if (CustIndvData.RMDetails != null)
                 {
-                    CRMDDEmappingFields.Add("eqs_servicermcode", CustIndvData.RMDetails?.ServiceRMCode?.ToString());
-                    CRMDDEmappingFields.Add("eqs_servicermname", CustIndvData.RMDetails?.ServiceRMName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_servicermrole", CustIndvData.RMDetails?.ServiceRMRole?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmcode", CustIndvData.RMDetails?.BusinessRMCode?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmname", CustIndvData.RMDetails?.BusinessRMName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmrole", CustIndvData.RMDetails?.BusinessRMRole?.ToString());
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ServiceRMCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermcode", CustIndvData.RMDetails?.ServiceRMCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ServiceRMName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermname", CustIndvData.RMDetails?.ServiceRMName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ServiceRMRole?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermrole", CustIndvData.RMDetails?.ServiceRMRole?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.BusinessRMCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmcode", CustIndvData.RMDetails?.BusinessRMCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.BusinessRMName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmname", CustIndvData.RMDetails?.BusinessRMName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.BusinessRMRole?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmrole", CustIndvData.RMDetails?.BusinessRMRole?.ToString());
+                    }
+                                        
                 }
 
-                CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
+                
 
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
@@ -395,15 +593,35 @@
                 }
 
                 /*********** KYCVerification *********/
-                if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.ToString()))
+                if (CustIndvData.KYCVerification != null)
                 {
                     CRMDDEmappingFields = new Dictionary<string, string>();
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempname", CustIndvData.KYCVerification?.EmpName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempid", CustIndvData.KYCVerification?.EmpID?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempdesignation", CustIndvData.KYCVerification?.EmpDesignation?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempbranch", CustIndvData.KYCVerification?.EmpBranch?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedinstitutename", CustIndvData.KYCVerification?.InstitutionName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedinstitutecode", CustIndvData.KYCVerification?.InstitutionCode?.ToString());
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.EmpName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempname", CustIndvData.KYCVerification?.EmpName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.EmpID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempid", CustIndvData.KYCVerification?.EmpID?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.EmpDesignation?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempdesignation", CustIndvData.KYCVerification?.EmpDesignation?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.EmpBranch?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempbranch", CustIndvData.KYCVerification?.EmpBranch?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.InstitutionName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedinstitutename", CustIndvData.KYCVerification?.InstitutionName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.KYCVerification?.InstitutionCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedinstitutecode", CustIndvData.KYCVerification?.InstitutionCode?.ToString());
+                    }
+                    
+                   
 
                     postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
 
@@ -426,7 +644,7 @@
                 }
 
                 /*********** Address *********/
-                if (!string.IsNullOrEmpty(CustIndvData.Address?.ToString()))
+                if (CustIndvData.Address != null)
                 {
                     Address_Id = new List<string>();
                     foreach (var CustIndvDataItem in CustIndvData.Address)
@@ -435,43 +653,94 @@
                         CRMDDEmappingFields1 = new Dictionary<string, bool>();
 
                         CRMDDEmappingFields.Add("eqs_name", Applicant_Data.eqs_applicantid?.ToString() + " - " + CustIndvDataItem.AddressType?.ToString());
-                        CRMDDEmappingFields.Add("eqs_applicantaddressid", CustIndvDataItem.ApplicantAddress?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustIndvDataItem.AddressType?.ToString()));
-                        CRMDDEmappingFields.Add("eqs_addressline1", CustIndvDataItem.AddressLine1?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline2", CustIndvDataItem.AddressLine2?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline3", CustIndvDataItem.AddressLine3?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline4", CustIndvDataItem.AddressLine4?.ToString());
-                        CRMDDEmappingFields.Add("eqs_faxnumber", CustIndvDataItem.FaxNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustIndvDataItem.OverseasMobileNumber?.ToString());
 
-                        var pincodeMaster = await this._commonFunc.getPincodeID(CustIndvDataItem.PinCodeMaster?.ToString());
-                        if (!string.IsNullOrEmpty(pincodeMaster))
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.ApplicantAddress?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({pincodeMaster})");
+                            CRMDDEmappingFields.Add("eqs_applicantaddressid", CustIndvDataItem.ApplicantAddress?.ToString());
                         }
-                        var cityId = await this._commonFunc.getCityID(CustIndvDataItem.CityId?.ToString());
-                        if (!string.IsNullOrEmpty(cityId))
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AddressType?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
+                            CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustIndvDataItem.AddressType?.ToString()));
                         }
-                        CRMDDEmappingFields.Add("eqs_district", CustIndvDataItem.District?.ToString());
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AddressLine1?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline1", CustIndvDataItem.AddressLine1?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AddressLine2?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline2", CustIndvDataItem.AddressLine2?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AddressLine3?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline3", CustIndvDataItem.AddressLine3?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AddressLine4?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline4", CustIndvDataItem.AddressLine4?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.FaxNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_faxnumber", CustIndvDataItem.FaxNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.OverseasMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustIndvDataItem.OverseasMobileNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.PinCodeMaster?.ToString()))
+                        {
+                            var pincodeMaster = await this._commonFunc.getPincodeID(CustIndvDataItem.PinCodeMaster?.ToString());
+                            if (!string.IsNullOrEmpty(pincodeMaster))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({pincodeMaster})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.CityId?.ToString()))
+                        {
+                            var cityId = await this._commonFunc.getCityID(CustIndvDataItem.CityId?.ToString());
+                            if (!string.IsNullOrEmpty(cityId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
+                            }
+                        }
 
-                        var stateId = await this._commonFunc.getStateID(CustIndvDataItem.StateId?.ToString());
-                        if (!string.IsNullOrEmpty(stateId))
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.District?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({stateId})");
+                            CRMDDEmappingFields.Add("eqs_district", CustIndvDataItem.District?.ToString());
                         }
-                        var countryId = await this._commonFunc.getCountryID(CustIndvDataItem.CountryId?.ToString());
-                        if (!string.IsNullOrEmpty(countryId))
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.CountryId?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({countryId})");
+                            var countryId = await this._commonFunc.getCountryID(CustIndvDataItem.CountryId?.ToString());
+                            if (!string.IsNullOrEmpty(countryId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({countryId})");
+                            }
                         }
-                        CRMDDEmappingFields.Add("eqs_pincode", CustIndvDataItem.PinCode?.ToString());
-                        CRMDDEmappingFields.Add("eqs_pobox", CustIndvDataItem.POBox?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landmark", CustIndvDataItem.Landmark?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landlinenumber", CustIndvDataItem.LandlineNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustIndvDataItem.AlternateMobileNumber?.ToString());
-                        CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustIndvDataItem.LocalOverseas?.ToString()) == "1") ? true : false);
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.PinCode?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pincode", CustIndvDataItem.PinCode?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.POBox?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pobox", CustIndvDataItem.POBox?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.Landmark?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landmark", CustIndvDataItem.Landmark?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.LandlineNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landlinenumber", CustIndvDataItem.LandlineNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.AlternateMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustIndvDataItem.AlternateMobileNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.LocalOverseas?.ToString()))
+                        {
+                            CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustIndvDataItem.LocalOverseas?.ToString()) == "1") ? true : false);
+                        }
+                                                
+                        
                         CRMDDEmappingFields.Add("eqs_individualdde@odata.bind", $"eqs_ddeindividualcustomers({this.DDEId})");
 
                         postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
@@ -497,7 +766,7 @@
 
 
                 /*********** FATCA Link *********/
-                if (!string.IsNullOrEmpty(CustIndvData.FATCA?.ToString()))
+                if (CustIndvData.FATCA != null)
                 {
                     CRMDDEmappingFields = new Dictionary<string, string>();
                     if (await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_taxresident", CustIndvData.FATCA?.TaxResident?.ToString()) == "1")
@@ -536,43 +805,103 @@
                             CRMDDEmappingFields = new Dictionary<string, string>();
                             CRMDDEmappingFields1 = new Dictionary<string, bool>();
 
-                            CRMDDEmappingFields.Add("eqs_name", Fatca_Id + " - " + CustIndvData.FATCA?.AddressType?.ToString());
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.AddressType?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_name", Fatca_Id + " - " + CustIndvData.FATCA?.AddressType?.ToString());
+                            }
 
-                            CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustIndvData.FATCA?.AddressType?.ToString()));
-                            CRMDDEmappingFields.Add("eqs_addressline1", CustIndvData.FATCA?.Address?.AddressLine1?.ToString());
-                            CRMDDEmappingFields.Add("eqs_addressline2", CustIndvData.FATCA?.Address?.AddressLine2?.ToString());
-                            CRMDDEmappingFields.Add("eqs_addressline3", CustIndvData.FATCA?.Address?.AddressLine3?.ToString());
-                            CRMDDEmappingFields.Add("eqs_addressline4", CustIndvData.FATCA?.Address?.AddressLine4?.ToString());
-                            CRMDDEmappingFields.Add("eqs_faxnumber", CustIndvData.FATCA?.Address?.FaxNumber?.ToString());
-                            CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustIndvData.FATCA?.Address?.OverseasMobileNumber?.ToString());
-                            var fatcaPinCode = await this._commonFunc.getPincodeID(CustIndvData.FATCA?.Address?.PinCodeMaster?.ToString());
-                            if (!string.IsNullOrEmpty(fatcaPinCode))
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.AddressType?.ToString()))
                             {
-                                CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({fatcaPinCode})");
+                                CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustIndvData.FATCA?.AddressType?.ToString()));
                             }
-                            var fatcaCityId = await this._commonFunc.getCityID(CustIndvData.FATCA?.Address?.CityId?.ToString());
-                            if (!string.IsNullOrEmpty(fatcaCityId))
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine1?.ToString()))
                             {
-                                CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({fatcaCityId})");
+                                CRMDDEmappingFields.Add("eqs_addressline1", CustIndvData.FATCA?.Address?.AddressLine1?.ToString());
                             }
-                            CRMDDEmappingFields.Add("eqs_district", CustIndvData.FATCA?.Address?.District?.ToString());
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine2?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_addressline2", CustIndvData.FATCA?.Address?.AddressLine2?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine3?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_addressline3", CustIndvData.FATCA?.Address?.AddressLine3?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine4?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_addressline4", CustIndvData.FATCA?.Address?.AddressLine4?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.FaxNumber?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_faxnumber", CustIndvData.FATCA?.Address?.FaxNumber?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.OverseasMobileNumber?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustIndvData.FATCA?.Address?.OverseasMobileNumber?.ToString());
+                            }
 
-                            var fatcaStateId = await this._commonFunc.getStateID(CustIndvData.FATCA?.Address?.StateId?.ToString());
-                            if (!string.IsNullOrEmpty(fatcaStateId))
+
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.PinCodeMaster?.ToString()))
                             {
-                                CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({fatcaStateId})");
+                                var fatcaPinCode = await this._commonFunc.getPincodeID(CustIndvData.FATCA?.Address?.PinCodeMaster?.ToString());
+                                if (!string.IsNullOrEmpty(fatcaPinCode))
+                                {
+                                    CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({fatcaPinCode})");
+                                }
                             }
-                            var fatcaCountry = await this._commonFunc.getCountryID(CustIndvData.FATCA?.Address?.CountryId?.ToString());
-                            if (!string.IsNullOrEmpty(fatcaCountry))
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.CityId?.ToString()))
                             {
-                                CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaCountry})");
+                                var fatcaCityId = await this._commonFunc.getCityID(CustIndvData.FATCA?.Address?.CityId?.ToString());
+                                if (!string.IsNullOrEmpty(fatcaCityId))
+                                {
+                                    CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({fatcaCityId})");
+                                }
                             }
-                            CRMDDEmappingFields.Add("eqs_pincode", CustIndvData.FATCA?.Address?.PinCode?.ToString());
-                            CRMDDEmappingFields.Add("eqs_pobox", CustIndvData.FATCA?.Address?.POBox?.ToString());
-                            CRMDDEmappingFields.Add("eqs_landmark", CustIndvData.FATCA?.Address?.Landmark?.ToString());
-                            CRMDDEmappingFields.Add("eqs_landlinenumber", CustIndvData.FATCA?.Address?.LandlineNumber?.ToString());
-                            CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustIndvData.FATCA?.Address?.AlternateMobileNumber?.ToString());
-                            CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustIndvData.FATCA?.Address?.LocalOverseas?.ToString()) == "1") ? true : false);
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.StateId?.ToString()))
+                            {
+                                var fatcaStateId = await this._commonFunc.getStateID(CustIndvData.FATCA?.Address?.StateId?.ToString());
+                                if (!string.IsNullOrEmpty(fatcaStateId))
+                                {
+                                    CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({fatcaStateId})");
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.CountryId?.ToString()))
+                            {
+                                var fatcaCountry = await this._commonFunc.getCountryID(CustIndvData.FATCA?.Address?.CountryId?.ToString());
+                                if (!string.IsNullOrEmpty(fatcaCountry))
+                                {
+                                    CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaCountry})");
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.District?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_district", CustIndvData.FATCA?.Address?.District?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.PinCode?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pincode", CustIndvData.FATCA?.Address?.PinCode?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.POBox?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pobox", CustIndvData.FATCA?.Address?.POBox?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.Landmark?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_landmark", CustIndvData.FATCA?.Address?.Landmark?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.LandlineNumber?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_landlinenumber", CustIndvData.FATCA?.Address?.LandlineNumber?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AlternateMobileNumber?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustIndvData.FATCA?.Address?.AlternateMobileNumber?.ToString());
+                            }
+                            if (!string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.LocalOverseas?.ToString()))
+                            {
+                                CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustIndvData.FATCA?.Address?.LocalOverseas?.ToString()) == "1") ? true : false);
+                            }
+                                                       
+                            
                             CRMDDEmappingFields.Add("eqs_applicantfatca@odata.bind", $"eqs_customerfactcaothers({this.FatcaId})");
 
                             postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
@@ -676,6 +1005,7 @@
 
             try
             {
+                string dd, mm, yyyy;
                 this.DDEId = await this._commonFunc.getDDEFinalAccountCorpData(Applicant_Data["eqs_accountapplicantid"]?.ToString());
 
                 if (!string.IsNullOrEmpty(this.DDEId))
@@ -689,86 +1019,192 @@
                         return csRtPrm;
                     }
                 }
-                if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                else if (string.IsNullOrEmpty(this.DDEId))
                 {
-                    if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
                     {
-                        this._logger.LogError("createDigiCustLeadCorp", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
-                        csRtPrm.ReturnCode = "CRM-ERROR-101";
-                        csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
-                        return csRtPrm;
+                        if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
+                        {
+                            this._logger.LogError("createDigiCustLeadCorp", "Lead details can't be created or updated because PAN has not been verified for this Lead.");
+                            csRtPrm.ReturnCode = "CRM-ERROR-101";
+                            csRtPrm.Message = "Lead details can't be created or updated because PAN has not been verified for this Lead.";
+                            return csRtPrm;
+                        }
+                    }
+
+                    CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
+                    CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
+                    CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_sourcebranchterritoryId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.SourceBranch?.ToString())})");
+                    CRMDDEmappingFields.Add("eqs_preferredhomebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.CustomerpreferredHomebranch?.ToString())})");
+                    CRMDDEmappingFields.Add("eqs_isprimaryholder", Applicant_Data.eqs_isprimaryholder?.ToString());
+                    CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_companyname1", Applicant_Data["eqs_companynamepart1"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_companyname2", Applicant_Data["eqs_companynamepart2"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_companyname3", Applicant_Data["eqs_companynamepart3"]?.ToString());
+                    string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
+                    CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
+
+                    dd = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(0, 2);
+                    mm = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(3, 2);
+                    yyyy = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(6, 4);
+                    CRMDDEmappingFields.Add("eqs_dateofincorporation", yyyy + "-" + mm + "-" + dd);
+                    CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
+
+                }
+
+
+
+                /*********** General *********/
+                if (CustCorpData.General != null)
+                {
+                    if (!string.IsNullOrEmpty(CustCorpData.General.LGCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lccode", CustCorpData.General.LGCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.LCCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lgcode", CustCorpData.General.LCCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.PhysicalAOFnumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_aofnumber", CustCorpData.General.PhysicalAOFnumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.Deferral?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_deferralcode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_deferralcode", CustCorpData.General.Deferral?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.Isdeferral?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_isdeferral", (await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_isdeferral", CustCorpData.General.Isdeferral?.ToString()) == "1") ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.PurposeofCreation?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_purposeofcreationId@odata.bind", $"eqs_purposeofcreations({await this._commonFunc.getPurposeID(CustCorpData.General.PurposeofCreation?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.General.IsCommAddrSameAsOfficeAddr?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustCorpData.General.IsCommAddrSameAsOfficeAddr?.ToString()));
                     }
                 }
 
-                string dd, mm, yyyy;
-                /*********** General *********/
-                CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
-                CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
-                CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
-                CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
-
-                CRMDDEmappingFields.Add("eqs_sourcebranchterritoryId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.SourceBranch?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_preferredhomebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.CustomerpreferredHomebranch?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_lccode", CustCorpData.General.LGCode?.ToString());
-                CRMDDEmappingFields.Add("eqs_lgcode", CustCorpData.General.LCCode?.ToString());
-                CRMDDEmappingFields.Add("eqs_aofnumber", CustCorpData.General.PhysicalAOFnumber?.ToString());
-
-                CRMDDEmappingFields.Add("eqs_isprimaryholder", Applicant_Data.eqs_isprimaryholder?.ToString());
-                CRMDDEmappingFields.Add("eqs_deferralcode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_deferralcode", CustCorpData.General.Deferral?.ToString()));
-                CRMDDEmappingFields1.Add("eqs_isdeferral", (await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_isdeferral", CustCorpData.General.Isdeferral?.ToString()) == "1") ? true : false);
-
-                CRMDDEmappingFields.Add("eqs_purposeofcreationId@odata.bind", $"eqs_purposeofcreations({await this._commonFunc.getPurposeID(CustCorpData.General.PurposeofCreation?.ToString())})");
-                CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustCorpData.General.IsCommAddrSameAsOfficeAddr?.ToString()));
 
                 /***********About Prospect * ********/
-                CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
-                CRMDDEmappingFields.Add("eqs_companyname1", Applicant_Data["eqs_companynamepart1"]?.ToString());
-                CRMDDEmappingFields.Add("eqs_companyname2", Applicant_Data["eqs_companynamepart2"]?.ToString());
-                CRMDDEmappingFields.Add("eqs_companyname3", Applicant_Data["eqs_companynamepart3"]?.ToString());
-                string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
-                CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
 
-                dd = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(0, 2);
-                mm = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(3, 2);
-                yyyy = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(6, 4);
-                CRMDDEmappingFields.Add("eqs_dateofincorporation", yyyy + "-" + mm + "-" + dd);
                 //dd = CustCorpData.AboutProspect?.UCICCreatedOn?.ToString()?.Substring(0, 2);
                 //mm = CustCorpData.AboutProspect?.UCICCreatedOn?.ToString()?.Substring(3, 2);
                 //yyyy = CustCorpData.AboutProspect?.UCICCreatedOn?.ToString()?.Substring(6, 4);
                 //CRMDDEmappingFields.Add("eqs_uciccreatedon", yyyy + "-" + mm + "-" + dd);
 
-                CRMDDEmappingFields.Add("eqs_preferredlanguagecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_preferredlanguagecode", CustCorpData.AboutProspect?.PreferredLanguage?.ToString()));
-                CRMDDEmappingFields.Add("eqs_emailid", CustCorpData.AboutProspect?.EmailId?.ToString());
-                CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpData.AboutProspect?.FaxNumber?.ToString());
-                CRMDDEmappingFields.Add("eqs_companyturnovervalue", CustCorpData.AboutProspect?.CompanyTurnoverValue?.ToString());
-                CRMDDEmappingFields.Add("eqs_noofbranchesregionaloffices", CustCorpData.AboutProspect?.NoofBranchesRegionaOffices?.ToString());
-                CRMDDEmappingFields.Add("eqs_currentemployeestrength", CustCorpData.AboutProspect?.CurrentEmployeeStrength?.ToString());
-                CRMDDEmappingFields.Add("eqs_averagesalarytoemployee", CustCorpData.AboutProspect?.AverageSalarytoEmployee?.ToString());
-                CRMDDEmappingFields.Add("eqs_minimumsalarytoemployee", CustCorpData.AboutProspect?.MinimumSalarytoEmployee?.ToString());
-                CRMDDEmappingFields.Add("eqs_industryothers", CustCorpData.AboutProspect?.IndustryOthers?.ToString());
-                CRMDDEmappingFields1.Add("eqs_ismficustomer", Convert.ToBoolean(CustCorpData.AboutProspect?.IsMFIcustomer?.ToString()));
-                CRMDDEmappingFields.Add("eqs_programcode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_programcode", CustCorpData.AboutProspect?.Program?.ToString()));
-                CRMDDEmappingFields.Add("eqs_npopocode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_npopocode", CustCorpData.AboutProspect?.NPOPO?.ToString()));
-                CRMDDEmappingFields.Add("eqs_companyturnovercode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_companyturnovercode", CustCorpData.AboutProspect?.CompanyTurnover?.ToString()));
-                CRMDDEmappingFields.Add("eqs_iscompanylisted", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_iscompanylisted", CustCorpData.AboutProspect?.CompanyListed?.ToString()));
-                CRMDDEmappingFields.Add("eqs_lob", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_lob", CustCorpData.AboutProspect?.LOB?.ToString()));
-                CRMDDEmappingFields.Add("eqs_aobocode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_aobocode", CustCorpData.AboutProspect?.AOBO?.ToString()));
+                if (CustCorpData.AboutProspect != null)
+                {
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.PreferredLanguage?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_preferredlanguagecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_preferredlanguagecode", CustCorpData.AboutProspect?.PreferredLanguage?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.EmailId?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_emailid", CustCorpData.AboutProspect?.EmailId?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.FaxNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpData.AboutProspect?.FaxNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.CompanyTurnoverValue?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_companyturnovervalue", CustCorpData.AboutProspect?.CompanyTurnoverValue?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.NoofBranchesRegionaOffices?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_noofbranchesregionaloffices", CustCorpData.AboutProspect?.NoofBranchesRegionaOffices?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.CurrentEmployeeStrength?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_currentemployeestrength", CustCorpData.AboutProspect?.CurrentEmployeeStrength?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.AverageSalarytoEmployee?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_averagesalarytoemployee", CustCorpData.AboutProspect?.AverageSalarytoEmployee?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.MinimumSalarytoEmployee?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_minimumsalarytoemployee", CustCorpData.AboutProspect?.MinimumSalarytoEmployee?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.IndustryOthers?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_industryothers", CustCorpData.AboutProspect?.IndustryOthers?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.IsMFIcustomer?.ToString()))
+                    {
+                        CRMDDEmappingFields1.Add("eqs_ismficustomer", Convert.ToBoolean(CustCorpData.AboutProspect?.IsMFIcustomer?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.Program?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_programcode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_programcode", CustCorpData.AboutProspect?.Program?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.NPOPO?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_npopocode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_npopocode", CustCorpData.AboutProspect?.NPOPO?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.CompanyTurnover?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_companyturnovercode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_companyturnovercode", CustCorpData.AboutProspect?.CompanyTurnover?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.CompanyListed?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_iscompanylisted", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_iscompanylisted", CustCorpData.AboutProspect?.CompanyListed?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.LOB?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_lob", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_lob", CustCorpData.AboutProspect?.LOB?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.AOBO?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_aobocode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_aobocode", CustCorpData.AboutProspect?.AOBO?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.BusinessType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businesstypeId@odata.bind", $"eqs_businesstypes({await this._commonFunc.getBusinessTypeId(CustCorpData.AboutProspect?.BusinessType?.ToString())})");
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.AboutProspect?.Industry?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_industryId@odata.bind", $"eqs_businessnatures({await this._commonFunc.getIndustryId(CustCorpData.AboutProspect?.Industry?.ToString())})");
+                    }
 
-                CRMDDEmappingFields.Add("eqs_businesstypeId@odata.bind", $"eqs_businesstypes({await this._commonFunc.getBusinessTypeId(CustCorpData.AboutProspect?.BusinessType?.ToString())})");
-                CRMDDEmappingFields.Add("eqs_industryId@odata.bind", $"eqs_businessnatures({await this._commonFunc.getIndustryId(CustCorpData.AboutProspect?.Industry?.ToString())})");
+
+                }
 
                 /*********** Identification Details *********/
-                if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.ToString()))
+                if (CustCorpData.IdentificationDetails != null)
                 {
                     //CRMDDEmappingFields.Add("eqs_pocpanform60code", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_pocpanform60code", CustCorpData.IdentificationDetails?.PanForm60?.ToString()));
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.GSTNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_gstnumber", CustCorpData.IdentificationDetails?.GSTNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.CKYCRefenceNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_ckycnumber", CustCorpData.IdentificationDetails?.CKYCRefenceNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.TANNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_tannumber", CustCorpData.IdentificationDetails?.TANNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.VATNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_cstvatnumber", CustCorpData.IdentificationDetails?.VATNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.RegisteredNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_cinregisterednumber", CustCorpData.IdentificationDetails?.RegisteredNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.KYCVerificationMode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverificationmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_kycverificationmodecode", CustCorpData.IdentificationDetails?.KYCVerificationMode?.ToString()));
+                    }
 
-                    CRMDDEmappingFields.Add("eqs_gstnumber", CustCorpData.IdentificationDetails?.GSTNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_ckycnumber", CustCorpData.IdentificationDetails?.CKYCRefenceNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_tannumber", CustCorpData.IdentificationDetails?.TANNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_cstvatnumber", CustCorpData.IdentificationDetails?.VATNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_cinregisterednumber", CustCorpData.IdentificationDetails?.RegisteredNumber?.ToString());
 
-                    CRMDDEmappingFields.Add("eqs_kycverificationmodecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_kycverificationmodecode", CustCorpData.IdentificationDetails?.KYCVerificationMode?.ToString()));
                     if (!string.IsNullOrEmpty(CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()))
                     {
                         dd = CustCorpData.IdentificationDetails?.CKYCUpdatedDate?.ToString()?.Substring(0, 2);
@@ -786,49 +1222,88 @@
                 }
 
                 /*********** RM Details *********/
-                if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ToString()))
+                if (CustCorpData.RMDetails != null)
                 {
-                    CRMDDEmappingFields.Add("eqs_servicermcode", CustCorpData.RMDetails?.ServiceRMCode?.ToString());
-                    CRMDDEmappingFields.Add("eqs_servicermname", CustCorpData.RMDetails?.ServiceRMName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_servicermrole", CustCorpData.RMDetails?.ServiceRMRole?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmcode", CustCorpData.RMDetails?.BusinessRMCode?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmname", CustCorpData.RMDetails?.BusinessRMName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_businessrmrole", CustCorpData.RMDetails?.BusinessRMRole?.ToString());
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermcode", CustCorpData.RMDetails?.ServiceRMCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermname", CustCorpData.RMDetails?.ServiceRMName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMRole?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_servicermrole", CustCorpData.RMDetails?.ServiceRMRole?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmcode", CustCorpData.RMDetails?.BusinessRMCode?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmname", CustCorpData.RMDetails?.BusinessRMName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMRole?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_businessrmrole", CustCorpData.RMDetails?.BusinessRMRole?.ToString());
+                    }
+
                 }
 
                 /*********** Point Of Contact *********/
 
-                var customer_Dtl = await this._commonFunc.getContactData(CustCorpData.PointOfContact?.POCUCIC?.ToString());
-                if (customer_Dtl.Count > 0)
+                if (CustCorpData.PointOfContact != null)
                 {
-                    CRMDDEmappingFields.Add("eqs_contactpersonname", customer_Dtl[0]["fullname"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_pocemailid", customer_Dtl[0]["emailaddress1"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_pocphonenumber", customer_Dtl[0]["mobilephone"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_pocucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_poclookupId@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
-                    CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                    if (!string.IsNullOrEmpty(CustCorpData.PointOfContact?.POCUCIC?.ToString()))
+                    {
+                        var customer_Dtl = await this._commonFunc.getContactData(CustCorpData.PointOfContact?.POCUCIC?.ToString());
+                        if (customer_Dtl.Count > 0)
+                        {
+                            CRMDDEmappingFields.Add("eqs_contactpersonname", customer_Dtl[0]["fullname"]?.ToString());
+                            CRMDDEmappingFields.Add("eqs_pocemailid", customer_Dtl[0]["emailaddress1"]?.ToString());
+                            CRMDDEmappingFields.Add("eqs_pocphonenumber", customer_Dtl[0]["mobilephone"]?.ToString());
+                            CRMDDEmappingFields.Add("eqs_pocucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
+                            CRMDDEmappingFields.Add("eqs_poclookupId@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
+                            CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                        }
+                        else
+                        {
+                            CRMDDEmappingFields.Add("eqs_contactpersonname", CustCorpData.PointOfContact?.ContactPersonName?.ToString());
+                            CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                        }
+                    }
+
                 }
-                else
-                {
-                    CRMDDEmappingFields.Add("eqs_contactpersonname", CustCorpData.PointOfContact?.ContactPersonName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
-                }
+
 
 
                 /*********** FATCA *********/
-                if (!string.IsNullOrEmpty(CustCorpData.FATCA?.ToString()))
+                if (CustCorpData.FATCA != null)
                 {
-                    CRMDDEmappingFields.Add("eqs_financialtype", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_financialtype", CustCorpData.FATCA?.FinancialType?.ToString()));
-                    CRMDDEmappingFields.Add("eqs_cityofincorporation", CustCorpData.FATCA?.CityofIncorporation?.ToString());
-                    CRMDDEmappingFields.Add("eqs_taxresidenttypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_taxresidenttypecode", CustCorpData.FATCA?.TaxResidentType?.ToString()));
-                    var countryId = await this._commonFunc.getCountryID(CustCorpData.FATCA?.CountryofIncorporation?.ToString());
-                    if (!string.IsNullOrEmpty(countryId))
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.FinancialType?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_countryofincorporationId@odata.bind", $"eqs_countries({countryId})");
+                        CRMDDEmappingFields.Add("eqs_financialtype", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_financialtype", CustCorpData.FATCA?.FinancialType?.ToString()));
                     }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.CityofIncorporation?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_cityofincorporation", CustCorpData.FATCA?.CityofIncorporation?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.TaxResidentType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_taxresidenttypecode", await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_taxresidenttypecode", CustCorpData.FATCA?.TaxResidentType?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.CountryofIncorporation?.ToString()))
+                    {
+                        var countryId = await this._commonFunc.getCountryID(CustCorpData.FATCA?.CountryofIncorporation?.ToString());
+                        if (!string.IsNullOrEmpty(countryId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_countryofincorporationId@odata.bind", $"eqs_countries({countryId})");
+                        }
+                    }
+
                 }
 
-                CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
                 string postDataParametr1 = JsonConvert.SerializeObject(CRMDDEmappingFields1);
@@ -854,16 +1329,36 @@
 
 
                 /*********** KYCVerification *********/
-                if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.ToString()))
+                if (CustCorpData.KYCVerification != null)
                 {
                     CRMDDEmappingFields = new Dictionary<string, string>();
 
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempname", CustCorpData.KYCVerification?.EmpName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempid", CustCorpData.KYCVerification?.EmpID?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempdesignation", CustCorpData.KYCVerification?.EmpDesignation?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedempbranch", CustCorpData.KYCVerification?.EmpBranch?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedinstitutename", CustCorpData.KYCVerification?.InstitutionName?.ToString());
-                    CRMDDEmappingFields.Add("eqs_kycverifiedinstitutecode", CustCorpData.KYCVerification?.InstitutionCode?.ToString());
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.EmpName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempname", CustCorpData.KYCVerification?.EmpName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.EmpID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempid", CustCorpData.KYCVerification?.EmpID?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.EmpDesignation?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempdesignation", CustCorpData.KYCVerification?.EmpDesignation?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.EmpBranch?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedempbranch", CustCorpData.KYCVerification?.EmpBranch?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.InstitutionName?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedinstitutename", CustCorpData.KYCVerification?.InstitutionName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.KYCVerification?.InstitutionCode?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_kycverifiedinstitutecode", CustCorpData.KYCVerification?.InstitutionCode?.ToString());
+                    }
+
+
 
                     postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
 
@@ -886,7 +1381,7 @@
                 }
 
                 /*********** Address *********/
-                if (!string.IsNullOrEmpty(CustCorpData.Address?.ToString()))
+                if (CustCorpData.Address != null)
                 {
                     Address_Id = new List<string>();
                     foreach (var CustCorpDataItem in CustCorpData.Address?.ToString())
@@ -894,48 +1389,106 @@
                         CRMDDEmappingFields = new Dictionary<string, string>();
                         CRMDDEmappingFields1 = new Dictionary<string, bool>();
 
-                        CRMDDEmappingFields.Add("eqs_name", Applicant_Data.eqs_applicantid?.ToString() + " - " + CustCorpDataItem.AddressType?.ToString());
-                        CRMDDEmappingFields.Add("eqs_applicantaddressid", CustCorpDataItem.ApplicantAddress?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustCorpDataItem.AddressType?.ToString()));
-                        CRMDDEmappingFields.Add("eqs_addressline1", CustCorpDataItem.AddressLine1?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline2", CustCorpDataItem.AddressLine2?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline3", CustCorpDataItem.AddressLine3?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline4", CustCorpDataItem.AddressLine4?.ToString());
-
-                        CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpDataItem.FaxNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustCorpDataItem.OverseasMobileNumber?.ToString());
-
-                        var pincodeMasterId = await this._commonFunc.getPincodeID(CustCorpDataItem.PinCodeMaster?.ToString());
-                        if (!string.IsNullOrEmpty(pincodeMasterId))
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressType?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({pincodeMasterId})");
+                            CRMDDEmappingFields.Add("eqs_name", Applicant_Data.eqs_applicantid?.ToString() + " - " + CustCorpDataItem.AddressType?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.ApplicantAddress?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_applicantaddressid", CustCorpDataItem.ApplicantAddress?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressType?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustCorpDataItem.AddressType?.ToString()));
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressLine1?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline1", CustCorpDataItem.AddressLine1?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressLine2?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline2", CustCorpDataItem.AddressLine2?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressLine3?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline3", CustCorpDataItem.AddressLine3?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AddressLine4?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline4", CustCorpDataItem.AddressLine4?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.FaxNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpDataItem.FaxNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.OverseasMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustCorpDataItem.OverseasMobileNumber?.ToString());
                         }
 
-                        var cityId = await this._commonFunc.getCityID(CustCorpDataItem.CityId?.ToString());
-                        if (!string.IsNullOrEmpty(cityId))
-                        {
-                            CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
-                        }
-                        CRMDDEmappingFields.Add("eqs_district", CustCorpDataItem.District?.ToString());
 
-                        var stateId = await this._commonFunc.getStateID(CustCorpDataItem.StateId?.ToString());
-                        if (!string.IsNullOrEmpty(stateId))
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.PinCodeMaster?.ToString()))
                         {
-                            CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({stateId})");
+                            var pincodeMasterId = await this._commonFunc.getPincodeID(CustCorpDataItem.PinCodeMaster?.ToString());
+                            if (!string.IsNullOrEmpty(pincodeMasterId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({pincodeMasterId})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.CityId?.ToString()))
+                        {
+                            var cityId = await this._commonFunc.getCityID(CustCorpDataItem.CityId?.ToString());
+                            if (!string.IsNullOrEmpty(cityId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.StateId?.ToString()))
+                        {
+                            var stateId = await this._commonFunc.getStateID(CustCorpDataItem.StateId?.ToString());
+                            if (!string.IsNullOrEmpty(stateId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({stateId})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.CountryId?.ToString()))
+                        {
+                            var countryId = await this._commonFunc.getCountryID(CustCorpDataItem.CountryId?.ToString());
+                            if (!string.IsNullOrEmpty(countryId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({countryId})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.District?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_district", CustCorpDataItem.District?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.PinCode?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pincode", CustCorpDataItem.PinCode?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.POBox?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pobox", CustCorpDataItem.POBox?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.Landmark?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landmark", CustCorpDataItem.Landmark?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.LandlineNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landlinenumber", CustCorpDataItem.LandlineNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.AlternateMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustCorpDataItem.AlternateMobileNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.LocalOverseas?.ToString()))
+                        {
+                            CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustCorpDataItem.LocalOverseas?.ToString()) == "1") ? true : false);
                         }
 
-                        var countryId = await this._commonFunc.getCountryID(CustCorpDataItem.CountryId?.ToString());
-                        if (!string.IsNullOrEmpty(countryId))
-                        {
-                            CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({countryId})");
-                        }
 
-                        CRMDDEmappingFields.Add("eqs_pincode", CustCorpDataItem.PinCode?.ToString());
-                        CRMDDEmappingFields.Add("eqs_pobox", CustCorpDataItem.POBox?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landmark", CustCorpDataItem.Landmark?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landlinenumber", CustCorpDataItem.LandlineNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustCorpDataItem.AlternateMobileNumber?.ToString());
-                        CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustCorpDataItem.LocalOverseas?.ToString()) == "1") ? true : false);
 
                         CRMDDEmappingFields.Add("eqs_corporatedde@odata.bind", $"eqs_ddecorporatecustomers({this.DDEId})");
 
@@ -960,24 +1513,55 @@
 
 
                 /*********** FATCA Link *********/
-                if (!string.IsNullOrEmpty(CustCorpData.FATCA?.ToString()))
+                if (CustCorpData.FATCA != null)
                 {
                     CRMDDEmappingFields = new Dictionary<string, string>();
 
-                    var fatcaCountry = await this._commonFunc.getCountryID(CustCorpData.FATCA?.CountryCode?.ToString());
-                    if (!string.IsNullOrEmpty(fatcaCountry))
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.CountryCode?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaCountry})");
+                        var fatcaCountry = await this._commonFunc.getCountryID(CustCorpData.FATCA?.CountryCode?.ToString());
+                        if (!string.IsNullOrEmpty(fatcaCountry))
+                        {
+                            CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaCountry})");
+                        }
                     }
-                    CRMDDEmappingFields.Add("eqs_otheridentificationnumber", CustCorpData.FATCA?.OtherIdentificationNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustCorpData.FATCA?.TaxIdentificationNumber?.ToString());
-                    CRMDDEmappingFields.Add("eqs_addresstype", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_addresstype", CustCorpData.FATCA?.AddressType?.ToString()));
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.OtherIdentificationNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_otheridentificationnumber", CustCorpData.FATCA?.OtherIdentificationNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.TaxIdentificationNumber?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustCorpData.FATCA?.TaxIdentificationNumber?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.AddressType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_addresstype", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_addresstype", CustCorpData.FATCA?.AddressType?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_typeofnonfinancialentitycode", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_typeofnonfinancialentitycode", CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.ListingType?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_listingtypecode", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_listingtypecode", CustCorpData.FATCA?.ListingType?.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.NameofStockExchange?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_nameofstockexchange", CustCorpData.FATCA?.NameofStockExchange?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.NameofListingCompany?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_nameoflistingcompany", CustCorpData.FATCA?.NameofListingCompany?.ToString());
+                    }
+                    
+                    
+                    
 
-                    CRMDDEmappingFields.Add("eqs_typeofnonfinancialentitycode", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_typeofnonfinancialentitycode", CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString()));
-                    CRMDDEmappingFields.Add("eqs_listingtypecode", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_listingtypecode", CustCorpData.FATCA?.ListingType?.ToString()));
-                    CRMDDEmappingFields.Add("eqs_nameofstockexchange", CustCorpData.FATCA?.NameofStockExchange?.ToString());
-                    CRMDDEmappingFields.Add("eqs_nameoflistingcompany", CustCorpData.FATCA?.NameofListingCompany?.ToString());
-                    if (CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString() == "Passive")
+                    
+                    
+                    
+                   
+                    if (!string.IsNullOrEmpty(CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString()) && CustCorpData.FATCA?.TypeofNonFinancialEntity?.ToString() == "Passive")
                     {
                         CRMDDEmappingFields.Add("eqs_nameofnonfinancialentity", CustCorpData.FATCA?.NameofNonFinancialEntity?.ToString());
 
@@ -985,24 +1569,35 @@
                         mm = CustCorpData.FATCA?.CustomerDOB?.ToString()?.Substring(3, 2);
                         yyyy = CustCorpData.FATCA?.CustomerDOB?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_customerdob", yyyy + "-" + mm + "-" + dd);
-                        CRMDDEmappingFields.Add("eqs_beneficiaryinterest", CustCorpData.FATCA?.BeneficiaryInterest?.ToString());
-                        CRMDDEmappingFields.Add("eqs_taxidentificationnumbernf", CustCorpData.FATCA?.TaxIdentificationNumberNF?.ToString());
-                        CRMDDEmappingFields.Add("eqs_otheridentificationnumbernf", CustCorpData.FATCA?.OtherIdentificationNumberNF?.ToString());
 
-                        var countryCodeId = await this._commonFunc.getContactData(CustCorpData.FATCA?.CustomerUCIC?.ToString());
-                        if (!string.IsNullOrEmpty(countryCodeId))
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.BeneficiaryInterest?.ToString()))
                         {
-                            customer_Dtl = countryCodeId;
+                            CRMDDEmappingFields.Add("eqs_beneficiaryinterest", CustCorpData.FATCA?.BeneficiaryInterest?.ToString());
                         }
-                        CRMDDEmappingFields.Add("eqs_customerucic", CustCorpData.FATCA?.CustomerUCIC?.ToString());
-                        CRMDDEmappingFields.Add("eqs_customerlookup@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
-                        CRMDDEmappingFields.Add("eqs_customername", customer_Dtl[0]["fullname"]?.ToString());
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.TaxIdentificationNumberNF?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_taxidentificationnumbernf", CustCorpData.FATCA?.TaxIdentificationNumberNF?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.OtherIdentificationNumberNF?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_otheridentificationnumbernf", CustCorpData.FATCA?.OtherIdentificationNumberNF?.ToString());
+                        }
+                        
+
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.CustomerUCIC?.ToString()))
+                        {
+                            var countryCodeId = await this._commonFunc.getContactData(CustCorpData.FATCA?.CustomerUCIC?.ToString());
+                           
+                            CRMDDEmappingFields.Add("eqs_customerucic", CustCorpData.FATCA?.CustomerUCIC?.ToString());
+                            CRMDDEmappingFields.Add("eqs_customerlookup@odata.bind", $"contacts({countryCodeId[0]["contactid"]?.ToString()})");
+                            CRMDDEmappingFields.Add("eqs_customername", countryCodeId[0]["fullname"]?.ToString());
+                        }
+                        
 
                         var countryId = await this._commonFunc.getCountryID(CustCorpData.FATCA?.CountryofTaxResidency?.ToString());
                         if (!string.IsNullOrEmpty(countryId))
                         {
                             CRMDDEmappingFields.Add("eqs_countryoftaxresidencyid@odata.bind", $"eqs_countries({countryId})");
-
                         }
                         CRMDDEmappingFields.Add("eqs_panofnonfinancialentity", CustCorpData.FATCA?.PanofNonFinancialEntity?.ToString());
                         CRMDDEmappingFields.Add("eqs_nfoccupationtype", await this._queryParser.getOptionSetTextToValue("eqs_customerfactcaother", "eqs_nfoccupationtype", CustCorpData.FATCA?.NFOccupationType?.ToString()));
@@ -1035,42 +1630,92 @@
                         CRMDDEmappingFields.Add("eqs_name", Fatca_Id + " - " + CustCorpData.FATCA?.AddressType?.ToString());
 
                         CRMDDEmappingFields.Add("eqs_addresstypecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_addresstypecode", CustCorpData.FATCA?.AddressType?.ToString()));
-                        CRMDDEmappingFields.Add("eqs_addressline1", CustCorpData.FATCA?.Address?.AddressLine1?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline2", CustCorpData.FATCA?.Address?.AddressLine2?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline3", CustCorpData.FATCA?.Address?.AddressLine3?.ToString());
-                        CRMDDEmappingFields.Add("eqs_addressline4", CustCorpData.FATCA?.Address?.AddressLine4?.ToString());
-                        CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpData.FATCA?.Address?.FaxNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustCorpData.FATCA?.Address?.OverseasMobileNumber?.ToString());
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine1?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline1", CustCorpData.FATCA?.Address?.AddressLine1?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine2?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline2", CustCorpData.FATCA?.Address?.AddressLine2?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine3?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline3", CustCorpData.FATCA?.Address?.AddressLine3?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine4?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_addressline4", CustCorpData.FATCA?.Address?.AddressLine4?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.FaxNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_faxnumber", CustCorpData.FATCA?.Address?.FaxNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.OverseasMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_overseasmobilenumber", CustCorpData.FATCA?.Address?.OverseasMobileNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.PinCodeMaster?.ToString()))
+                        {
+                            var fatcaPinCode = await this._commonFunc.getPincodeID(CustCorpData.FATCA?.Address?.PinCodeMaster?.ToString());
+                            if (!string.IsNullOrEmpty(fatcaPinCode))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({fatcaPinCode})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.CityId?.ToString()))
+                        {
+                            var fatcaCity = await this._commonFunc.getCityID(CustCorpData.FATCA?.Address?.CityId?.ToString());
+                            if (!string.IsNullOrEmpty(fatcaCity))
+                            {
+                                CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({fatcaCity})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.District?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_district", CustCorpData.FATCA?.Address?.District?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.StateId?.ToString()))
+                        {
+                            var fatcaState = await this._commonFunc.getStateID(CustCorpData.FATCA?.Address?.StateId?.ToString());
+                            if (!string.IsNullOrEmpty(fatcaState))
+                            {
+                                CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({fatcaState})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.CountryId?.ToString()))
+                        {
+                            var fatcaAddCountry = await this._commonFunc.getCountryID(CustCorpData.FATCA?.Address?.CountryId?.ToString());
+                            if (!string.IsNullOrEmpty(fatcaAddCountry))
+                            {
+                                CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaAddCountry})");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.PinCode?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pincode", CustCorpData.FATCA?.Address?.PinCode?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.POBox?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_pobox", CustCorpData.FATCA?.Address?.POBox?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.Landmark?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landmark", CustCorpData.FATCA?.Address?.Landmark?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.LandlineNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_landlinenumber", CustCorpData.FATCA?.Address?.LandlineNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AlternateMobileNumber?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustCorpData.FATCA?.Address?.AlternateMobileNumber?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.LocalOverseas?.ToString()))
+                        {
+                            CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustCorpData.FATCA?.Address?.LocalOverseas?.ToString()) == "1") ? true : false);
+                        }
 
-                        var fatcaPinCode = await this._commonFunc.getPincodeID(CustCorpData.FATCA?.Address?.PinCodeMaster?.ToString());
-                        if (!string.IsNullOrEmpty(fatcaPinCode))
-                        {
-                            CRMDDEmappingFields.Add("eqs_pincodemaster@odata.bind", $"eqs_pincodes({fatcaPinCode})");
-                        }
-                        var fatcaCity = await this._commonFunc.getCityID(CustCorpData.FATCA?.Address?.CityId?.ToString());
-                        if (!string.IsNullOrEmpty(fatcaCity))
-                        {
-                            CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({fatcaCity})");
-                        }
-
-                        CRMDDEmappingFields.Add("eqs_district", CustCorpData.FATCA?.Address?.District?.ToString());
-
-                        var fatcaState = await this._commonFunc.getStateID(CustCorpData.FATCA?.Address?.StateId?.ToString());
-                        if (!string.IsNullOrEmpty(fatcaState))
-                        {
-                            CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({fatcaState})");
-                        }
-                        var fatcaAddCountry = await this._commonFunc.getCountryID(CustCorpData.FATCA?.Address?.CountryId?.ToString());
-                        if (!string.IsNullOrEmpty(fatcaAddCountry))
-                        {
-                            CRMDDEmappingFields.Add("eqs_countryid@odata.bind", $"eqs_countries({fatcaAddCountry})");
-                        }
-                        CRMDDEmappingFields.Add("eqs_pincode", CustCorpData.FATCA?.Address?.PinCode?.ToString());
-                        CRMDDEmappingFields.Add("eqs_pobox", CustCorpData.FATCA?.Address?.POBox?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landmark", CustCorpData.FATCA?.Address?.Landmark?.ToString());
-                        CRMDDEmappingFields.Add("eqs_landlinenumber", CustCorpData.FATCA?.Address?.LandlineNumber?.ToString());
-                        CRMDDEmappingFields.Add("eqs_alternatemobilenumber", CustCorpData.FATCA?.Address?.AlternateMobileNumber?.ToString());
-                        CRMDDEmappingFields1.Add("eqs_localoverseas", (await this._queryParser.getOptionSetTextToValue("eqs_leadaddress", "eqs_localoverseas", CustCorpData.FATCA?.Address?.LocalOverseas?.ToString()) == "1") ? true : false);
+                       
                         CRMDDEmappingFields.Add("eqs_applicantfatca@odata.bind", $"eqs_customerfactcaothers({this.FatcaId})");
 
                         postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
@@ -1136,14 +1781,14 @@
                 */
 
                 /*********** BO *********/
-                if (!string.IsNullOrEmpty(CustCorpData.BODetails?.ToString()))
+                if (CustCorpData.BODetails != null)
                 {
                     foreach (var CustCorpDataItem in CustCorpData.BODetails?.ToString())
                     {
                         CRMDDEmappingFields = new Dictionary<string, string>();
 
                         CRMDDEmappingFields.Add("eqs_name", CustCorpDataItem.BOName?.ToString());
-                        customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.BOUCIC?.ToString());
+                        var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.BOUCIC?.ToString());
                         if (CustCorpDataItem.BOUCIC.ToString() != "" && customer_Dtl.Count < 1)
                         {
                             this._logger.LogInformation("createDigiCustLeadCorp", "BOUCIC is incorrect.");
@@ -1191,7 +1836,7 @@
                 }
 
                 /*********** CP *********/
-                if (!string.IsNullOrEmpty(CustCorpData.CPDetails?.ToString()))
+                if (CustCorpData.CPDetails != null)
                 {
                     foreach (var CustCorpDataItem in CustCorpData.CPDetails?.ToString())
                     {
@@ -1200,7 +1845,7 @@
                         CRMDDEmappingFields.Add("eqs_name", CustCorpDataItem.NameofCP?.ToString());
 
 
-                        customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.CPUCIC?.ToString());
+                        var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.CPUCIC?.ToString());
 
                         if (CustCorpDataItem.CPUCIC?.ToString() != "" && customer_Dtl.Count < 1)
                         {
