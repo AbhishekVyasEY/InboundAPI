@@ -109,9 +109,6 @@
                                 accountnumber = RequestData.AccountNumber.ToString();
                             }
                             ldRtPrm = await this.FetCustomerDtl(RequestData.CustomerID.ToString(), accountnumber);
-
-                            ldRtPrm.ReturnCode = "CRM-SUCCESS";
-                            ldRtPrm.Message = OutputMSG.Case_Success;
                         }
                         else
                         {
@@ -119,7 +116,6 @@
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
                             ldRtPrm.Message = "Customer ID is incorrect";
                         }
-
                     }
                     else
                     {
@@ -294,6 +290,9 @@
                         }
                     }
                 }
+
+                customerDetailReturn.ReturnCode = "CRM-SUCCESS";
+                customerDetailReturn.Message = OutputMSG.Case_Success;
             }
             else
             {
