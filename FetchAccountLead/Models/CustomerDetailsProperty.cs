@@ -27,12 +27,12 @@ namespace FetchAccountLead
         public string Branch { get; set; }
         public string BranchCode { get; set; }
         public string Cluster { get; set; }
-        public string EmpRoleLabel { get; set; }
         public string Department { get; set; }
         public string Divison { get; set; }
         public string EmailID { get; set; }
         public string EmpCategory { get; set; }
         public string EmpPhoneNumber { get; set; }
+        public string EmpRoleLabel { get; set; }
         public string EmpStatus { get; set; }
         public string Region { get; set; }
         public string ResignedFlag { get; set; }
