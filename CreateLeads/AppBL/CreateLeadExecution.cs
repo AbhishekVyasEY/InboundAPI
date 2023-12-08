@@ -85,8 +85,14 @@ namespace CreateLeads
 
         public async Task<LeadReturnParam> ValidateLeade(dynamic LeadData)
         {
-            LeadData = await this.getRequestData(LeadData);
+            LeadData = await this.getRequestData(LeadData);            
             LeadReturnParam ldRtPrm = new LeadReturnParam();
+            if (LeadData.ErrorNo != null && LeadData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
             try
             {
 
@@ -827,7 +833,7 @@ namespace CreateLeads
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, "CreateLeadK");
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";
@@ -836,7 +842,7 @@ namespace CreateLeads
                 {
                     rejusetJson = JsonConvert.DeserializeObject(childrenNode.Value);
 
-                    var payload = rejusetJson.CreateLead;
+                    var payload = rejusetJson.CreateLeadK;
                     this.appkey = payload.msgHdr.authInfo.token.ToString();
                     this.Transaction_ID = payload.msgHdr.conversationID.ToString();
                     this.Channel_ID = payload.msgHdr.channelID.ToString();

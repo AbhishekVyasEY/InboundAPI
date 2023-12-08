@@ -10,7 +10,7 @@ namespace CRMConnect
         public Task<string> getOptionSetTextToValue(string tableName, string fieldName, string OptionText);
         public Task<string> getOptionSetValuToText(string tableName, string fieldName, string OptionValue);
         public Task<bool> DeleteFromTable(string tablename, string tableid = "", string filter = "", string filtervalu = "", string tableselecter = "");
-        public Task<string> PayloadDecryption(string V_requestData, string BankCode);
+        public Task<string> PayloadDecryption(string V_requestData, string BankCode, string APIName="");
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
         public Task<string> getAccessToken();
     }

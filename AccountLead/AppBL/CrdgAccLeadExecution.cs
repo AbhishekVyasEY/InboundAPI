@@ -486,7 +486,7 @@
                 {
                     odatab.Add("eqs_relationship@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationshipId(applicant.relationToPrimaryHolder)})");
                 }
-                else
+                else if (applicant.isPrimaryHolder == false && string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
                 {
                     hasError = 1;
                     errors.Add(applicant.UCIC + " RelationToPrimaryHolder");
@@ -734,10 +734,11 @@
             {
                 if (ApplicentData.Count > 0)
                 {
+                    int ValidationError = 0;
+                    List<string> errorText = new List<string>();
                     foreach (var item in ApplicentData)
                     {
-                        int ValidationError = 0;
-                        List<string> errorText = new List<string>();
+                       
                         AccountApplicant accountApplicant = new AccountApplicant();
                         if (string.IsNullOrEmpty(item.UCIC.ToString()))
                         {
@@ -769,32 +770,33 @@
                             accountApplicant.isPrimaryHolder = item.isPrimaryHolder;
                         }
 
-                        if (!Convert.ToBoolean(item.isPrimaryHolder.ToString()))
+                        
+                        if (item.isPrimaryHolder.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder.ToString()))
                         {
-                            if (string.IsNullOrEmpty(item.relationToPrimaryHolder.ToString()))
-                            {
 
-                                ValidationError = 1;
-                                errorText.Add("relationToPrimaryHolder");
-                            }
-                            else
-                            {
-                                accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
-                            }
-
-                        }
-
-                        if(ValidationError > 0)
-                        {
-                            return string.Join(",", errorText) + " fields can not be null.";
+                            ValidationError = 1;
+                            errorText.Add("relationToPrimaryHolder");
                         }
                         else
                         {
-                            _accountApplicants.Add(accountApplicant);
+                            accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
                         }
+
+                        
+
+                            _accountApplicants.Add(accountApplicant);
+                       
                        
                     }
-                    return "ok";
+                    if (ValidationError > 0)
+                    {
+                        return string.Join(",", errorText) + " fields can not be null.";
+                    }
+                    else
+                    {
+                        return "ok";
+                    }
+                   
                 }
                 else
                 {
