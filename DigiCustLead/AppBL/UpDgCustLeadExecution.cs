@@ -384,7 +384,7 @@
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()))
                     {
-                        CRMDDEmappingFields1.Add("eqs_ispep", Convert.ToBoolean(CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()));
+                        CRMDDEmappingFields.Add("eqs_politicallyexposedpersoncode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_politicallyexposedpersoncode", CustIndvData.ProspectDetails?.PolitcallyExposedPerson.ToString()));
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.LOBCode.ToString()))
                     {
