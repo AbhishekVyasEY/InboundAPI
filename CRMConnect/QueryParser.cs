@@ -521,7 +521,7 @@
             }
         }
 
-        public async Task<string> PayloadDecryption(string V_requestData, string BankCode)
+        public async Task<string> PayloadDecryption(string V_requestData, string BankCode, string APIName= "")
         {
             try
             {
@@ -538,6 +538,33 @@
                 byte[] cipherdecrypt = decrypt.TransformFinalBlock(decryptFinaldata, 0, decryptFinaldata.Length);
                 decryptedText = Encoding.UTF8.GetString(cipherdecrypt);
                 decryptedText = decryptedText.Replace("\\", "");
+                if (!string.IsNullOrEmpty(APIName))
+                {
+                    string APIPermissions, APIPermissions1;
+                    if (!this.GetMvalue<string>("APIPermissions", out APIPermissions1))
+                    {
+                        APIPermissions = this._keyVaultService.ReadSecret("APIPermissions");
+                        this.SetMvalue<string>("APIPermissions", 10080, APIPermissions);
+                    }
+                    else
+                    {
+                        APIPermissions = APIPermissions1;
+                    }
+                    dynamic ApiPerData = JsonConvert.DeserializeObject(APIPermissions);
+                    int match = 0;
+                    foreach (var Item in ApiPerData[BankCode])
+                    {
+                        if (Item.ToString() == APIName)
+                        {
+                            match = 1; 
+                            break;
+                        }
+                    }
+                    if (match == 0)
+                    {
+                        decryptedText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<PIDBlock>\r\n<payload>{\"" + APIName + "\":{\"msgHdr\":{\"channelID\":\"12\",\"transactionType\":\"\",\"transactionSubType\":\"\",\"conversationID\":\"CreateLead1684402315\",\"externalReferenceId\":\"\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"\",\"userID\":\"\",\"token\":\"Y62RxQDpPW\"}},\"msgBdy\":{\"ErrorNo\":\"Error99\"}}}</payload>\r\n<checksum></checksum></PIDBlock>";
+                    }
+                }
                 //var json = JsonConvert.DeserializeObject(decryptedText);
                 //decryptedText = JsonConvert.SerializeObject(json);
                 return decryptedText;
