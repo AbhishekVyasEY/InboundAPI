@@ -646,10 +646,10 @@
                         {
                             odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString());
                         }
-                        if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString()))
-                        {
-                            odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString());
-                        }
+                        //if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString()))
+                        //{
+                        //    odatab.Add("eqs_esfbaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToESFBAccountNo?.ToString());
+                        //}
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankAccountNo?.ToString()))
                         {
                             odatab.Add("eqs_otherbankaccountnumber_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MICreditToOtherBankAccountNo?.ToString());
@@ -686,9 +686,6 @@
                         {
                             odatab.Add("eqs_payeename_maturity", ddeData.FDRDDetails?.MaturityInstructionDetails?.MIByDDPOPayeeName?.ToString());
                         }
-
-
-
                     }
 
 
