@@ -301,9 +301,10 @@
                     {
                         Dictionary<string, string> odatab = new Dictionary<string, string>();
                         //odatab.Add("eqs_leadstatus", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", "Not Onboarded"));
-                        odatab.Add("eqs_leadstatus", "2");
-                        odatab.Add("statecode", "2");
-                        odatab.Add("statuscode", "136980001");
+                        odatab.Add("eqs_leadstatus", "2"); //Not Onboarded
+                        odatab.Add("eqs_assetleadstatus", "868420001"); //Lead Dropped
+                        odatab.Add("statecode", "2"); // Disqualified
+                        odatab.Add("statuscode", "136980001"); // Duplicate
                         postDataParametr = JsonConvert.SerializeObject(odatab);
                         var LeadAccount_details = await this._queryParser.HttpApiCall($"leads({applicentDtls[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
                         ddupdgCustomerReturn.decideNL = responsD;
