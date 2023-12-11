@@ -295,8 +295,11 @@
                     {
                         CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustIndvData.General?.IsPermAddrAndCurrAddrSame?.ToString()));
                     }
-                   
-                    
+                    if (!string.IsNullOrEmpty(CustIndvData.General?.InstaKitCustomerID?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_instakitcustomerid", CustIndvData.General?.InstaKitCustomerID?.ToString());
+                    }
+
                 }
 
                 /*********** Prospect Details *********/
