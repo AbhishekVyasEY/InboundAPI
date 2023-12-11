@@ -109,9 +109,6 @@
                                 accountnumber = RequestData.AccountNumber.ToString();
                             }
                             ldRtPrm = await this.FetCustomerDtl(RequestData.CustomerID.ToString(), accountnumber);
-
-                            ldRtPrm.ReturnCode = "CRM-SUCCESS";
-                            ldRtPrm.Message = OutputMSG.Case_Success;
                         }
                         else
                         {
@@ -119,7 +116,6 @@
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
                             ldRtPrm.Message = "Customer ID is incorrect";
                         }
-
                     }
                     else
                     {
@@ -200,12 +196,12 @@
                     customerDetailReturn.RMDetails.Branch = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_branch"].ToString();
                     customerDetailReturn.RMDetails.BranchCode = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_branchcodeslot"].ToString();
                     customerDetailReturn.RMDetails.Cluster = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_cluster"].ToString();
-                    customerDetailReturn.RMDetails.EmpRoleLabel = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_department"].ToString();
-                    customerDetailReturn.RMDetails.Department = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_division"].ToString();
-                    customerDetailReturn.RMDetails.Divison = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emailid"].ToString();
-                    customerDetailReturn.RMDetails.EmailID = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empcategory"].ToString();
-                    customerDetailReturn.RMDetails.EmpCategory = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empphonenumber"].ToString();
-                    customerDetailReturn.RMDetails.EmpPhoneNumber = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emprolelabel"].ToString();
+                    customerDetailReturn.RMDetails.Department = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_department"].ToString();
+                    customerDetailReturn.RMDetails.Divison = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_division"].ToString();
+                    customerDetailReturn.RMDetails.EmailID = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emailid"].ToString();
+                    customerDetailReturn.RMDetails.EmpCategory = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empcategory"].ToString();
+                    customerDetailReturn.RMDetails.EmpPhoneNumber = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empphonenumber"].ToString();
+                    customerDetailReturn.RMDetails.EmpRoleLabel = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_emprolelabel"].ToString();
                     customerDetailReturn.RMDetails.EmpStatus = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_empstatus"].ToString();
                     customerDetailReturn.RMDetails.Region = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_region"].ToString();
                     customerDetailReturn.RMDetails.ResignedFlag = CuatomerDetails[0]["eqs_rmemployeeid"]["eqs_resignedflagtwo"].ToString();
@@ -294,6 +290,9 @@
                         }
                     }
                 }
+
+                customerDetailReturn.ReturnCode = "CRM-SUCCESS";
+                customerDetailReturn.Message = OutputMSG.Case_Success;
             }
             else
             {

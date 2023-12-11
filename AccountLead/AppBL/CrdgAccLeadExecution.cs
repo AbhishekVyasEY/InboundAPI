@@ -119,15 +119,25 @@
                             else
                             {
                                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                                ldRtPrm.Message = ApplicentValidation;
+                                ldRtPrm.Message = ApplicentValidation + " field can not be null.";
                             }
                             
                         }
                         else
                         {
-                            this._logger.LogInformation("ValidateLeadtInput", Fieldvalidation + " field can not be null.");
-                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = Fieldvalidation + " field can not be null.";
+                            
+                            if (ApplicentValidation == "ok")
+                            {
+                                this._logger.LogInformation("ValidateLeadtInput", Fieldvalidation + " field can not be null.");
+                                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                                ldRtPrm.Message = Fieldvalidation + " field can not be null.";
+                            }
+                            else
+                            {
+                                this._logger.LogInformation("ValidateLeadtInput", Fieldvalidation + "," + ApplicentValidation + " field can not be null.");
+                                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                                ldRtPrm.Message = Fieldvalidation + "," + ApplicentValidation + " field can not be null.";
+                            }
                         }
                     }
                     else
@@ -790,7 +800,7 @@
                     }
                     if (ValidationError > 0)
                     {
-                        return string.Join(",", errorText) + " fields can not be null.";
+                        return string.Join(",", errorText);
                     }
                     else
                     {
