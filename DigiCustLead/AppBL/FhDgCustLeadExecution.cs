@@ -620,7 +620,7 @@
                     foreach (var addressItem in addressDetail)
                     {
                         Address address = new Address();
-                        address.AddressId = addressItem.eqs_name.ToString();
+                        address.AddressId = addressItem.eqs_applicantaddressid.ToString();
                         address.ApplicantAddress = addressItem.eqs_applicantaddressid.ToString();
                         address.AddressType = await this._queryParser.getOptionSetValuToText("eqs_leadaddress", "eqs_addresstypecode", addressItem.eqs_addresstypecode.ToString());
                         address.AddressLine1 = addressItem.eqs_addressline1.ToString();
@@ -766,6 +766,7 @@
                     foreach (var cpitem in cpDetail)
                     {
                         CPDetails cp = new CPDetails();
+                        cp.CPID = cpDetail[0].eqs_cpid.ToString();
                         cp.NameofCP = cpDetail[0].eqs_name.ToString();
                         cp.CPUCIC = cpDetail[0].eqs_cpucic.ToString();
                         cp.Holding = cpDetail[0].eqs_holding.ToString();
@@ -782,6 +783,7 @@
                     foreach (var boitem in boDetail)
                     {
                         BODetails bo = new BODetails();
+                        bo.BOID = boitem.eqs_boid.ToString();
                         bo.BOType = await this._queryParser.getOptionSetValuToText("eqs_customerbo", "eqs_botypecode", boitem.eqs_botypecode.ToString());
                         bo.BOListingType = await this._queryParser.getOptionSetValuToText("eqs_customerbo", "eqs_bolistingtypecode", boitem.eqs_bolistingtypecode.ToString());
 

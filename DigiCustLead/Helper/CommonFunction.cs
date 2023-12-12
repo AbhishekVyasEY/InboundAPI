@@ -243,7 +243,7 @@
 
         public async Task<string> getRelationshipID(string relationshipCode)
         {
-            return await this.getIDfromMSDTable("eqs_relationships", "eqs_relationshipid", "eqs_name", relationshipCode);
+            return await this.getIDfromMSDTable("eqs_relationships", "eqs_relationshipid", "eqs_relationship", relationshipCode);
         }
         public async Task<string> getRelationshipText(string relationshipId)
         {
