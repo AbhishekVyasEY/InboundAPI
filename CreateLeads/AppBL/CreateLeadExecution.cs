@@ -85,7 +85,7 @@ namespace CreateLeads
 
         public async Task<LeadReturnParam> ValidateLeade(dynamic LeadData)
         {
-            LeadData = await this.getRequestData(LeadData);            
+            LeadData = await this.getRequestData(LeadData);
             LeadReturnParam ldRtPrm = new LeadReturnParam();
             if (LeadData.ErrorNo != null && LeadData.ErrorNo.ToString() == "Error99")
             {
@@ -95,109 +95,108 @@ namespace CreateLeads
             }
             try
             {
-
-                string channel = LeadData.ChannelType;
-
                 if (!string.IsNullOrEmpty(this.Transaction_ID) && !string.IsNullOrEmpty(this.Channel_ID) && !string.IsNullOrEmpty(this.appkey) && this.appkey != "" && checkappkey(this.appkey))
                 {
-                    if (!string.IsNullOrEmpty(channel) && channel != "")
+                    if (!string.IsNullOrEmpty(LeadData.ChannelType.ToString()) && LeadData.ChannelType.ToString() != "")
                     {
-                        int ValidationError = 0;
-                        string errorText = "";
-
+                        List<string> requredFields = new List<string>();
                         if (string.Equals(LeadData.ChannelType.ToString(), "ESFB Website"))
                         {
                             if (LeadData.FirstName == null || string.IsNullOrEmpty(LeadData.FirstName.ToString()) || LeadData.FirstName.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "FirstName";
+                                requredFields.Add("FirstName");
                             }
                             if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "LastName";
+                                requredFields.Add("LastName");
                             }
                             if (LeadData.MobileNumber == null || string.IsNullOrEmpty(LeadData.MobileNumber.ToString()) || LeadData.MobileNumber.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "MobileNumber";
+                                requredFields.Add("MobileNumber");
                             }
                             if (LeadData.ProductCode == null || string.IsNullOrEmpty(LeadData.ProductCode.ToString()) || LeadData.ProductCode.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "ProductCode";
+                                requredFields.Add("ProductCode");
                             }
-
-
                         }
                         else if (string.Equals(LeadData.ChannelType.ToString(), "Internet Banking") || string.Equals(LeadData.ChannelType.ToString(), "Mobile Banking"))
                         {
                             if (LeadData.CustomerID == null || string.IsNullOrEmpty(LeadData.CustomerID.ToString()) || LeadData.CustomerID.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "CustomerID";
+                                requredFields.Add("CustomerID");
+                            }
+                            if (LeadData.FirstName == null || string.IsNullOrEmpty(LeadData.FirstName.ToString()) || LeadData.FirstName.ToString() == "")
+                            {
+                                requredFields.Add("FirstName");
+                            }
+                            if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
+                            {
+                                requredFields.Add("LastName");
+                            }
+                            if (LeadData.MobileNumber == null || string.IsNullOrEmpty(LeadData.MobileNumber.ToString()) || LeadData.MobileNumber.ToString() == "")
+                            {
+                                requredFields.Add("MobileNumber");
+                            }
+                            if (LeadData.ProductCode == null || string.IsNullOrEmpty(LeadData.ProductCode.ToString()) || LeadData.ProductCode.ToString() == "")
+                            {
+                                requredFields.Add("ProductCode");
                             }
                         }
                         else if (string.Equals(LeadData.ChannelType.ToString(), "ChatBot"))
                         {
                             if (LeadData.Email == null || string.IsNullOrEmpty(LeadData.Email.ToString()) || LeadData.Email.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "Email";
+                                requredFields.Add("Email");
                             }
-
                             if (LeadData.MobileNumber == null || string.IsNullOrEmpty(LeadData.MobileNumber.ToString()) || LeadData.MobileNumber.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "MobileNumber";
+                                requredFields.Add("MobileNumber");
                             }
-
                             if (LeadData.Transcript == null || string.IsNullOrEmpty(LeadData.Transcript.ToString()) || LeadData.Transcript.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "Transcript";
+                                requredFields.Add("Transcript");
                             }
-
                         }
                         else if (string.Equals(LeadData.ChannelType.ToString(), "Email"))
                         {
                             if (LeadData.Email == null || string.IsNullOrEmpty(LeadData.Email.ToString()) || LeadData.Email.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "Email";
+                                requredFields.Add("Email");
                             }
-
                             if (LeadData.EmailBody == null || string.IsNullOrEmpty(LeadData.EmailBody.ToString()) || LeadData.EmailBody.ToString() == "")
                             {
-                                ValidationError = 1;
-                                errorText = "EmailBody";
+                                requredFields.Add("EmailBody");
                             }
                         }
-
-
-                        if (ValidationError == 1)
+                        else
                         {
-                            this._logger.LogInformation("ValidateLeade", $"{errorText} is mandatory");
+                            this._logger.LogInformation("ValidateLead", "Channel is incorrect");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = $"{errorText} is mandatory";
+                            ldRtPrm.Message = "Channel is incorrect";
+                            return ldRtPrm;
+                        }
+
+                        if (requredFields.Count > 0)
+                        {
+                            this._logger.LogInformation("ValidateLead", $"Mandatory fields required: {string.Join(", ", requredFields.ToArray())}");
+                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                            ldRtPrm.Message = $"Mandatory fields required: {string.Join(", ", requredFields.ToArray())}";
                         }
                         else
                         {
                             ldRtPrm = await this.CreateLead(LeadData);
                         }
-
-
                     }
                     else
                     {
-                        this._logger.LogInformation("ValidateLeade", "Channel is incorrect");
+                        this._logger.LogInformation("ValidateLead", "Channel is incorrect");
                         ldRtPrm.ReturnCode = "CRM-ERROR-102";
                         ldRtPrm.Message = "Channel is incorrect";
                     }
                 }
                 else
                 {
-                    this._logger.LogInformation("ValidateLeade", "Transaction_ID or appkey is incorrect");
+                    this._logger.LogInformation("ValidateLead", "Transaction_ID or appkey is incorrect");
                     ldRtPrm.ReturnCode = "CRM-ERROR-102";
                     ldRtPrm.Message = "Transaction_ID or appkey is incorrect";
                 }
@@ -206,7 +205,7 @@ namespace CreateLeads
             }
             catch (Exception ex)
             {
-                this._logger.LogError("ValidateLeade", ex.Message);
+                this._logger.LogError("ValidateLead", ex.Message);
                 ldRtPrm.ReturnCode = "CRM-ERROR-101";
                 ldRtPrm.Message = OutputMSG.Resource_n_Found;
                 return ldRtPrm;
@@ -225,8 +224,6 @@ namespace CreateLeads
                 return false;
             }
         }
-
-
 
         public async Task<LeadReturnParam> CreateLead(dynamic LeadData)
         {
@@ -343,7 +340,7 @@ namespace CreateLeads
                     }
                     else
                     {
-                        this._logger.LogInformation("ValidateLeade", "Input parameters are incorrect");
+                        this._logger.LogInformation("ValidateLead", "Input parameters are incorrect");
                         ldRtPrm.ReturnCode = "CRM-ERROR-102";
                         ldRtPrm.Message = OutputMSG.Incorrect_Input;
                     }
@@ -833,7 +830,7 @@ namespace CreateLeads
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, "CreateLeadK");
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, "CreateLead");
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";
@@ -842,7 +839,7 @@ namespace CreateLeads
                 {
                     rejusetJson = JsonConvert.DeserializeObject(childrenNode.Value);
 
-                    var payload = rejusetJson.CreateLeadK;
+                    var payload = rejusetJson.CreateLead;
                     this.appkey = payload.msgHdr.authInfo.token.ToString();
                     this.Transaction_ID = payload.msgHdr.conversationID.ToString();
                     this.Channel_ID = payload.msgHdr.channelID.ToString();
