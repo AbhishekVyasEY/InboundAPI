@@ -7,6 +7,7 @@ namespace DigiCustLead
         public Task<string> getDDEFinalAccountIndvData(string AccountNumber);
         public Task<string> getDDEFinalAccountCorpData(string AccountNumber);
         public Task<string> getBranchId(string BranchCode);
+        public Task<string> getRMId(string Code);
         public Task<JArray> getContactData(string contact_id);
         public Task<string> getEntityID(string Entity);
         public Task<string> getSubentitytypeID(string Subentitytype);
