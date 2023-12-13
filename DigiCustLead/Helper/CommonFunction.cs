@@ -211,6 +211,12 @@
         {
             return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchid", "eqs_branchidvalue", BranchCode);
         }
+
+        public async Task<string> getRMId(string Code)
+        {
+            return await this.getIDfromMSDTable("eqs_rmemployees", "eqs_rmemployeeid", "eqs_rmempidslot", Code);
+        }
+       
         public async Task<string> getBranchText(string BranchwId)
         {
             return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchidvalue", "eqs_branchid", BranchwId);

@@ -114,34 +114,44 @@ namespace ManageCase
             ldRtPrm.TransactionID = Transaction_ID;
             try
             {
-                string channel = CaseData.Channel;
+                //string channel = CaseData.Channel;
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "CreateCaseappkey"))
                 {
-                    if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID) && !string.IsNullOrEmpty(channel) && channel != "")
+                    if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
                         int ValidationError = 0;
                         List<string> errors = new List<string>();
 
-                        if (CaseData.UCIC == null || string.IsNullOrEmpty(CaseData.UCIC.ToString()) || CaseData.UCIC.ToString() == "")
+                        if (CaseData.Channel == null || string.IsNullOrEmpty(CaseData.Channel.ToString()) || CaseData.Channel.ToString() == "")
                         {
                             ValidationError = 1;
-                            errors.Add("UCIC");                           
-                        }
-                        if (CaseData.Classification == null || string.IsNullOrEmpty(CaseData.Classification.ToString()) || CaseData.Classification.ToString() == "")
-                        {
-                            ValidationError = 1;
-                            errors.Add("Classification");
-                        }
-                        if (CaseData.CaseType == null || string.IsNullOrEmpty(CaseData.CaseType.ToString()) || CaseData.CaseType.ToString() == "")
-                        {
-                            ValidationError = 1;
-                            errors.Add("CaseType");
+                            errors.Add("Channel");
                         }
                         if (CaseData.Source == null || string.IsNullOrEmpty(CaseData.Source.ToString()) || CaseData.Source.ToString() == "")
                         {
                             ValidationError = 1;
                             errors.Add("Source");
                         }
+                        if (CaseData.UCIC == null || string.IsNullOrEmpty(CaseData.UCIC.ToString()) || CaseData.UCIC.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("UCIC");                           
+                        }
+                        if (CaseData.CaseType == null || string.IsNullOrEmpty(CaseData.CaseType.ToString()) || CaseData.CaseType.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("CaseType");
+                        }
+                        if (CaseData.Subject == null || string.IsNullOrEmpty(CaseData.Subject.ToString()) || CaseData.Subject.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("Subject");
+                        }
+                        if (CaseData.Classification == null || string.IsNullOrEmpty(CaseData.Classification.ToString()) || CaseData.Classification.ToString() == "")
+                        {
+                            ValidationError = 1;
+                            errors.Add("Classification");
+                        }                      
                         if (CaseData.Category == null || string.IsNullOrEmpty(CaseData.Category.ToString()) || CaseData.Category.ToString() == "")
                         {
                             ValidationError = 1;
@@ -152,11 +162,7 @@ namespace ManageCase
                             ValidationError = 1;
                             errors.Add("SubCategory");
                         }
-                        if (CaseData.Channel == null || string.IsNullOrEmpty(CaseData.Channel.ToString()) || CaseData.Channel.ToString() == "")
-                        {
-                            ValidationError = 1;
-                            errors.Add("Channel");
-                        }
+                        
 
                         if (ValidationError == 1)
                         {
@@ -345,32 +351,117 @@ namespace ManageCase
                 Dictionary<string, double> odatab1 = new Dictionary<string, double>();
                 string postDataParametr, postDataParametr1;
                 List<JObject> case_details = new List<JObject>();
+                //Channel
+                csProperty.channelId = await this._commonFunc.getChannelId(CaseData.Channel.ToString());
+                if (csProperty.channelId != null && csProperty.channelId.Length > 4)
+                {
+                    odatab.Add("eqs_CaseChannel@odata.bind", $"eqs_casechannels({csProperty.channelId})");
+                }
+                else
+                {
+                    this._logger.LogInformation("CreateCase", "Channel not found.");
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = "Channel not found.";
+                    return csRtPrm;
+                }
 
+                //Source
+                csProperty.SourceId = await this._commonFunc.getSourceId(CaseData.Source.ToString());
+                if (csProperty.SourceId != null && csProperty.SourceId.Length > 4)
+                {
+                    odatab.Add("eqs_CaseSource@odata.bind", $"eqs_casesources({csProperty.SourceId})");
+                }
+                else
+                {
+                    this._logger.LogInformation("CreateCase", "Source not found.");
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = "Source not found.";
+                    return csRtPrm;
+                }
+
+                //UCIC
+                csProperty.eqs_customerid = CaseData.UCIC.ToString();
+                odatab.Add("eqs_customercode", csProperty.eqs_customerid);
+                csProperty.customerid = await this._commonFunc.getCustomerId(csProperty.eqs_customerid);
+                if (!string.IsNullOrEmpty(csProperty.customerid))
+                {
+                    odatab.Add("customerid_contact@odata.bind", $"contacts({csProperty.customerid})");
+                    
+                }
+                else
+                {
+                    this._logger.LogError("CreateCase", "Customer not found!");
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = "Customer not found!";
+                    return csRtPrm;
+                }
+                
                 case_Property.eqs_casetype = this.CaseType[CaseData.CaseType.ToString()];
                 case_Property.title = CaseData.Subject.ToString();
-                case_Property.eqs_casepriority = await this._queryParser.getOptionSetTextToValue("incident", "eqs_casepriority", CaseData.Priority.ToString());
-                case_Property.description = CaseData.Description.ToString();
 
-                csProperty.eqs_customerid = CaseData.UCIC.ToString();
-                csProperty.channelId = await this._commonFunc.getChannelId(CaseData.Channel.ToString());
-                csProperty.customerid = await this._commonFunc.getCustomerId(csProperty.eqs_customerid);
+                csProperty.CategoryId = await this._commonFunc.getCategoryId(CaseData.Category.ToString());
+                if (csProperty.CategoryId != null && csProperty.CategoryId.Length > 4)
+                {
+                    odatab.Add("ccs_category@odata.bind", $"ccs_categories({csProperty.CategoryId})");
+                }
+                else
+                {
+                    this._logger.LogError("CreateCase", "Category not found!");
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = "Category not found!";
+                    return csRtPrm;
+                }
 
+                csProperty.SubCategoryId = await this._commonFunc.getSubCategoryId(CaseData.SubCategory.ToString(), csProperty.CategoryId);
+                if (csProperty.SubCategoryId != null && csProperty.SubCategoryId.Length > 4)
+                {
+                    odatab.Add("ccs_subcategory@odata.bind", $"ccs_subcategories({csProperty.SubCategoryId})");
+                }
+                else
+                {
+                    this._logger.LogError("CreateCase", "SubCategory not found!");
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = "SubCategory not found!";
+                    return csRtPrm;
+                }
+
+                if (!string.IsNullOrEmpty(CaseData.Priority.ToString()))
+                {
+                    case_Property.eqs_casepriority = await this._queryParser.getOptionSetTextToValue("incident", "eqs_casepriority", CaseData.Priority.ToString());
+                }
+                if (!string.IsNullOrEmpty(CaseData.Description.ToString()))
+                {
+                    case_Property.description = CaseData.Description.ToString();
+                }               
                 if (!string.IsNullOrEmpty(CaseData.AccountNumber.ToString()))
                 {
                     csProperty.Accountid = await this._commonFunc.getAccountId(CaseData.AccountNumber.ToString());
+                    if (csProperty.Accountid != null && csProperty.Accountid.Length > 4)
+                    {
+                        odatab.Add("eqs_account@odata.bind", $"eqs_accounts({csProperty.Accountid})");
+                    }
+                    else
+                    {
+                            this._logger.LogError("CreateCase", "Account not found!");
+                            csRtPrm.ReturnCode = "CRM-ERROR-102";
+                            csRtPrm.Message = "Account not found!";
+                            return csRtPrm;
+                    }
                 }
-               
-
-                csProperty.ccs_classification = await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
-                csProperty.CategoryId = await this._commonFunc.getCategoryId(CaseData.Category.ToString());
-                csProperty.SubCategoryId = await this._commonFunc.getSubCategoryId(CaseData.SubCategory.ToString(), csProperty.CategoryId);
-                csProperty.SourceId = await this._commonFunc.getSourceId(CaseData.Source.ToString());
+                if (!string.IsNullOrEmpty(CaseData.Classification.ToString()))
+                {
+                    csProperty.ccs_classification = await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
+                    if (csProperty.ccs_classification.Length > 4)
+                    {
+                        odatab.Add("ccs_classification@odata.bind", $"ccs_classifications({csProperty.ccs_classification})");
+                    }
+                }
 
                 if (csProperty.SubCategoryId == "" || csProperty.SubCategoryId.Length < 4)
                 {
-                    this._logger.LogInformation("CreateCase", "SubCategoryId can not be null.");
+                    this._logger.LogInformation("CreateCase", "SubCategoryId not found.");
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
-                    csRtPrm.Message = "SubCategoryId can not be null.";
+                    csRtPrm.Message = "SubCategoryId not found.";
                     return csRtPrm;
                 }
                 else
@@ -432,74 +523,16 @@ namespace ManageCase
                                 csRtPrm.Message = $"{field.CRMField} can not be null.";
                                 return csRtPrm;
                             }
-
                         }
                     }
-                }
-
-                if (!string.IsNullOrEmpty(csProperty.customerid))
-                {
-                    odatab.Add("customerid_contact@odata.bind", $"contacts({csProperty.customerid})");
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(CaseData.UCIC.ToString()))
-                    {
-
-                        this._logger.LogError("CreateCase", "Customer not found!");
-                        csRtPrm.ReturnCode = "CRM-ERROR-102";
-                        csRtPrm.Message = "Customer not found!";
-                        return csRtPrm;
-                    }
-                }
-
-                if (csProperty.Accountid != null && csProperty.Accountid.Length > 4)
-                {
-                    odatab.Add("eqs_account@odata.bind", $"eqs_accounts({csProperty.Accountid})");
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(CaseData.AccountNumber.ToString()))
-                    {
-                        this._logger.LogError("CreateCase", "Account not found!");
-                        csRtPrm.ReturnCode = "CRM-ERROR-102";
-                        csRtPrm.Message = "Account not found!";
-                        return csRtPrm;
-                    }
-                }
-                //else
-                //{
-                //    this._logger.LogError("CreateCase", "Accountid can not be null.");
-                //    csRtPrm.ReturnCode = "CRM-ERROR-102";
-                //    csRtPrm.Message = "Accountid can not be null.";
-                //    return csRtPrm;
-                //}
-                if (csProperty.channelId.Length > 4)
-                {
-                    odatab.Add("eqs_CaseChannel@odata.bind", $"eqs_casechannels({csProperty.channelId})");
-                }
-                if (csProperty.ccs_classification.Length > 4)
-                {
-                    odatab.Add("ccs_classification@odata.bind", $"ccs_classifications({csProperty.ccs_classification})");
-                }
-                if (csProperty.CategoryId.Length > 4)
-                {
-                    odatab.Add("ccs_category@odata.bind", $"ccs_categories({csProperty.CategoryId})");
-                }
-                if (csProperty.SubCategoryId.Length > 4)
-                {
-                    odatab.Add("ccs_subcategory@odata.bind", $"ccs_subcategories({csProperty.SubCategoryId})");
-                }
+                }                             
                 
-                if (csProperty.SourceId.Length > 4)
+                if (!string.IsNullOrEmpty(CaseData.AdditionalField.ToString()))
                 {
-                    odatab.Add("eqs_CaseSource@odata.bind", $"eqs_casesources({csProperty.SourceId})");
+                    odatab.Add("eqs_casepayload", JsonConvert.SerializeObject(CaseData.AdditionalField));
                 }
-
-                odatab.Add("eqs_casepayload", JsonConvert.SerializeObject(CaseData.AdditionalField));
-
                 odatab.Add("caseorigincode", "3");
-                odatab.Add("eqs_customercode", csProperty.eqs_customerid);
+                
 
                 postDataParametr = JsonConvert.SerializeObject(case_Property);
                 postDataParametr1 = JsonConvert.SerializeObject(odatab);
@@ -509,9 +542,6 @@ namespace ManageCase
                 postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
 
                 case_details = await this._queryParser.HttpApiCall("incidents?$select=ticketnumber", HttpMethod.Post, postDataParametr);
-
-
-
 
                 if (case_details.Count > 0)
                 {
