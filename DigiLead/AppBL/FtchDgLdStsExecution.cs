@@ -92,11 +92,18 @@
                 string LeadID = RequestData.LeadID;
                 if (!string.IsNullOrEmpty(this.appkey) && this.appkey != "" && checkappkey(this.appkey, "FetchDigiLeadStatusappkey"))
                 {
-                    if (!string.IsNullOrEmpty(this.Transaction_ID) && !string.IsNullOrEmpty(this.Channel_ID) && !string.IsNullOrEmpty(LeadID) && LeadID != "")
-                    {                       
-                        
-                       ldRtPrm = await this.getDigiLeadStatus(RequestData);
-
+                    if (!string.IsNullOrEmpty(this.Transaction_ID) && !string.IsNullOrEmpty(this.Channel_ID))
+                    {
+                        if (!string.IsNullOrEmpty(LeadID) && LeadID != "")
+                        {
+                            ldRtPrm = await this.getDigiLeadStatus(RequestData);
+                        }
+                        else
+                        {
+                            this._logger.LogInformation("ValidateFtchDgLdSts", "LeadID is mandatory.");
+                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                            ldRtPrm.Message = "LeadID is mandatory.";
+                        }
                     }
                     else
                     {

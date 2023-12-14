@@ -153,79 +153,485 @@
             {
                 int haserror = 0;
                 List<string> fields = new List<string>();
-                if (RequestData.Nominee != null)
-                {
-                    if (string.IsNullOrEmpty(RequestData.Nominee?.nomineeUCICIfCustomer?.ToString()))
+                if (string.IsNullOrEmpty(_leadDetails[0]["eqs_ddefinalid"].ToString()))
+                {                    
+                    if (string.IsNullOrEmpty(RequestData.General?.ApplicationDate?.ToString()))
                     {
                         haserror = 1;
-                        fields.Add("nomineeUCICIfCustomer");
+                        fields.Add("ApplicationDate");
                     }
-                    if (string.IsNullOrEmpty(RequestData.Nominee?.name?.ToString()))
+                    if (string.IsNullOrEmpty(RequestData.General?.InstaKit?.ToString()))
                     {
                         haserror = 1;
-                        fields.Add("name");
+                        fields.Add("InstaKit");
                     }
-                    if (string.IsNullOrEmpty(RequestData.Nominee?.NomineeRelationship?.ToString()))
+                    else
+                    {
+                        if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                        {
+                            if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("InstaKitAccountNumber");
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(RequestData.General?.AccountOpeningBranch?.ToString()))
                     {
                         haserror = 1;
-                        fields.Add("NomineeRelationship");
+                        fields.Add("AccountOpeningBranch");
                     }
-                    if (string.IsNullOrEmpty(RequestData.Nominee?.DOB?.ToString()))
+                    if (string.IsNullOrEmpty(RequestData.General?.PurposeofOpeningAccount?.ToString()))
                     {
                         haserror = 1;
-                        fields.Add("DOB");
+                        fields.Add("PurposeofOpeningAccount");
                     }
-                    //if (string.IsNullOrEmpty(RequestData.Nominee?.DOB?.ToString()))
-                    //{
-                    //    haserror = 1;
-                    //    fields.Add("DOB");
-                    //}
-                    if (RequestData.Nominee?.Guardian != null)
+                    else
                     {
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.Name?.ToString()))
+                        if (RequestData.General?.PurposeofOpeningAccount?.ToString() == "Others")
                         {
-                            haserror = 1;
-                            fields.Add("Guardian Name");
+                            if (string.IsNullOrEmpty(RequestData.General?.PurposeOfOpeningAccountOthers?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("PurposeOfOpeningAccountOthers");
+                            }
                         }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.RelationshipToMinor?.ToString()))
+                    }
+                    
+                    if (string.IsNullOrEmpty(RequestData.General?.ModeofOperation?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("ModeofOperation");
+                    }
+                    if (string.IsNullOrEmpty(RequestData.General?.AccountOwnership?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("AccountOwnership");
+                    }
+                    if (string.IsNullOrEmpty(RequestData.General?.LGCode?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("LGCode");
+                    }
+                    if (string.IsNullOrEmpty(RequestData.General?.LCCode?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("LCCode");
+                    }
+
+                    if (RequestData.AdditionalDetails != null && string.IsNullOrEmpty(RequestData.AdditionalDetails?.DepositAmount?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("DepositAmount");
+                    }
+
+                    if (RequestData.FDRDDetails!=null)
+                    {
+                        if (string.IsNullOrEmpty(RequestData.FDRDDetails?.DepositDetails?.SpecialInterestRateRequired?.ToString()))
                         {
                             haserror = 1;
-                            fields.Add("Guardian RelationshipToMinor");
+                            fields.Add("SpecialInterestRateRequired");
                         }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianAddress1?.ToString()))
+                        if (string.IsNullOrEmpty(RequestData.FDRDDetails?.DepositDetails?.WaivedOffTDS?.ToString()))
                         {
                             haserror = 1;
-                            fields.Add("Guardian Address");
-                        }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianPin?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("Guardian Pin");
-                        }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCityCode?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("Guardian CityCode");
-                        }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianDistrict?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("Guardian District");
-                        }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCountryCode?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("Guardian CountryCode");
-                        }
-                        if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianState?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("Guardian State");
+                            fields.Add("WaivedOffTDS");
                         }
                     }
 
+                    if (RequestData.DirectBanking.Preferences != null)
+                    {
+                        foreach (var items in RequestData.DirectBanking.Preferences)
+                        {
+                            if (string.IsNullOrEmpty(items.UCIC?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("UCIC");
+                            }
+                            if (string.IsNullOrEmpty(items.DebitCardFlag?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("DebitCardFlag");
+                            }
+                            if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("NameonCard");
+                            }
+                            if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("DebitCardID");
+                            }
+                            if (string.IsNullOrEmpty(items.SMS?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("SMS");
+                            }
+                            if (string.IsNullOrEmpty(items.NetBanking?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("NetBanking");
+                            }
+                            if (string.IsNullOrEmpty(items.MobileBanking?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("MobileBanking");
+                            }
+                            if (string.IsNullOrEmpty(items.EmailStatement?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("EmailStatement");
+                            }
+                            if (string.IsNullOrEmpty(items.InternationalDCLimitAct?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("InternationalDCLimitAct");
+                            }
+                            if (string.IsNullOrEmpty(items.physicalStatement?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("physicalStatement");
+                            }
+                        }
+                    }
+
+
+                    if (RequestData.Nominee != null)
+                    {
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.name?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("name");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.NomineeRelationship?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("NomineeRelationship");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.DOB?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("DOB");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.Address1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("Address1");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.Pin?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("Pin");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.CityCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CityCode");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.District?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("District");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.CountryCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CountryCode");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.State?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("State");
+                        }
+
+                        if (RequestData.Nominee?.Guardian != null)
+                        {
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.Name?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Name");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.RelationshipToMinor?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian RelationshipToMinor");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianAddress1?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Address");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianPin?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Pin");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCityCode?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian CityCode");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianDistrict?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian District");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCountryCode?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian CountryCode");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianState?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian State");
+                            }
+                        }
+                        
+                    }
+                    
 
                 }
+                else
+                {
+                    if (RequestData.General != null)
+                    {
+                        if (string.IsNullOrEmpty(RequestData.General?.ApplicationDate?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("ApplicationDate");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.InstaKit?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("InstaKit");
+                        }
+                        else
+                        {
+                            if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                            {
+                                if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
+                                {
+                                    haserror = 1;
+                                    fields.Add("InstaKitAccountNumber");
+                                }
+                            }
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.AccountOpeningBranch?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AccountOpeningBranch");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.PurposeofOpeningAccount?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("PurposeofOpeningAccount");
+                        }
+                        else
+                        {
+                            if (RequestData.General?.PurposeofOpeningAccount?.ToString() == "Others")
+                            {
+                                if (string.IsNullOrEmpty(RequestData.General?.PurposeOfOpeningAccountOthers?.ToString()))
+                                {
+                                    haserror = 1;
+                                    fields.Add("PurposeOfOpeningAccountOthers");
+                                }
+                            }
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.ModeofOperation?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("ModeofOperation");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.AccountOwnership?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AccountOwnership");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.LGCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("LGCode");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.General?.LCCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("LCCode");
+                        }
+                    }                    
+
+                    if (RequestData.FDRDDetails != null)
+                    {
+                        if (string.IsNullOrEmpty(RequestData.FDRDDetails?.DepositDetails?.SpecialInterestRateRequired?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("SpecialInterestRateRequired");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.FDRDDetails?.DepositDetails?.WaivedOffTDS?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("WaivedOffTDS");
+                        }
+                    }                   
+
+                    foreach (var items in RequestData.DirectBanking.Preferences)
+                    {
+                        if (string.IsNullOrEmpty(items.PreferenceID?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("PreferenceID");
+                        }
+                        if (string.IsNullOrEmpty(items.UCIC?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("UCIC");
+                        }
+                        if (string.IsNullOrEmpty(items.DebitCardFlag?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("DebitCardFlag");
+                        }
+                        if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("NameonCard");
+                        }
+                        if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("DebitCardID");
+                        }
+                        if (string.IsNullOrEmpty(items.SMS?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("SMS");
+                        }
+                        if (string.IsNullOrEmpty(items.NetBanking?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("NetBanking");
+                        }
+                        if (string.IsNullOrEmpty(items.MobileBanking?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("MobileBanking");
+                        }
+                        if (string.IsNullOrEmpty(items.EmailStatement?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("EmailStatement");
+                        }
+                        if (string.IsNullOrEmpty(items.InternationalDCLimitAct?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("InternationalDCLimitAct");
+                        }
+                        if (string.IsNullOrEmpty(items.physicalStatement?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("physicalStatement");
+                        }
+                    }
+
+                    if (RequestData.Nominee != null)
+                    {
+                        
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.name?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("name");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.NomineeRelationship?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("NomineeRelationship");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.DOB?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("DOB");
+                        }
+
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.Address1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("Address1");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.Pin?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("Pin");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.CityCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CityCode");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.District?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("District");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.CountryCode?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CountryCode");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.Nominee?.State?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("State");
+                        }
+
+                        if (RequestData.Nominee?.Guardian != null)
+                        {
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.Name?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Name");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.RelationshipToMinor?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian RelationshipToMinor");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianAddress1?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Address");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianPin?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian Pin");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCityCode?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian CityCode");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianDistrict?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian District");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianCountryCode?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian CountryCode");
+                            }
+                            if (string.IsNullOrEmpty(RequestData.Nominee?.Guardian?.GuardianState?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("Guardian State");
+                            }
+                        }
+
+
+                    }
+                }
+               
 
                 if (haserror == 1)
                 {
