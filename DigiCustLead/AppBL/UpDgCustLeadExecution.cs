@@ -547,6 +547,11 @@
                 {
                     if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ServiceRMCode?.ToString()))
                     {
+                        var smEmployeeId = await this._commonFunc.getRMId(CustIndvData.RMDetails?.ServiceRMCode?.ToString());
+                        if (!string.IsNullOrEmpty(smEmployeeId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_servicermemployeeid@odata.bind", $"eqs_rmemployees({smEmployeeId})");
+                        }
                         CRMDDEmappingFields.Add("eqs_servicermcode", CustIndvData.RMDetails?.ServiceRMCode?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.RMDetails?.ServiceRMName?.ToString()))
