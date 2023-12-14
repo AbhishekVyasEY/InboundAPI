@@ -64,14 +64,49 @@ namespace DigiCustLead
     {
       
         public string FATCAID { get; set; }
-        public List<string> Address { get; set; }
-        public string BOID { get; set; }
-        public string CPID { get; set; }
+        public List<AddressResponse> Address { get; set; }
+        public List<BOResponse> BOID { get; set; }
+        public List<CPResponse> CPID { get; set; }
         public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
 
+    }
+
+    public class AddressResponse
+    {
+        public AddressResponse(string addressType, string addressId)
+        {
+            AddressType = addressType;
+            AddressId = addressId;
+        }
+        public string AddressType { get; set; }
+        public string AddressId { get; set; }
+    }
+
+    public class BOResponse
+    {
+        public BOResponse(string boId, string boListingType, string boName)
+        {
+            BOID = boId;
+            BOListingType = boListingType;
+            BOName = boName;
+        }
+        public string BOID { get; set; }
+        public string BOListingType { get; set; }
+        public string BOName { get; set; }
+    }
+
+    public class CPResponse
+    {
+        public CPResponse(string cpId, string nameofCP)
+        {
+            CPID = cpId;
+            NameofCP = nameofCP;
+        }
+        public string CPID { get; set; }
+        public string NameofCP { get; set; }
     }
 
     public class FetchCust_LeadReturn

@@ -7,6 +7,7 @@ namespace DigiCustLead
         public Task<string> getDDEFinalAccountIndvData(string AccountNumber);
         public Task<string> getDDEFinalAccountCorpData(string AccountNumber);
         public Task<string> getBranchId(string BranchCode);
+        public Task<string> getRMId(string Code);
         public Task<JArray> getContactData(string contact_id);
         public Task<string> getEntityID(string Entity);
         public Task<string> getSubentitytypeID(string Subentitytype);
@@ -26,7 +27,7 @@ namespace DigiCustLead
         public Task<string> getPincodeID(string PincodeCode);
         public Task<string> getCityID(string CityCode);
         public Task<string> getStateID(string StateCode);
-        public Task<string> getAddressID(string DDEID, string types);
+        public Task<string> getAddressID(string DDEID, string AddressID, string types);
         public  Task<string> getFatcaID(string DDEID, string types);
         public Task<string> getDocumentId(string ddeId);
         public Task<string> getDocCategoryId(string doccatCode);
@@ -42,7 +43,7 @@ namespace DigiCustLead
         public Task<string> getBranchText(string BranchwId);
         public Task<string> getRelationshipText(string relationshipId);
         public Task<string> getAccRelationshipText(string accrelationshipId);
-        public Task<string> getFatcaAddressID(string FatcaID);
+        public Task<string> getFatcaAddressID(string FatcaID, string AddressID);
         public Task<string> getPurposeText(string Purpose);
         public Task<string> getCountryText(string CountryId);
         public Task<string> getcorporatemasterID(string CorporateCode);
