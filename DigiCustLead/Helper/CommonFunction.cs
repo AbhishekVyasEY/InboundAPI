@@ -216,7 +216,7 @@
         {
             return await this.getIDfromMSDTable("eqs_rmemployees", "eqs_rmemployeeid", "eqs_rmempidslot", Code);
         }
-       
+
         public async Task<string> getBranchText(string BranchwId)
         {
             return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchidvalue", "eqs_branchid", BranchwId);
@@ -316,21 +316,47 @@
         {
             return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", Purpose);
         }
-        public async Task<string> getFatcaAddressID(string FatcaID)
+        public async Task<string> getFatcaAddressID(string FatcaID, string AddressID)
         {
-            return await this.getIDfromMSDTable("eqs_leadaddresses", "eqs_leadaddressid", "_eqs_applicantfatca_value", FatcaID);
-        }
-        public async Task<string> getAddressID(string DDEID, string types)
-        {
-            if (types == "indv")
+            if (string.IsNullOrEmpty(AddressID))
+                return string.Empty;
+
+            string query_url = $"eqs_leadaddresses()?$select=eqs_leadaddressid&$filter=_eqs_applicantfatca_value eq '{FatcaID}' and eqs_applicantaddressid eq '{AddressID}'";
+
+            var adddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var add_dtails = await this.getDataFromResponce(adddtails);
+            if (add_dtails.Count > 0)
             {
-                return await this.getIDfromMSDTable("eqs_leadaddresses", "eqs_leadaddressid", "_eqs_individualdde_value", DDEID);
+                return add_dtails[0]["eqs_leadaddressid"].ToString();
             }
             else
             {
-                return await this.getIDfromMSDTable("eqs_leadaddresses", "eqs_leadaddressid", "_eqs_corporatedde_value", DDEID);
+                return string.Empty;
             }
-               
+        }
+        public async Task<string> getAddressID(string DDEID, string AddressID, string types)
+        {
+            if (string.IsNullOrEmpty(AddressID)) 
+                return string.Empty;
+            
+            string DDEField;
+            if (types == "indv")
+                DDEField = "_eqs_individualdde_value";
+            else
+                DDEField = "_eqs_corporatedde_value";
+            
+            string query_url = $"eqs_leadaddresses()?$select=eqs_leadaddressid&$filter={DDEField} eq '{DDEID}' and eqs_applicantaddressid eq '{AddressID}'";
+
+            var adddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var add_dtails = await this.getDataFromResponce(adddtails);
+            if (add_dtails.Count > 0)
+            {
+                return add_dtails[0]["eqs_leadaddressid"].ToString();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
         public async Task<string> getFatcaID(string DDEID,string types)
         {
