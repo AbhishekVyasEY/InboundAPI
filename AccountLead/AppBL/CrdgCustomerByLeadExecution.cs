@@ -188,86 +188,56 @@
                         string Lead_details = "";
                         var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString());
 
-                        if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString()) && AccountDDE[0]["_eqs_leadaccountdde_value"].ToString() != "")
+                        
+                        
+                        string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMIL NADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
+                        dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
+                        dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
+                        dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
+                        Guid ReferenceId = Guid.NewGuid();
+                        msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
+                        Request_Template.createCustomerRequest.msgHdr = msgHdr;
+
+                        if (address.Count > 0)
                         {
-                            var ddeaccountdtails = await this._commonFunc.getInstrakitStatus(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString());
-                            if (ddeaccountdtails["eqs_instakitcode"] == "Insta Kit")
-                            {
-                                string RequestTemplate = "{\"activateWizInstantAccountReq\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"string\",\"externalReferenceId\":\"\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"9999\",\"userID\":\"WIZARDAUTH3\"}},\"msgBdy\":{\"accountId\":\"100048413491\",\"accountTitle\":\"NandhaKannan\",\"acctOperatingInstr\":\"Single\",\"custDtls\":{\"businessType\":\"\",\"countryOfResidence\":\"IN\",\"custEducation\":\"\",\"custIC\":\"13971357\",\"custType\":\"I\",\"customerMobilePhone\":\"918667266490\",\"dateOfBirthReg\":\"1988-12-17\",\"designation\":\"\",\"empID\":\"\",\"firstName\":\"KARTHIKA\",\"gender\":\"F\",\"icType\":\"\",\"incomeTaxNo\":\"PEZEZ9616J\",\"lastName\":\"C\",\"mailAddEmail\":\"a_karthikac@equitasbank.com\",\"mailPhoneRes\":\"0918667266490\",\"mailPhoneoff\":\"\",\"mailingAddress\":{\"city\":\"PERUNGUDI.\",\"country\":\"IN\",\"line1\":\"Westmambalam\",\"line2\":\"Westmambalam\",\"line3\":\"Ramnagar\",\"state\":\"TAMIL NADU\",\"zip\":\"600096\"},\"maritalStatus\":\"2\",\"middleName\":\"\",\"motherMaidenName\":\"Dfgh\",\"namPrefix\":\"MRS.\",\"nationality\":\"IN\",\"professionCode\":\"15\",\"repPermAdd\":\"N\",\"shortName\":\"KARTHIKAC\",\"signType\":\"1\",\"staff\":\"N\"},\"custId\":\"13971357\",\"dateAcctOpen\":\"2023-09-21\",\"flgBA525\":\"Y\",\"flgCM01\":\"N\",\"limitProfile\":\"\",\"nomineeDtls\":{\"guardianAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"34/65\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMIL NADU\",\"zip\":\"600033\"},\"guardianEmailId\":\"\",\"guardianMobile\":\"\",\"guardianName\":\"Chandru\",\"guardianPhoneArea\":\"91\",\"guardianPhoneCntry\":\"91\",\"guardianPhoneExt\":\"91\",\"guardianRel\":\"1\",\"isBankCustomer\":\"N\",\"nomAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"32/45\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMILNADU\",\"zip\":\"600033\"},\"nomCustId\":\"\",\"nomDOB\":\"1998-07-16\",\"nomEmailId\":\"\",\"nomMobile\":\"\",\"nomName\":\"Mithraan\",\"nomPhoneArea\":\"91\",\"nomPhoneCntry\":\"91\",\"nomPhoneExt\":\"91\",\"nomRegNo\":\"\",\"nomRel\":\"4\"}}}}";
-                                dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
-                                dynamic msgHdr = Request_Template.activateWizInstantAccountReq.msgHdr;
-                                dynamic msgBdy = Request_Template.activateWizInstantAccountReq.msgBdy;
-                                Guid ReferenceId = Guid.NewGuid();
-                                msgHdr.conversationID = ReferenceId.ToString().Replace("-", "");
-                                msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
-                                Request_Template.activateWizInstantAccountReq.msgHdr = msgHdr;
-
-                                msgBdy.accountId = ddeaccountdtails["accountnumner"];
-                                msgBdy.custId = ddeaccountdtails["custid"];
-                                msgBdy.custDtls.custIC = ddeaccountdtails["custid"];
-
-                                if (address.Count > 0)
-                                {
-
-                                }
-
-                                Request_Template.activateWizInstantAccountReq.msgBdy = msgBdy;
-                                string wso_request = JsonConvert.SerializeObject(Request_Template);
-                                string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                                Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSInstaAcct", postDataParametr);
-                                responsD = JsonConvert.DeserializeObject(Lead_details);
-                            }
+                            msgBdy.individualCustomer.address.line1 = address[0]["eqs_addressline1"].ToString();
+                            msgBdy.individualCustomer.address.line2 = address[0]["eqs_addressline2"].ToString();
+                            msgBdy.individualCustomer.address.line3 = address[0]["eqs_addressline3"].ToString();
+                            msgBdy.individualCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
+                            msgBdy.individualCustomer.address.zip = address[0]["eqs_pincode"].ToString();
+                            msgBdy.individualCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
+                            msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
+                            msgBdy.individualCustomer.address.country = "IN";
                         }
-                        else
-                        {
-                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMIL NADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
-                            dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
-                            dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
-                            dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
-                            Guid ReferenceId = Guid.NewGuid();
-                            msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
-                            Request_Template.createCustomerRequest.msgHdr = msgHdr;
-
-                            if (address.Count > 0)
-                            {
-                                msgBdy.individualCustomer.address.line1 = address[0]["eqs_addressline1"].ToString();
-                                msgBdy.individualCustomer.address.line2 = address[0]["eqs_addressline2"].ToString();
-                                msgBdy.individualCustomer.address.line3 = address[0]["eqs_addressline3"].ToString();
-                                msgBdy.individualCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
-                                msgBdy.individualCustomer.address.zip = address[0]["eqs_pincode"].ToString();
-                                msgBdy.individualCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
-                                msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
-                                msgBdy.individualCustomer.address.country = "IN";
-                            }
 
 
-                            string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(8, 2);
-                            string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(5, 2);
-                            string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 4);
-                            msgBdy.individualCustomer.dateOfBirthOrRegistration = yy + mm + dd;
-                            msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
-                            msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+                        string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(8, 2);
+                        string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(5, 2);
+                        string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 4);
+                        msgBdy.individualCustomer.dateOfBirthOrRegistration = yy + mm + dd;
+                        msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
+                        msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
 
-                            msgBdy.individualCustomer.name.firstName = AccountDDE[0]["eqs_firstname"].ToString();
-                            msgBdy.individualCustomer.name.lastName = AccountDDE[0]["eqs_lastname"].ToString();
-                            msgBdy.individualCustomer.name.midName = AccountDDE[0]["eqs_middlename"].ToString();
-                            msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
+                        msgBdy.individualCustomer.name.firstName = AccountDDE[0]["eqs_firstname"].ToString();
+                        msgBdy.individualCustomer.name.lastName = AccountDDE[0]["eqs_lastname"].ToString();
+                        msgBdy.individualCustomer.name.midName = AccountDDE[0]["eqs_middlename"].ToString();
+                        msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
 
-                            //msgBdy.individualCustomer.employeeId = "";
-                            msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
-                            msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
-                            msgBdy.individualCustomer.isStaff = "Y";
-                            msgBdy.individualCustomer.sex = (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") ? "M" : "F";
+                        //msgBdy.individualCustomer.employeeId = "";
+                        msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
+                        msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
+                        msgBdy.individualCustomer.isStaff = "Y";
+                        msgBdy.individualCustomer.sex = (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") ? "M" : "F";
 
-                            msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
+                        msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
 
 
-                            Request_Template.createCustomerRequest.msgBdy = msgBdy;
-                            string wso_request = JsonConvert.SerializeObject(Request_Template);
-                            string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                            Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
-                            responsD = JsonConvert.DeserializeObject(Lead_details);
-                        }
+                        Request_Template.createCustomerRequest.msgBdy = msgBdy;
+                        string wso_request = JsonConvert.SerializeObject(Request_Template);
+                        string postDataParametr = await EncriptRespons(wso_request, "FI0060");
+                        Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
+                        responsD = JsonConvert.DeserializeObject(Lead_details);
+                        
 
 
                         if (responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
@@ -283,7 +253,7 @@
                             if (!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
                             {
                                 fieldInput.Add("eqs_customeridcreated", customerLeadReturn.customerId);
-                                string postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                postDataParametr = JsonConvert.SerializeObject(fieldInput);
 
                                 var resp1 = await this._queryParser.HttpApiCall($"eqs_accountapplicants({AccountDDE[0]["_eqs_accountapplicantid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 
@@ -334,92 +304,95 @@
 
                 if (AccountDDE.Count > 0)
                 {
-                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
+                    if(true)
+                    //if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
                     {
                         dynamic responsD = "";
                         string Lead_details = "";
-                        var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddecorporatecustomerid"].ToString());
+                        var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddecorporatecustomerid"].ToString(), "corp");
 
-                        if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString()) && AccountDDE[0]["_eqs_leadaccountdde_value"].ToString() != "")
+                        
+                        
+                        string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"corporateCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"C\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"nationalIdentificationCode\":\"234325\",\"businessCode\":\"\",\"alternateEmailId\":\"\",\"annualTurnover\":\"\",\"businessRegistrationNumber\":\"\",\"businessType\":\"\",\"copyMailAddToPermAdd\":\"\",\"dateRegistered\":\"\",\"fax\":\"\",\"telexHandPhone\":\"\",\"riskCategory\":\"\",\"riskCategoryChangeReason\":\"\",\"incomeTaxNumber\":\"\",\"gstNumber\":\"\",\"tan\":\"\",\"cinOrRegNo\":\"\",\"tin\":\"\",\"din\":\"\",\"nrega\":\"\",\"districtCommunication\":\"\",\"nationality\":\"IN\"}}}}";
+                        dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
+                        dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
+                        dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
+                        Guid ReferenceId = Guid.NewGuid();
+                        msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
+                        Request_Template.createCustomerRequest.msgHdr = msgHdr;
+
+
+                        if (address.Count > 0)
                         {
-                            var ddeaccountdtails = await this._commonFunc.getInstrakitStatus(AccountDDE[0]["_eqs_leadaccountdde_value"].ToString());
-                            if (ddeaccountdtails["eqs_instakitcode"] == "Insta Kit")
-                            {
-                                string RequestTemplate = "{\"activateWizInstantAccountReq\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"string\",\"externalReferenceId\":\"\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"9999\",\"userID\":\"WIZARDAUTH3\"}},\"msgBdy\":{\"accountId\":\"100048413491\",\"accountTitle\":\"NandhaKannan\",\"acctOperatingInstr\":\"Single\",\"custDtls\":{\"businessType\":\"\",\"countryOfResidence\":\"IN\",\"custEducation\":\"\",\"custIC\":\"13971357\",\"custType\":\"I\",\"customerMobilePhone\":\"918667266490\",\"dateOfBirthReg\":\"1988-12-17\",\"designation\":\"\",\"empID\":\"\",\"firstName\":\"KARTHIKA\",\"gender\":\"F\",\"icType\":\"\",\"incomeTaxNo\":\"PEZEZ9616J\",\"lastName\":\"C\",\"mailAddEmail\":\"a_karthikac@equitasbank.com\",\"mailPhoneRes\":\"0918667266490\",\"mailPhoneoff\":\"\",\"mailingAddress\":{\"city\":\"PERUNGUDI.\",\"country\":\"IN\",\"line1\":\"Westmambalam\",\"line2\":\"Westmambalam\",\"line3\":\"Ramnagar\",\"state\":\"TAMIL NADU\",\"zip\":\"600096\"},\"maritalStatus\":\"2\",\"middleName\":\"\",\"motherMaidenName\":\"Dfgh\",\"namPrefix\":\"MRS.\",\"nationality\":\"IN\",\"professionCode\":\"15\",\"repPermAdd\":\"N\",\"shortName\":\"KARTHIKAC\",\"signType\":\"1\",\"staff\":\"N\"},\"custId\":\"13971357\",\"dateAcctOpen\":\"2023-09-21\",\"flgBA525\":\"Y\",\"flgCM01\":\"N\",\"limitProfile\":\"\",\"nomineeDtls\":{\"guardianAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"34/65\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMIL NADU\",\"zip\":\"600033\"},\"guardianEmailId\":\"\",\"guardianMobile\":\"\",\"guardianName\":\"Chandru\",\"guardianPhoneArea\":\"91\",\"guardianPhoneCntry\":\"91\",\"guardianPhoneExt\":\"91\",\"guardianRel\":\"1\",\"isBankCustomer\":\"N\",\"nomAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"32/45\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMILNADU\",\"zip\":\"600033\"},\"nomCustId\":\"\",\"nomDOB\":\"1998-07-16\",\"nomEmailId\":\"\",\"nomMobile\":\"\",\"nomName\":\"Mithraan\",\"nomPhoneArea\":\"91\",\"nomPhoneCntry\":\"91\",\"nomPhoneExt\":\"91\",\"nomRegNo\":\"\",\"nomRel\":\"4\"}}}}";
-                                dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
-                                dynamic msgHdr = Request_Template.activateWizInstantAccountReq.msgHdr;
-                                dynamic msgBdy = Request_Template.activateWizInstantAccountReq.msgBdy;
-                                Guid ReferenceId = Guid.NewGuid();
-                                msgHdr.conversationID = ReferenceId.ToString().Replace("-", "");
-                                msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
-                                Request_Template.activateWizInstantAccountReq.msgHdr = msgHdr;
-
-                                msgBdy.accountId = ddeaccountdtails["accountnumner"];
-                                msgBdy.custId = ddeaccountdtails["custid"];
-                                msgBdy.custDtls.custIC = ddeaccountdtails["custid"];
-
-                                if (address.Count > 0)
-                                {
-
-                                }
-
-                                Request_Template.activateWizInstantAccountReq.msgBdy = msgBdy;
-                                string wso_request = JsonConvert.SerializeObject(Request_Template);
-                                string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                                Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSInstaAcct", postDataParametr);
-                                responsD = JsonConvert.DeserializeObject(Lead_details);
-                            }
+                            msgBdy.corporateCustomer.address.line1 = address[0]["eqs_addressline1"].ToString();
+                            msgBdy.corporateCustomer.address.line2 = address[0]["eqs_addressline2"].ToString();
+                            msgBdy.corporateCustomer.address.line3 = address[0]["eqs_addressline3"].ToString();
+                            msgBdy.corporateCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
+                            msgBdy.corporateCustomer.address.zip = address[0]["eqs_pincode"].ToString();
+                            msgBdy.corporateCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
+                            msgBdy.corporateCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
+                            msgBdy.corporateCustomer.address.country = "IN";
                         }
-                        else
+
+
+                        string dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(8, 2);
+                        string mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(5, 2);
+                        string yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 4);
+                        msgBdy.corporateCustomer.dateOfBirthOrRegistration = "20221212";//yy + mm + dd;
+                        msgBdy.corporateCustomer.customerMobilePhone = AccountDDE[0]["eqs_pocphonenumber"].ToString();
+                        msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+
+                        msgBdy.corporateCustomer.name.firstName = AccountDDE[0]["eqs_companyname1"].ToString();
+                        msgBdy.corporateCustomer.name.lastName = AccountDDE[0]["eqs_companyname3"].ToString();
+                        msgBdy.corporateCustomer.name.midName = AccountDDE[0]["eqs_companyname2"].ToString();
+                        msgBdy.corporateCustomer.name.shortName = AccountDDE[0]["eqs_companyname1"].ToString();
+
+                        msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;                            
+                        msgBdy.corporateCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchterritoryid_value"].ToString());
+
+
+                        msgBdy.corporateCustomer.annualTurnover = AccountDDE[0]["eqs_companyturnovervalue"].ToString();
+                        string businessregno = "";
+                        string gstnum = AccountDDE[0]["eqs_gstnumber"].ToString();
+                        string cstvat = AccountDDE[0]["eqs_cstvatnumber"].ToString();
+                        string tan = AccountDDE[0]["eqs_tannumber"].ToString();
+                        if (cstvat != string.Empty)
                         {
-                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMIL NADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
-                            dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
-                            dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
-                            dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
-                            Guid ReferenceId = Guid.NewGuid();
-                            msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
-                            Request_Template.createCustomerRequest.msgHdr = msgHdr;
-
-
-                            if (address.Count > 0)
-                            {
-                                msgBdy.individualCustomer.address.line1 = address[0]["eqs_addressline1"].ToString();
-                                msgBdy.individualCustomer.address.line2 = address[0]["eqs_addressline2"].ToString();
-                                msgBdy.individualCustomer.address.line3 = address[0]["eqs_addressline3"].ToString();
-                                msgBdy.individualCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
-                                msgBdy.individualCustomer.address.zip = address[0]["eqs_pincode"].ToString();
-                                msgBdy.individualCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
-                                msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
-                                msgBdy.individualCustomer.address.country = "IN";
-                            }
-
-
-                            string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(8, 2);
-                            string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(5, 2);
-                            string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 4);
-                            msgBdy.individualCustomer.dateOfBirthOrRegistration = yy + mm + dd;
-                            msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
-                            msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
-
-                            msgBdy.individualCustomer.name.firstName = AccountDDE[0]["eqs_firstname"].ToString();
-                            msgBdy.individualCustomer.name.lastName = AccountDDE[0]["eqs_lastname"].ToString();
-                            msgBdy.individualCustomer.name.midName = AccountDDE[0]["eqs_middlename"].ToString();
-                            msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
-
-                            msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
-                            msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
-                            msgBdy.individualCustomer.isStaff = "Y";
-                            msgBdy.individualCustomer.sex = (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") ? "M" : "F";
-
-                            msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
-
-
-                            Request_Template.createCustomerRequest.msgBdy = msgBdy;
-                            string wso_request = JsonConvert.SerializeObject(Request_Template);
-                            string postDataParametr = await EncriptRespons(wso_request, "FI0060");
-                            Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
-                            responsD = JsonConvert.DeserializeObject(Lead_details);
+                            businessregno = cstvat;
                         }
+                        else if (gstnum != string.Empty)
+                        {
+                            businessregno = gstnum;
+                        }
+                        else if (tan != string.Empty)
+                        {
+                            businessregno = tan;
+                        }
+                        msgBdy.corporateCustomer.businessRegistrationNumber = businessregno;
+                      
+                        msgBdy.corporateCustomer.copyMailAddToPermAdd = "Y";
+                        dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(8, 2);
+                        mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(5, 2);
+                        yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 4);
+                        msgBdy.corporateCustomer.dateRegistered = "20221212"; //yy + mm + dd;
+                        msgBdy.corporateCustomer.fax = AccountDDE[0]["eqs_faxnumber"].ToString();
+
+                        msgBdy.corporateCustomer.incomeTaxNumber = AccountDDE[0]["eqs_pannumber"].ToString();
+                        msgBdy.corporateCustomer.gstNumber = gstnum;
+                        msgBdy.corporateCustomer.tan = tan;
+                        msgBdy.corporateCustomer.cinOrRegNo = AccountDDE[0]["eqs_cinregisterednumber"].ToString();
+                        msgBdy.corporateCustomer.riskCategory = "1";
+
+                        msgBdy.corporateCustomer.districtCommunicationmsgBdy = "Distr";
+
+
+
+                        Request_Template.createCustomerRequest.msgBdy = msgBdy;
+                        string wso_request = JsonConvert.SerializeObject(Request_Template);
+                        string postDataParametr = await EncriptRespons(wso_request, "FI0060");
+                        Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
+                        responsD = JsonConvert.DeserializeObject(Lead_details);
+                        
 
 
                         if (responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
@@ -435,7 +408,7 @@
                             if (!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
                             {
                                 fieldInput.Add("eqs_customeridcreated", customerLeadReturn.customerId);
-                                string postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                postDataParametr = JsonConvert.SerializeObject(fieldInput);
 
                                 var resp1 = await this._queryParser.HttpApiCall($"eqs_accountapplicants({AccountDDE[0]["_eqs_accountapplicantid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 

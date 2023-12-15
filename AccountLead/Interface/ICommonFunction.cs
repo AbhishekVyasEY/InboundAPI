@@ -23,7 +23,7 @@ namespace AccountLead
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);
 
-        public Task<JArray> getAddressData(string individuaID);
+        public Task<JArray> getAddressData(string individuaID, string type="");
 
 
         public Task<string> getCityName(string CityId);

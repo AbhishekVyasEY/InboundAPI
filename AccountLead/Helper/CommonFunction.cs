@@ -334,7 +334,7 @@ namespace AccountLead
             try
             {
                 string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicantID);
-                //string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
+                string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
 
                 string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -372,11 +372,15 @@ namespace AccountLead
 
         }
 
-        public async Task<JArray> getAddressData(string individuaID)
+        public async Task<JArray> getAddressData(string individuaID, string type = "")
         {
             try
             {
                 string query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_individualdde_value eq '{individuaID}'";
+                if (type=="corp")
+                {
+                    query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_corporatedde_value eq '{individuaID}'";
+                }
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
