@@ -304,8 +304,8 @@
 
                 if (AccountDDE.Count > 0)
                 {
-                    if(true)
-                    //if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
+                    //if(true)
+                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
                     {
                         dynamic responsD = "";
                         string Lead_details = "";
