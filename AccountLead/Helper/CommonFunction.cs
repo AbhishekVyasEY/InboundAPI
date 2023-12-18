@@ -249,7 +249,7 @@ namespace AccountLead
             try
             {
                 string query_url = $"eqs_ddeaccountnominees()?$select=eqs_nomineename,eqs_emailid,eqs_mobile,eqs_nomineedob,eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_pincode,_eqs_city_value,_eqs_state_value,_eqs_country_value,eqs_guardianname,eqs_guardianmobile,eqs_guardianaddressline1,eqs_guardianaddressline2,eqs_guardianaddressline3,_eqs_guardiancity_value,_eqs_guardianstate_value,_eqs_guardiancountry_value,eqs_guardianpincode&$filter=_eqs_leadaccountddeid_value eq '{ddeaccountid}'";
-                var Nomineedtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Nomineedtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var Nominee_dtails = await this.getDataFromResponce(Nomineedtails);
                 return Nominee_dtails;
             }
@@ -282,7 +282,7 @@ namespace AccountLead
             {
                 string leadaccount_id = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", AccountID);
                 string Stage = await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddeaccounts()?$select=eqs_readyforonboarding,eqs_onboardingvalidationmessage,eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value,_eqs_productcategoryid_value&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}";
+                string query_url = $"eqs_ddeaccounts()?$select=eqs_readyforonboarding,eqs_onboardingvalidationmessage,eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value,_eqs_productcategoryid_value,eqs_instakitcode,eqs_instakitaccountnumber,eqs_applicationdate&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
@@ -306,6 +306,23 @@ namespace AccountLead
             catch (Exception ex)
             {
                 this._logger.LogError("getApplicentData", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<JArray> getApplicentFinalDDEbyAccountLead(string AccountDDEId)
+        {
+            try
+            {
+                string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
+                string query_url = $"eqs_ddeindividualcustomers()?$filter=_eqs_leadaccountdde_value eq '{AccountDDEId}' and eqs_dataentrystage eq {DataEntryStage}";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var Account_dtails = await this.getDataFromResponce(Accountdtails);
+                return Account_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getApplicentIndivDDE", ex.Message);
                 throw ex;
             }
         }

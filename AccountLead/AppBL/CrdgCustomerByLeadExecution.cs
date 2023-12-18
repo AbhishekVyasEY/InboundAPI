@@ -211,9 +211,9 @@
                         }
 
 
-                        string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(8, 2);
-                        string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(5, 2);
-                        string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 4);
+                        string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 2);
+                        string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(3, 2);
+                        string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(6, 4);
                         msgBdy.individualCustomer.dateOfBirthOrRegistration = yy + mm + dd;
                         msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
                         msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
@@ -335,10 +335,10 @@
                         }
 
 
-                        string dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(8, 2);
-                        string mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(5, 2);
-                        string yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 4);
-                        msgBdy.corporateCustomer.dateOfBirthOrRegistration = "20221212";//yy + mm + dd;
+                        string dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
+                        string mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(3, 2);
+                        string yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(6, 4);
+                        msgBdy.corporateCustomer.dateOfBirthOrRegistration = yy + mm + dd;
                         msgBdy.corporateCustomer.customerMobilePhone = AccountDDE[0]["eqs_pocphonenumber"].ToString();
                         msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
 
@@ -371,10 +371,10 @@
                         msgBdy.corporateCustomer.businessRegistrationNumber = businessregno;
                       
                         msgBdy.corporateCustomer.copyMailAddToPermAdd = "Y";
-                        dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(8, 2);
-                        mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(5, 2);
-                        yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 4);
-                        msgBdy.corporateCustomer.dateRegistered = "20221212"; //yy + mm + dd;
+                        dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
+                        mm = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(3, 2);
+                        yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(6, 4);
+                        msgBdy.corporateCustomer.dateRegistered = yy + mm + dd;
                         msgBdy.corporateCustomer.fax = AccountDDE[0]["eqs_faxnumber"].ToString();
 
                         msgBdy.corporateCustomer.incomeTaxNumber = AccountDDE[0]["eqs_pannumber"].ToString();
