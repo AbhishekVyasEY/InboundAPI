@@ -223,10 +223,11 @@
 
                     if (!string.IsNullOrEmpty(Applicant_Data["eqs_dob"]?.ToString()))
                     {
-                        dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 2);
-                        mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(3, 2);
-                        yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(6, 4);
-                        CRMDDEmappingFields.Add("eqs_dob", yyyy + "-" + mm + "-" + dd);
+                        DateTime dt = ((DateTime)((JObject)Applicant_Data)["eqs_dob"]);
+                        //dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(8, 2);
+                        //mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(5, 2);
+                        //yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 4);
+                        CRMDDEmappingFields.Add("eqs_dob", dt.ToString("yyyy-MM-dd"));
                     }
 
                     if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
@@ -1069,10 +1070,15 @@
                     string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
                     CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
 
-                    dd = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(0, 2);
-                    mm = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(3, 2);
-                    yyyy = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(6, 4);
-                    CRMDDEmappingFields.Add("eqs_dateofincorporation", yyyy + "-" + mm + "-" + dd);
+                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_dateofincorporation"]?.ToString()))
+                    {
+                        DateTime dt = ((DateTime)((JObject)Applicant_Data)["eqs_dateofincorporation"]);
+                        //dd = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(0, 2);
+                        //mm = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(3, 2);
+                        //yyyy = Applicant_Data["eqs_dateofincorporation"]?.ToString()?.Substring(6, 4);
+                        CRMDDEmappingFields.Add("eqs_dateofincorporation", dt.ToString("yyyy-MM-dd"));
+                    }
+
                     CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
 
                 }
