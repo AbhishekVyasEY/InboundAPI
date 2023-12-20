@@ -103,12 +103,12 @@
 
                         if (!string.IsNullOrEmpty(RequestData.CustomerID.ToString()))
                         {
-                            string accountnumber = string.Empty;
-                            if (RequestData is JObject && ((JObject)RequestData).ContainsKey("AccountNumber"))
-                            {
-                                accountnumber = RequestData.AccountNumber.ToString();
-                            }
-                            ldRtPrm = await this.FetCustomerDtl(RequestData.CustomerID.ToString(), accountnumber);
+                            //string accountnumber = string.Empty;
+                            //if (RequestData is JObject && ((JObject)RequestData).ContainsKey("AccountNumber"))
+                            //{
+                            //    accountnumber = RequestData.AccountNumber.ToString();
+                            //}
+                            ldRtPrm = await this.FetCustomerDtl(RequestData.CustomerID.ToString());
                         }
                         else
                         {
@@ -142,7 +142,7 @@
         }
 
 
-        private async Task<FetchCustomerDtlReturn> FetCustomerDtl(string CustomerID, string AccountNumber)
+        private async Task<FetchCustomerDtlReturn> FetCustomerDtl(string CustomerID)
         {
             FetchCustomerDtlReturn customerDetailReturn = new FetchCustomerDtlReturn();
 
@@ -213,29 +213,37 @@
 
                 }
 
-                if (!string.IsNullOrEmpty(AccountNumber))
+                var AccountRelDetails = await this._commonFunc.getAccountRelationshipDetails(CustomerID);
+                if (AccountRelDetails.Count > 0)
                 {
-                    var AccountRelDetails = await this._commonFunc.getAccountRelationshipDetails(CustomerID, AccountNumber);
-                    if (AccountRelDetails.Count > 0)
+                    customerDetailReturn.CustomerPreferences = new List<CustomerPreferences>();
+                    customerDetailReturn.DSBServiceDetails = new List<ServiceDetails>();
+                    foreach (var AccountRel in AccountRelDetails)
                     {
-                        customerDetailReturn.CustomerPreferences = new CustomerPreferences();
-                        customerDetailReturn.CustomerPreferences.NetBanking = AccountRelDetails[0]["eqs_netbanking"].ToString();
-                        customerDetailReturn.CustomerPreferences.MobileBanking = AccountRelDetails[0]["eqs_mobilebanking"].ToString();
-                        customerDetailReturn.CustomerPreferences.SMS = AccountRelDetails[0]["eqs_smstwo"].ToString();
-                        customerDetailReturn.CustomerPreferences.AllSMSAlerts = (!Convert.ToBoolean(AccountRelDetails[0]["eqs_onlytransactionalerts"].ToString())).ToString();
-                        customerDetailReturn.CustomerPreferences.PhysicalStatement = AccountRelDetails[0]["eqs_physicalstatement"].ToString();
-                        customerDetailReturn.CustomerPreferences.EmailStatement = AccountRelDetails[0]["eqs_emailstatement"].ToString();
+                        string accountNumber = AccountRel["eqs_name"].ToString();
 
-                        this.customerid = AccountRelDetails[0]["_eqs_customeridvalue_value"].ToString();
-                        this.accountid = AccountRelDetails[0]["_eqs_accountid_value"].ToString();
+                        CustomerPreferences custpref = new CustomerPreferences();
+                        custpref.AccountNumber = accountNumber;
+                        custpref.NetBanking = AccountRel["eqs_netbanking"].ToString();
+                        custpref.MobileBanking = AccountRel["eqs_mobilebanking"].ToString();
+                        custpref.SMS = AccountRel["eqs_smstwo"].ToString();
+                        custpref.PhysicalStatement = AccountRel["eqs_physicalstatement"].ToString();
+                        custpref.EmailStatement = AccountRel["eqs_emailstatement"].ToString();
+
+                        if (AccountRel["eqs_onlytransactionalerts"] != null && !string.IsNullOrEmpty(AccountRel["eqs_onlytransactionalerts"].ToString()))
+                            custpref.AllSMSAlerts = (!Convert.ToBoolean(AccountRel["eqs_onlytransactionalerts"].ToString())).ToString();
+                        customerDetailReturn.CustomerPreferences.Add(custpref);
+
+                        this.customerid = AccountRel["_eqs_customeridvalue_value"].ToString();
+                        this.accountid = AccountRel["_eqs_accountid_value"].ToString();
                         //Add Beat and OnCall Service Details
                         var ServiceDetails = await this._commonFunc.getServiceDetails(customerid, accountid);
                         if (ServiceDetails.Count > 0)
                         {
-                            customerDetailReturn.DSBServiceDetails = new List<ServiceDetails>();
                             var servicedetail = ServiceDetails[0];
 
                             ServiceDetails item = new ServiceDetails();
+                            item.AccountNumber = accountNumber;
                             if (!string.IsNullOrEmpty(servicedetail["eqs_cashpickup"].ToString()))
                             {
                                 item.ServiceName = "Cash Pickup";
@@ -254,6 +262,7 @@
                             customerDetailReturn.DSBServiceDetails.Add(item);
 
                             item = new ServiceDetails();
+                            item.AccountNumber = accountNumber;
                             if (!string.IsNullOrEmpty(servicedetail["eqs_cashdelivery"].ToString()))
                             {
                                 item.ServiceName = "Cash Delivery";
@@ -272,6 +281,7 @@
                             customerDetailReturn.DSBServiceDetails.Add(item);
 
                             item = new ServiceDetails();
+                            item.AccountNumber = accountNumber;
                             if (!string.IsNullOrEmpty(servicedetail["eqs_chequepickup"].ToString()))
                             {
                                 item.ServiceName = "Cheque Pickup";
@@ -290,6 +300,7 @@
                         }
                     }
                 }
+
 
                 customerDetailReturn.ReturnCode = "CRM-SUCCESS";
                 customerDetailReturn.Message = OutputMSG.Case_Success;

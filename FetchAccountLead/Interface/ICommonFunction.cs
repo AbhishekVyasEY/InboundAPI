@@ -24,7 +24,7 @@ namespace FetchAccountLead
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
         public Task<JArray> getLeadAccountDetails(string LdApplicantId, string stage = "");
         public Task<JArray> getCustomerDetails(string filterkey, string filtervalue);
-        public Task<JArray> getAccountRelationshipDetails(string CustomerID, string AccountNumber);
+        public Task<JArray> getAccountRelationshipDetails(string CustomerID);
         public Task<JArray> getServiceDetails(string customerid, string accountid);
         public Task<string> getPurposeOfCreation(string id);
         public Task<string> MeargeJsonString(string json1, string json2);

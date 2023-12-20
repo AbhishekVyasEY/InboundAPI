@@ -6,7 +6,7 @@ namespace FetchAccountLead
     public class FetchCustomerDtlReturn
     {
         public GeneralDetails General { get; set; }
-        public CustomerPreferences CustomerPreferences { get; set; }
+        public List<CustomerPreferences> CustomerPreferences { get; set; }
         public List<ServiceDetails> DSBServiceDetails { get; set; }
         public RMDetails RMDetails { get; set; }
         public string ReturnCode { get; set; }
@@ -46,6 +46,7 @@ namespace FetchAccountLead
 
     public class CustomerPreferences
     {
+        public string AccountNumber { get; set; }
         public string NetBanking { get; set; }
         public string MobileBanking { get; set; }
         public string SMS { get; set; }
@@ -57,6 +58,7 @@ namespace FetchAccountLead
 
     public class ServiceDetails
     {
+        public string AccountNumber { get; set; }
         public string ServiceName { get; set; }
         public string IsRegistered { get; set; }
         public string ServiceType { get; set; }

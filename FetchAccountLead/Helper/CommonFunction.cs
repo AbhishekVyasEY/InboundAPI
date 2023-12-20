@@ -328,11 +328,11 @@
             }
         }
 
-        public async Task<JArray> getAccountRelationshipDetails(string CustomerID, string AccountNumber)
+        public async Task<JArray> getAccountRelationshipDetails(string CustomerID)
         {
             try
             {
-                string query_url = $"eqs_accountrelationships()?$filter=eqs_name eq '{AccountNumber}' and eqs_customerid eq '{CustomerID}'";
+                string query_url = $"eqs_accountrelationships()?$filter=eqs_customerid eq '{CustomerID}'";
                 var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
                 return Customer_dtails;
