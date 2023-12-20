@@ -163,7 +163,7 @@
                         accountApplicantCorp.Companynamepart1 = Customerdtl[0]["eqs_companynamepart1"].ToString();
                         accountApplicantCorp.Companynamepart2 = Customerdtl[0]["eqs_companynamepart2"].ToString();
                         accountApplicantCorp.Companynamepart3 = Customerdtl[0]["eqs_companynamepart3"].ToString();
-                        accountApplicantCorp.pan = Customerdtl[0]["eqs_tannumber"].ToString();
+                        accountApplicantCorp.TAN = Customerdtl[0]["eqs_tannumber"].ToString();
 
                         accountLeadReturn.AccountApplicants = accountApplicantCorp;
                     }
@@ -196,7 +196,7 @@
                             accountApplicantCorp.Companynamepart1 = customerDetail[0]["eqs_companyname"].ToString();
                             accountApplicantCorp.Companynamepart2 = customerDetail[0]["eqs_companyname2"].ToString();
                             accountApplicantCorp.Companynamepart3 = customerDetail[0]["eqs_companyname3"].ToString();
-                            accountApplicantCorp.pan = customerDetail[0]["eqs_tannumber"].ToString();
+                            accountApplicantCorp.TAN = customerDetail[0]["eqs_tannumber"].ToString();
 
                             accountLeadReturn.AccountApplicants = accountApplicantCorp;
                         }
