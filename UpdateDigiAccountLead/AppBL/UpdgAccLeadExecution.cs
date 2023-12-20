@@ -482,71 +482,75 @@
                         }
                     }
 
-                    foreach (var items in RequestData.DirectBanking.Preferences)
+                    if (RequestData.DirectBanking?.Preferences != null)
                     {
-                        if (string.IsNullOrEmpty(items.PreferenceID?.ToString()))
+                        foreach (var items in RequestData.DirectBanking.Preferences)
                         {
-                            haserror = 1;
-                            fields.Add("PreferenceID");
-                        }
-                        if (string.IsNullOrEmpty(items.UCIC?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("UCIC");
-                        }
-                        if (string.IsNullOrEmpty(items.DebitCardFlag?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("DebitCardFlag");
-                        }
-                        else
-                        {
-                            if (items["DebitCardFlag"].ToString().ToLower() == "yes")
+                            if (string.IsNullOrEmpty(items.PreferenceID?.ToString()))
                             {
-                                if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                                haserror = 1;
+                                fields.Add("PreferenceID");
+                            }
+                            if (string.IsNullOrEmpty(items.UCIC?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("UCIC");
+                            }
+                            if (string.IsNullOrEmpty(items.DebitCardFlag?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("DebitCardFlag");
+                            }
+                            else
+                            {
+                                if (items["DebitCardFlag"].ToString().ToLower() == "yes")
                                 {
-                                    haserror = 1;
-                                    fields.Add("NameonCard");
-                                }
-                                if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
-                                {
-                                    haserror = 1;
-                                    fields.Add("DebitCardID");
+                                    if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                                    {
+                                        haserror = 1;
+                                        fields.Add("NameonCard");
+                                    }
+                                    if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
+                                    {
+                                        haserror = 1;
+                                        fields.Add("DebitCardID");
+                                    }
                                 }
                             }
-                        }
 
-                        if (string.IsNullOrEmpty(items.SMS?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("SMS");
-                        }
-                        if (string.IsNullOrEmpty(items.NetBanking?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("NetBanking");
-                        }
-                        if (string.IsNullOrEmpty(items.MobileBanking?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("MobileBanking");
-                        }
-                        if (string.IsNullOrEmpty(items.EmailStatement?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("EmailStatement");
-                        }
-                        if (string.IsNullOrEmpty(items.InternationalDCLimitAct?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("InternationalDCLimitAct");
-                        }
-                        if (string.IsNullOrEmpty(items.physicalStatement?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("physicalStatement");
+                            if (string.IsNullOrEmpty(items.SMS?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("SMS");
+                            }
+                            if (string.IsNullOrEmpty(items.NetBanking?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("NetBanking");
+                            }
+                            if (string.IsNullOrEmpty(items.MobileBanking?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("MobileBanking");
+                            }
+                            if (string.IsNullOrEmpty(items.EmailStatement?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("EmailStatement");
+                            }
+                            if (string.IsNullOrEmpty(items.InternationalDCLimitAct?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("InternationalDCLimitAct");
+                            }
+                            if (string.IsNullOrEmpty(items.physicalStatement?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("physicalStatement");
+                            }
                         }
                     }
+                    
 
                     if (RequestData.Nominee != null)
                     {
