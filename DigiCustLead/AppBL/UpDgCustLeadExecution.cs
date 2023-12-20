@@ -210,6 +210,7 @@
                             return csRtPrm;
                         }
                     }
+
                     CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
                     CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
                     CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
@@ -244,6 +245,99 @@
                     CRMDDEmappingFields.Add("eqs_mobilenumber", Applicant_Data["eqs_mobilenumber"]?.ToString());
                 }
 
+                List<string> fields = new List<string>();
+                int haserror = 0;
+                if (CustIndvData.Address != null)
+                {
+                    foreach (var item in CustIndvData.Address)
+                    {
+                        if (string.IsNullOrEmpty(item.AddressType?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AddressType");
+                        }
+                        if (string.IsNullOrEmpty(item.AddressLine1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AddressLine1");
+                        }
+                        if (string.IsNullOrEmpty(item.PinCodeMaster?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("PinCodeMaster");
+                        }
+                        if (string.IsNullOrEmpty(item.CityId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CityId");
+                        }
+                        if (string.IsNullOrEmpty(item.StateId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("StateId");
+                        }
+                        if (string.IsNullOrEmpty(item.CountryId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CountryId");
+                        }
+                    }
+
+                }
+                if (CustIndvData.FATCA != null)
+                {
+                    if (string.IsNullOrEmpty(CustIndvData.FATCA?.OtherIdentificationNumber?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("OtherIdentificationNumber");
+                    }
+                    if (string.IsNullOrEmpty(CustIndvData.FATCA?.TaxIdentificationNumber?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("TaxIdentificationNumber");
+                    }
+                    if (string.IsNullOrEmpty(CustIndvData.FATCA?.AddressType?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("AddressType");
+                    }
+                    if (CustIndvData.FATCA?.Address != null)
+                    {
+
+                        if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA AddressLine1");
+                        }
+                        if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.PinCodeMaster?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA PinCodeMaster");
+                        }
+                        if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.CityId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA CityId");
+                        }
+                        if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.StateId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA StateId");
+                        }
+                        if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.CountryId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA CountryId");
+                        }
+                    }
+                }
+
+                if (haserror == 1)
+                {
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = string.Join(",", fields) + " fields should not be null!";
+                    return csRtPrm;
+                }
 
 
                 /*********** General *********/
@@ -1063,12 +1157,16 @@
                     CRMDDEmappingFields.Add("eqs_sourcebranchterritoryId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.SourceBranch?.ToString())})");
                     CRMDDEmappingFields.Add("eqs_preferredhomebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustCorpData.General.CustomerpreferredHomebranch?.ToString())})");
                     CRMDDEmappingFields.Add("eqs_isprimaryholder", Applicant_Data.eqs_isprimaryholder?.ToString());
-                    CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
+                    if (!string.IsNullOrEmpty(Applicant_Data["_eqs_titleid_value"]?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
+                    }
                     CRMDDEmappingFields.Add("eqs_companyname1", Applicant_Data["eqs_companynamepart1"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_companyname2", Applicant_Data["eqs_companynamepart2"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_companyname3", Applicant_Data["eqs_companynamepart3"]?.ToString());
                     string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
                     CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
+
 
                     if (!string.IsNullOrEmpty(Applicant_Data["eqs_dateofincorporation"]?.ToString()))
                     {
@@ -1083,7 +1181,98 @@
 
                 }
 
+                List<string> fields = new List<string>();
+                int haserror = 0;
+                if (CustCorpData.Address != null)
+                {
+                    foreach (var item in CustCorpData.Address)
+                    {
+                        if (string.IsNullOrEmpty(item.AddressType?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AddressType");
+                        }
+                        if (string.IsNullOrEmpty(item.AddressLine1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("AddressLine1");
+                        }
+                        if (string.IsNullOrEmpty(item.PinCodeMaster?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("PinCodeMaster");
+                        }
+                        if (string.IsNullOrEmpty(item.CityId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CityId");
+                        }
+                        if (string.IsNullOrEmpty(item.StateId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("StateId");
+                        }
+                        if (string.IsNullOrEmpty(item.CountryId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("CountryId");
+                        }
+                    }
+                }
+                if (CustCorpData.FATCA != null)
+                {
+                    if (string.IsNullOrEmpty(CustCorpData.FATCA?.OtherIdentificationNumber?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("OtherIdentificationNumber");
+                    }
+                    if (string.IsNullOrEmpty(CustCorpData.FATCA?.TaxIdentificationNumber?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("TaxIdentificationNumber");
+                    }
+                    if (string.IsNullOrEmpty(CustCorpData.FATCA?.AddressType?.ToString()))
+                    {
+                        haserror = 1;
+                        fields.Add("AddressType");
+                    }
+                    if (CustCorpData.FATCA?.Address != null)
+                    {
 
+                        if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine1?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA AddressLine1");
+                        }
+                        if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.PinCodeMaster?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA PinCodeMaster");
+                        }
+                        if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.CityId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA CityId");
+                        }
+                        if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.StateId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA StateId");
+                        }
+                        if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.CountryId?.ToString()))
+                        {
+                            haserror = 1;
+                            fields.Add("FATCA CountryId");
+                        }
+                    }
+                }
+
+                if (haserror == 1)
+                {
+                    csRtPrm.ReturnCode = "CRM-ERROR-102";
+                    csRtPrm.Message = string.Join(",", fields) + " fields should not be null!";
+                    return csRtPrm;
+                }
 
                 /*********** General *********/
                 if (CustCorpData.General != null)
@@ -1356,7 +1545,6 @@
                     var response = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
                 }
 
-
                 /*********** KYCVerification *********/
                 if (CustCorpData.KYCVerification != null)
                 {
@@ -1616,8 +1804,11 @@
                             var countryCodeId = await this._commonFunc.getContactData(CustCorpData.FATCA?.CustomerUCIC?.ToString());
 
                             CRMDDEmappingFields.Add("eqs_customerucic", CustCorpData.FATCA?.CustomerUCIC?.ToString());
-                            CRMDDEmappingFields.Add("eqs_customerlookup@odata.bind", $"contacts({countryCodeId[0]["contactid"]?.ToString()})");
-                            CRMDDEmappingFields.Add("eqs_customername", countryCodeId[0]["fullname"]?.ToString());
+                            if (countryCodeId.Count > 0)
+                            {
+                                CRMDDEmappingFields.Add("eqs_customerlookup@odata.bind", $"contacts({countryCodeId[0]["contactid"]?.ToString()})");
+                                CRMDDEmappingFields.Add("eqs_customername", countryCodeId[0]["fullname"]?.ToString());
+                            }
                         }
 
 

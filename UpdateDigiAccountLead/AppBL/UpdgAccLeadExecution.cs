@@ -154,7 +154,7 @@
                 int haserror = 0;
                 List<string> fields = new List<string>();
                 if (string.IsNullOrEmpty(_leadDetails[0]["eqs_ddefinalid"].ToString()))
-                {                    
+                {
                     if (string.IsNullOrEmpty(RequestData.General?.ApplicationDate?.ToString()))
                     {
                         haserror = 1;
@@ -197,7 +197,7 @@
                             }
                         }
                     }
-                    
+
                     if (string.IsNullOrEmpty(RequestData.General?.ModeofOperation?.ToString()))
                     {
                         haserror = 1;
@@ -225,7 +225,7 @@
                         fields.Add("DepositAmount");
                     }
 
-                    if (RequestData.FDRDDetails!=null)
+                    if (RequestData.FDRDDetails != null)
                     {
                         if (string.IsNullOrEmpty(RequestData.FDRDDetails?.DepositDetails?.SpecialInterestRateRequired?.ToString()))
                         {
@@ -253,16 +253,23 @@
                                 haserror = 1;
                                 fields.Add("DebitCardFlag");
                             }
-                            if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                            else
                             {
-                                haserror = 1;
-                                fields.Add("NameonCard");
+                                if (items["DebitCardFlag"].ToString().ToLower() == "yes")
+                                {
+                                    if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                                    {
+                                        haserror = 1;
+                                        fields.Add("NameonCard");
+                                    }
+                                    if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
+                                    {
+                                        haserror = 1;
+                                        fields.Add("DebitCardID");
+                                    }
+                                }
                             }
-                            if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
-                            {
-                                haserror = 1;
-                                fields.Add("DebitCardID");
-                            }
+
                             if (string.IsNullOrEmpty(items.SMS?.ToString()))
                             {
                                 haserror = 1;
@@ -388,9 +395,9 @@
                                 fields.Add("Guardian State");
                             }
                         }
-                        
+
                     }
-                    
+
 
                 }
                 else
@@ -459,7 +466,7 @@
                             haserror = 1;
                             fields.Add("LCCode");
                         }
-                    }                    
+                    }
 
                     if (RequestData.FDRDDetails != null)
                     {
@@ -473,7 +480,7 @@
                             haserror = 1;
                             fields.Add("WaivedOffTDS");
                         }
-                    }                   
+                    }
 
                     foreach (var items in RequestData.DirectBanking.Preferences)
                     {
@@ -492,16 +499,23 @@
                             haserror = 1;
                             fields.Add("DebitCardFlag");
                         }
-                        if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                        else
                         {
-                            haserror = 1;
-                            fields.Add("NameonCard");
+                            if (items["DebitCardFlag"].ToString().ToLower() == "yes")
+                            {
+                                if (string.IsNullOrEmpty(items.NameonCard?.ToString()))
+                                {
+                                    haserror = 1;
+                                    fields.Add("NameonCard");
+                                }
+                                if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
+                                {
+                                    haserror = 1;
+                                    fields.Add("DebitCardID");
+                                }
+                            }
                         }
-                        if (string.IsNullOrEmpty(items.DebitCardID?.ToString()))
-                        {
-                            haserror = 1;
-                            fields.Add("DebitCardID");
-                        }
+
                         if (string.IsNullOrEmpty(items.SMS?.ToString()))
                         {
                             haserror = 1;
@@ -536,7 +550,7 @@
 
                     if (RequestData.Nominee != null)
                     {
-                        
+
                         if (string.IsNullOrEmpty(RequestData.Nominee?.name?.ToString()))
                         {
                             haserror = 1;
@@ -631,7 +645,7 @@
 
                     }
                 }
-               
+
 
                 if (haserror == 1)
                 {
@@ -725,7 +739,12 @@
                 {
                     if (ddeData.General?.AccountNumber.ToString() != "")
                     {
-                        odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({await this._commonFunc.getAccountId(ddeData.General?.AccountNumber?.ToString())})");
+                        string Account = await this._commonFunc.getAccountId(ddeData.General?.AccountNumber?.ToString());
+                        if (!string.IsNullOrEmpty(Account))
+                        {
+                            odatab.Add("eqs_AccountNumber@odata.bind", $"eqs_accounts({Account})");
+                        }
+
                     }
                     if (!string.IsNullOrEmpty(ddeData.General?.ApplicationDate?.ToString()))
                     {
@@ -1233,7 +1252,11 @@
 
                 if (!string.IsNullOrEmpty(item["UCIC"].ToString()))
                 {
-                    inputItem.Add("eqs_applicantid@odata.bind", $"eqs_accountapplicants({await this._commonFunc.getApplicentID(item["UCIC"].ToString())})");
+                    string Applicent_ID = await this._commonFunc.getApplicentID(item["UCIC"].ToString());
+                    if (!string.IsNullOrEmpty(Applicent_ID))
+                    {
+                        inputItem.Add("eqs_applicantid@odata.bind", $"eqs_accountapplicants({Applicent_ID})");
+                    }
                 }
                 if (!string.IsNullOrEmpty(item["DebitCardFlag"].ToString()))
                 {
@@ -1304,7 +1327,12 @@
 
                 odatab.Add("eqs_nomineename", ddeNominee?.name?.ToString());
                 odatab.Add("eqs_nomineedob", ddeNominee?.DOB?.ToString());
-                odatab.Add("eqs_nomineerelationshipwithaccountholder@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee?.NomineeRelationship?.ToString())})");
+                string nominRel = await this._commonFunc.getRelationShipId(ddeNominee?.NomineeRelationship?.ToString());
+                if (!string.IsNullOrEmpty(nominRel))
+                {
+                    odatab.Add("eqs_nomineerelationshipwithaccountholder@odata.bind", $"eqs_relationships({nominRel})");
+                }
+
                 //odatab.Add("eqs_nomineeage", ddeNominee?.age?.ToString());
                 odatab.Add("eqs_nomineeucic", ddeNominee?.nomineeUCICIfCustomer?.ToString());
                 odatab.Add("eqs_nomineedisplayname", ddeNominee?.NomineeDisplayName?.ToString());
@@ -1323,9 +1351,22 @@
 
                 odatab.Add("eqs_leadaccountddeid@odata.bind", $"eqs_ddeaccounts({this.DDEId})");
 
-                odatab.Add("eqs_city@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee?.CityCode?.ToString())})");
-                odatab.Add("eqs_state@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee?.State?.ToString())})");
-                odatab.Add("eqs_country@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee?.CountryCode?.ToString())})");
+                string cityC = await this._commonFunc.getCityId(ddeNominee?.CityCode?.ToString());
+                if (!string.IsNullOrEmpty(cityC))
+                {
+                    odatab.Add("eqs_city@odata.bind", $"eqs_cities({cityC})");
+                }
+                string stateC = await this._commonFunc.getStateId(ddeNominee?.State?.ToString());
+                if (!string.IsNullOrEmpty(stateC))
+                {
+                    odatab.Add("eqs_state@odata.bind", $"eqs_states({stateC})");
+                }
+                string CountryC = await this._commonFunc.getCuntryId(ddeNominee?.CountryCode?.ToString());
+                if (!string.IsNullOrEmpty(CountryC))
+                {
+                    odatab.Add("eqs_country@odata.bind", $"eqs_countries({CountryC})");
+                }
+
 
                 if (ddeNominee?.Guardian?.Name != null)
                 {
@@ -1341,10 +1382,29 @@
                     odatab.Add("eqs_guardianpobox", ddeNominee?.Guardian?.GuardianPO?.ToString());
                     odatab.Add("eqs_guardianlandmark", ddeNominee?.Guardian?.GuardianLandmark?.ToString());
 
-                    odatab.Add("eqs_guardianrelationshiptominor@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationShipId(ddeNominee?.Guardian?.RelationshipToMinor?.ToString())})");
-                    odatab.Add("eqs_guardiancity@odata.bind", $"eqs_cities({await this._commonFunc.getCityId(ddeNominee?.Guardian?.GuardianCityCode?.ToString())})");
-                    odatab.Add("eqs_guardiancountry@odata.bind", $"eqs_countries({await this._commonFunc.getCuntryId(ddeNominee?.Guardian?.GuardianCountryCode?.ToString())})");
-                    odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({await this._commonFunc.getStateId(ddeNominee?.Guardian?.GuardianState?.ToString())})");
+                    string Grelation = await this._commonFunc.getRelationShipId(ddeNominee?.Guardian?.RelationshipToMinor?.ToString());
+                    if (!string.IsNullOrEmpty(Grelation))
+                    {
+                        odatab.Add("eqs_guardianrelationshiptominor@odata.bind", $"eqs_relationships({Grelation})");
+                    }
+                    string GcityC = await this._commonFunc.getCityId(ddeNominee?.Guardian?.GuardianCityCode?.ToString());
+                    if (!string.IsNullOrEmpty(GcityC))
+                    {
+                        odatab.Add("eqs_guardiancity@odata.bind", $"eqs_cities({GcityC})");
+                    }
+                    string GCuntryC = await this._commonFunc.getCuntryId(ddeNominee?.Guardian?.GuardianCountryCode?.ToString());
+                    if (!string.IsNullOrEmpty(GCuntryC))
+                    {
+                        odatab.Add("eqs_guardiancountry@odata.bind", $"eqs_countries({GCuntryC})");
+                    }
+                    string GStateC = await this._commonFunc.getStateId(ddeNominee?.Guardian?.GuardianState?.ToString());
+                    if (!string.IsNullOrEmpty(GStateC))
+                    {
+                        odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({GStateC})");
+                    }
+
+
+
                 }
 
 
