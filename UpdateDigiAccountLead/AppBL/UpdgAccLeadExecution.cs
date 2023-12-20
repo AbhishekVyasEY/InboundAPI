@@ -1238,7 +1238,11 @@
 
                 if (!string.IsNullOrEmpty(item["UCIC"].ToString()))
                 {
-                    inputItem.Add("eqs_applicantid@odata.bind", $"eqs_accountapplicants({await this._commonFunc.getApplicentID(item["UCIC"].ToString())})");
+                    string Applicent_ID = await this._commonFunc.getApplicentID(item["UCIC"].ToString());
+                    if (!string.IsNullOrEmpty(Applicent_ID))
+                    {
+                        inputItem.Add("eqs_applicantid@odata.bind", $"eqs_accountapplicants({Applicent_ID})");
+                    }                    
                 }
                 if (!string.IsNullOrEmpty(item["DebitCardFlag"].ToString()))
                 {
@@ -1346,7 +1350,7 @@
                 string CountryC = await this._commonFunc.getCuntryId(ddeNominee?.CountryCode?.ToString());
                 if (!string.IsNullOrEmpty(CountryC))
                 {
-                    odatab.Add("eqs_country@odata.bind", $"eqs_countries({})");
+                    odatab.Add("eqs_country@odata.bind", $"eqs_countries({CountryC})");
                 }
                    
 
@@ -1476,4 +1480,3 @@
 
     }
 }
-GcityC

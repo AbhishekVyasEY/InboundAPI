@@ -28,7 +28,7 @@ namespace CustomerLead
         public string Companynamepart1 { get; set; }
         public string Companynamepart2 { get; set; }
         public string Companynamepart3 { get; set; }
-        public string pan { get; set; }
+        public string TAN { get; set; }
 
     }
 
