@@ -31,12 +31,19 @@ namespace UpdateAccountLead
     }
     
     public class UpAccountLeadReturn
-    {        
+    {
+        public List<Preference> Preferences { get; set; }
         public string ReturnCode { get; set; } 
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
 
+    }
+
+    public class Preference
+    {
+        public string PreferenceID { get; set; }
+        public string UCIC { get; set; }
     }
 
     public class AccountApplicant

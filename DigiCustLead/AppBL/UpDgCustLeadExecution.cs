@@ -282,7 +282,7 @@
                             fields.Add("CountryId");
                         }
                     }
-                    
+
                 }
                 if (CustIndvData.FATCA != null)
                 {
@@ -303,7 +303,7 @@
                     }
                     if (CustIndvData.FATCA?.Address != null)
                     {
-                        
+
                         if (string.IsNullOrEmpty(CustIndvData.FATCA?.Address?.AddressLine1?.ToString()))
                         {
                             haserror = 1;
@@ -1160,12 +1160,13 @@
                     if (!string.IsNullOrEmpty(Applicant_Data["_eqs_titleid_value"]?.ToString()))
                     {
                         CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
-                    }                    
+                    }
                     CRMDDEmappingFields.Add("eqs_companyname1", Applicant_Data["eqs_companynamepart1"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_companyname2", Applicant_Data["eqs_companynamepart2"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_companyname3", Applicant_Data["eqs_companynamepart3"]?.ToString());
                     string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
                     CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
+
 
                     if (!string.IsNullOrEmpty(Applicant_Data["eqs_dateofincorporation"]?.ToString()))
                     {
@@ -1237,7 +1238,7 @@
                     }
                     if (CustCorpData.FATCA?.Address != null)
                     {
-                        
+
                         if (string.IsNullOrEmpty(CustCorpData.FATCA?.Address?.AddressLine1?.ToString()))
                         {
                             haserror = 1;
@@ -1543,12 +1544,6 @@
                 {
                     var response = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
                 }
-                if (!string.IsNullOrEmpty(this.DDEId))
-                {
-                    CRMDDEupdateTriggerFields.Add("eqs_triggervalidation", true);
-                    postDataParametr = JsonConvert.SerializeObject(CRMDDEupdateTriggerFields);
-                    var response = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
-                }
 
                 /*********** KYCVerification *********/
                 if (CustCorpData.KYCVerification != null)
@@ -1809,11 +1804,11 @@
                             var countryCodeId = await this._commonFunc.getContactData(CustCorpData.FATCA?.CustomerUCIC?.ToString());
 
                             CRMDDEmappingFields.Add("eqs_customerucic", CustCorpData.FATCA?.CustomerUCIC?.ToString());
-                            if(countryCodeId.Count > 0)
+                            if (countryCodeId.Count > 0)
                             {
                                 CRMDDEmappingFields.Add("eqs_customerlookup@odata.bind", $"contacts({countryCodeId[0]["contactid"]?.ToString()})");
                                 CRMDDEmappingFields.Add("eqs_customername", countryCodeId[0]["fullname"]?.ToString());
-                            }                            
+                            }
                         }
 
 
@@ -2127,7 +2122,12 @@
                 csRtPrm.BOID = BO_Id;
                 csRtPrm.CPID = CP_Id;
 
-                
+                if (!string.IsNullOrEmpty(this.DDEId))
+                {
+                    CRMDDEupdateTriggerFields.Add("eqs_triggervalidation", true);
+                    postDataParametr = JsonConvert.SerializeObject(CRMDDEupdateTriggerFields);
+                    var response = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({this.DDEId})?", HttpMethod.Patch, postDataParametr);
+                }
 
                 csRtPrm.Message = OutputMSG.Case_Success;
                 csRtPrm.ReturnCode = "CRM-SUCCESS";
