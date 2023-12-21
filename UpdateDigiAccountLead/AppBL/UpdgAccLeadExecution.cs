@@ -17,6 +17,7 @@
     using System.Security.Cryptography.Xml;
     using Azure;
     using Microsoft.VisualBasic;
+    using System.Text;
 
     public class UpdgAccLeadExecution : IUpdgAccLeadExecution
     {
@@ -73,7 +74,7 @@
         private LeadAccount _accountLead;
         private LeadDetails _leadParam;
         private List<AccountApplicant> _accountApplicants;
-
+        private List<Preference> Preferences;
 
 
         private ICommonFunction _commonFunc;
@@ -486,11 +487,11 @@
                     {
                         foreach (var items in RequestData.DirectBanking.Preferences)
                         {
-                            if (string.IsNullOrEmpty(items.PreferenceID?.ToString()))
-                            {
-                                haserror = 1;
-                                fields.Add("PreferenceID");
-                            }
+                            //if (string.IsNullOrEmpty(items.PreferenceID?.ToString()))
+                            //{
+                            //    haserror = 1;
+                            //    fields.Add("PreferenceID");
+                            //}
                             if (string.IsNullOrEmpty(items.UCIC?.ToString()))
                             {
                                 haserror = 1;
@@ -658,7 +659,7 @@
                     return accountLeadReturn;
                 }
 
-                List<string> Preferences;
+                
                 string errorMessage = await SetLeadAccountDDE(_leadDetails, RequestData);
                 if (string.IsNullOrEmpty(errorMessage))
                 {
@@ -670,15 +671,25 @@
 
                     if (RequestData.DirectBanking?.Preferences != null && RequestData.DirectBanking?.Preferences.Count > 0)
                     {
-                        Preferences = await SetPreferencesDDE(RequestData.DirectBanking?.Preferences);
+                        string preferenceValidation = await SetPreferencesDDE(RequestData.DirectBanking?.Preferences);
+                        if (string.IsNullOrEmpty(preferenceValidation))
+                        {
+                            accountLeadReturn.Preferences = Preferences;
+                        }
+                        else
+                        {
+                            accountLeadReturn.Preferences = Preferences;
+                            accountLeadReturn.ReturnCode = "CRM-ERROR-102";
+                            accountLeadReturn.Message = preferenceValidation;
+                            return accountLeadReturn;
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(RequestData.Nominee?.ToString()))
                     {
                         await SetNomineeDDE(RequestData.Nominee);
                     }
-
-
+                    
                     accountLeadReturn.ReturnCode = "CRM-SUCCESS";
                     accountLeadReturn.Message = OutputMSG.Case_Success;
 
@@ -1240,28 +1251,43 @@
             }
         }
 
-        private async Task<List<string>> SetPreferencesDDE(dynamic preferenceData)
+        private async Task<string> SetPreferencesDDE(dynamic preferenceData)
         {
-            List<string> PreferenceIds = new List<string>();
+            Preferences = new List<Preference>();
+            StringBuilder error = new StringBuilder();
             foreach (var item in preferenceData)
             {
-                string PreferenceID = "";
+                string preferenceGUID = string.Empty, ucic = string.Empty, preferenceID = string.Empty;
+                bool process = true;
                 Dictionary<string, string> inputItem = new Dictionary<string, string>();
                 if (!string.IsNullOrEmpty(item["PreferenceID"].ToString()))
                 {
-                    PreferenceID = this._commonFunc.getPreferenceID(item["PreferenceID"].ToString(), this.DDEId);
-                    PreferenceIds.Add(PreferenceID);
+                    preferenceID = item["PreferenceID"].ToString();
+                    preferenceGUID = await this._commonFunc.getPreferenceID(preferenceID, this.DDEId);
+                    if (string.IsNullOrEmpty(preferenceGUID))
+                    {
+                        error.Append("Invalid PreferenceID '" + preferenceID + "', ");
+                        process = false;
+                    }
                 }
                 inputItem.Add("eqs_leadaccountdde@odata.bind", $"eqs_ddeaccounts({this.DDEId})");
 
                 if (!string.IsNullOrEmpty(item["UCIC"].ToString()))
                 {
-                    string Applicent_ID = await this._commonFunc.getApplicentID(item["UCIC"].ToString());
+                    ucic = item["UCIC"].ToString();
+                    string Applicent_ID = await this._commonFunc.getApplicentID(ucic);
                     if (!string.IsNullOrEmpty(Applicent_ID))
-                    {
                         inputItem.Add("eqs_applicantid@odata.bind", $"eqs_accountapplicants({Applicent_ID})");
+                    else
+                    {
+                        error.Append("Invalid UCIC '" + ucic + "', ");
+                        process = false;
                     }
                 }
+
+                if (!process)
+                    continue;
+
                 if (!string.IsNullOrEmpty(item["DebitCardFlag"].ToString()))
                 {
                     inputItem.Add("eqs_debitcardflag", (item["DebitCardFlag"].ToString() == "Yes") ? "true" : "false");
@@ -1295,29 +1321,31 @@
                     inputItem.Add("eqs_internationaldclimitact", item["InternationalDCLimitAct"].ToString());
                 }
 
-
-
                 string postDataParametr = JsonConvert.SerializeObject(inputItem);
 
-                if (string.IsNullOrEmpty(PreferenceID))
+                if (string.IsNullOrEmpty(preferenceID))
                 {
                     var resp = await this._queryParser.HttpApiCall("eqs_customerpreferences()?$select=eqs_preferenceid", HttpMethod.Post, postDataParametr);
                     if (resp[0]["responsecode"].ToString() == "400")
                     {
                         this._logger.LogError("SetPreferencesDDE", JsonConvert.SerializeObject(resp), postDataParametr);
                     }
-                    var Preference_data = CommonFunction.GetIdFromPostRespons201(resp[0]["responsebody"], "eqs_preferenceid");
-                    PreferenceIds.Add(Preference_data);
+                    preferenceID = CommonFunction.GetIdFromPostRespons201(resp[0]["responsebody"], "eqs_preferenceid");
                 }
                 else
                 {
-                    await this._queryParser.HttpApiCall($"eqs_customerpreferences({PreferenceID})", HttpMethod.Patch, postDataParametr);
+                    await this._queryParser.HttpApiCall($"eqs_customerpreferences({preferenceGUID})", HttpMethod.Patch, postDataParametr);
                 }
 
-
+                Preferences.Add(new Preference() { PreferenceID = preferenceID, UCIC = ucic });
             }
 
-            return PreferenceIds;
+            if (!string.IsNullOrEmpty(error.ToString()))
+            {
+                return error.ToString().Trim().Trim(',');
+            }
+
+            return string.Empty;
         }
 
 
