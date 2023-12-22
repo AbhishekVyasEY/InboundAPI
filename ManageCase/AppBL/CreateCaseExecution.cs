@@ -380,7 +380,7 @@ namespace ManageCase
                 }
 
                 //UCIC
-                csProperty.eqs_customerid = CaseData.UCIC.ToString();
+                csProperty.eqs_customerid = CaseData.UCIC?.ToString();
                 odatab.Add("eqs_customercode", csProperty.eqs_customerid);
                 csProperty.customerid = await this._commonFunc.getCustomerId(csProperty.eqs_customerid);
                 if (!string.IsNullOrEmpty(csProperty.customerid))
@@ -396,10 +396,10 @@ namespace ManageCase
                     return csRtPrm;
                 }
                 
-                case_Property.eqs_casetype = this.CaseType[CaseData.CaseType.ToString()];
-                case_Property.title = CaseData.Subject.ToString();
+                case_Property.eqs_casetype = this.CaseType[CaseData.CaseType?.ToString()];
+                case_Property.title = CaseData.Subject?.ToString();
 
-                csProperty.CategoryId = await this._commonFunc.getCategoryId(CaseData.Category.ToString());
+                csProperty.CategoryId = await this._commonFunc.getCategoryId(CaseData.Category?.ToString());
                 if (csProperty.CategoryId != null && csProperty.CategoryId.Length > 4)
                 {
                     odatab.Add("ccs_category@odata.bind", $"ccs_categories({csProperty.CategoryId})");
@@ -425,15 +425,15 @@ namespace ManageCase
                     return csRtPrm;
                 }
 
-                if (!string.IsNullOrEmpty(CaseData.Priority.ToString()))
+                if (!string.IsNullOrEmpty(CaseData.Priority?.ToString()))
                 {
                     case_Property.eqs_casepriority = await this._queryParser.getOptionSetTextToValue("incident", "eqs_casepriority", CaseData.Priority.ToString());
                 }
-                if (!string.IsNullOrEmpty(CaseData.Description.ToString()))
+                if (!string.IsNullOrEmpty(CaseData.Description?.ToString()))
                 {
                     case_Property.description = CaseData.Description.ToString();
                 }               
-                if (!string.IsNullOrEmpty(CaseData.AccountNumber.ToString()))
+                if (!string.IsNullOrEmpty(CaseData.AccountNumber?.ToString()))
                 {
                     csProperty.Accountid = await this._commonFunc.getAccountId(CaseData.AccountNumber.ToString());
                     if (csProperty.Accountid != null && csProperty.Accountid.Length > 4)
@@ -448,7 +448,7 @@ namespace ManageCase
                             return csRtPrm;
                     }
                 }
-                if (!string.IsNullOrEmpty(CaseData.Classification.ToString()))
+                if (!string.IsNullOrEmpty(CaseData.Classification?.ToString()))
                 {
                     csProperty.ccs_classification = await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
                     if (csProperty.ccs_classification.Length > 4)
@@ -457,7 +457,7 @@ namespace ManageCase
                     }
                 }
 
-                if (csProperty.SubCategoryId == "" || csProperty.SubCategoryId.Length < 4)
+                if (csProperty.SubCategoryId == "" || csProperty.SubCategoryId?.Length < 4)
                 {
                     this._logger.LogInformation("CreateCase", "SubCategoryId not found.");
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
@@ -527,7 +527,7 @@ namespace ManageCase
                     }
                 }                             
                 
-                if (!string.IsNullOrEmpty(CaseData.AdditionalField.ToString()))
+                if (!string.IsNullOrEmpty(CaseData.AdditionalField?.ToString()))
                 {
                     odatab.Add("eqs_casepayload", JsonConvert.SerializeObject(CaseData.AdditionalField));
                 }
@@ -538,8 +538,11 @@ namespace ManageCase
                 postDataParametr1 = JsonConvert.SerializeObject(odatab);
 
                 postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
-                postDataParametr1 = JsonConvert.SerializeObject(odatab1);
-                postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+                if (odatab1 != null && odatab1.Count >0)
+                {
+                    postDataParametr1 = JsonConvert.SerializeObject(odatab1);
+                    postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+                }
 
                 case_details = await this._queryParser.HttpApiCall("incidents?$select=ticketnumber", HttpMethod.Post, postDataParametr);
 

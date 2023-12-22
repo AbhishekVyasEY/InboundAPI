@@ -218,7 +218,7 @@
 
             if (ProductId != "")
             {
-                var appitem = _accountApplicants.Where(x => x.UCIC == _leadParam.eqs_ucic).FirstOrDefault();
+                var appitem = _accountApplicants.Where(x => x.UCIC == _leadParam.eqs_ucic)?.FirstOrDefault();
 
                 string BranchId = await this._commonFunc.getBranchId(_accountLead.sourceBranch);
                 if (BranchId != null && BranchId != "")
@@ -251,7 +251,7 @@
                     odatab.Add("eqs_gendercode", appitem.gender);
 
                 odatab.Add("eqs_createdfromonline", "true");
-                if (!string.IsNullOrEmpty(_accountLead.leadsource.ToString()))
+                if (!string.IsNullOrEmpty(_accountLead.leadsource?.ToString()))
                 {
                     odatab.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({await this._commonFunc.getLeadSourceId(_accountLead.leadsource)})");
                 }
@@ -324,11 +324,11 @@
             {
                 odatab.Add("eqs_branchid@odata.bind", $"eqs_branchs({_leadParam.branchid})");
             }
-            if (!string.IsNullOrEmpty(_accountLead.accountOpeningFlow.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.accountOpeningFlow?.ToString()))
             {
                 odatab.Add("eqs_instakitoptioncode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_instakitoptioncode", _accountLead.accountOpeningFlow.ToString()));
             }
-            if (!string.IsNullOrEmpty(_accountLead.initialDepositType.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.initialDepositType?.ToString()))
             {
                 odatab.Add("eqs_initialdepositmodecode", await this._queryParser.getOptionSetTextToValue("eqs_leadaccount", "eqs_initialdepositmodecode", _accountLead.initialDepositType.ToString()));
             }
@@ -363,30 +363,30 @@
             {
                 odatab.Add("eqs_fdvaluedate", _accountLead.fdAccOpeningDate);
             }
-            if (!string.IsNullOrEmpty(_accountLead.sweepFacility.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.sweepFacility?.ToString()))
             {
-                odatab.Add("eqs_sweepfacility", _accountLead.sweepFacility.ToString().ToLower());
+                odatab.Add("eqs_sweepfacility", _accountLead.sweepFacility?.ToString()?.ToLower());
             }
                        
 
-            if (!string.IsNullOrEmpty(_accountLead.tenureInMonths.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.tenureInMonths?.ToString()))
             {
                 odatab.Add("eqs_tenureinmonths", _accountLead.tenureInMonths);
             }
-            if (!string.IsNullOrEmpty(_accountLead.tenureInDays.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.tenureInDays?.ToString()))
             {
                 odatab.Add("eqs_tenureindays", _accountLead.tenureInDays);
             }
 
             string postDataParametr = JsonConvert.SerializeObject(odatab);
 
-            if (!string.IsNullOrEmpty(_accountLead.rateOfInterest.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.rateOfInterest?.ToString()))
             {
-                odatab1.Add("eqs_rateofinterest", Convert.ToDouble(_accountLead.rateOfInterest.ToString()));
+                odatab1.Add("eqs_rateofinterest", Convert.ToDouble(_accountLead.rateOfInterest?.ToString()));
             }
-            if (!string.IsNullOrEmpty(_accountLead.depositAmount.ToString()))
+            if (!string.IsNullOrEmpty(_accountLead.depositAmount?.ToString()))
             {
-                odatab1.Add("eqs_depositamount", Convert.ToDouble(_accountLead.depositAmount.ToString()));
+                odatab1.Add("eqs_depositamount", Convert.ToDouble(_accountLead.depositAmount?.ToString()));
             }
 
             string postDataParametr1 = JsonConvert.SerializeObject(odatab1);
@@ -605,7 +605,7 @@
         {
             int ValidationError = 0;
             List<string> errorText = new List<string>();
-            if (string.IsNullOrEmpty(AccountData.accountType.ToString()))
+            if (string.IsNullOrEmpty(AccountData.accountType?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("AccountType");
@@ -615,17 +615,17 @@
                 _accountLead.accountType = AccountData.accountType.ToString();
             }
 
-            if (string.IsNullOrEmpty(AccountData.leadsource.ToString()))
+            if (string.IsNullOrEmpty(AccountData.leadsource?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("Leadsource");
             }
             else
             {
-                _accountLead.leadsource = AccountData.leadsource.ToString();
+                _accountLead.leadsource = AccountData.leadsource?.ToString();
             }
 
-            if (string.IsNullOrEmpty(AccountData.productCode.ToString()))
+            if (string.IsNullOrEmpty(AccountData.productCode?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("ProductCode");
@@ -635,7 +635,7 @@
                 _accountLead.productCode = AccountData.productCode.ToString();
             }
 
-            if (string.IsNullOrEmpty(AccountData.sourceBranch.ToString()))
+            if (string.IsNullOrEmpty(AccountData.sourceBranch?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("SourceBranch");
@@ -645,7 +645,7 @@
                 _accountLead.sourceBranch = AccountData.sourceBranch.ToString();
             }
             
-            if (string.IsNullOrEmpty(AccountData.accountOpeningFlow.ToString()))
+            if (string.IsNullOrEmpty(AccountData.accountOpeningFlow?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("AccountOpeningFlow");
@@ -655,7 +655,7 @@
                 _accountLead.accountOpeningFlow = AccountData.accountOpeningFlow.ToString();
             }
 
-            if (string.IsNullOrEmpty(AccountData.depositAmount.ToString()))
+            if (string.IsNullOrEmpty(AccountData.depositAmount?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("DepositAmount");
@@ -665,7 +665,7 @@
                 _accountLead.depositAmount = AccountData.depositAmount.ToString();
             }
 
-            if (string.IsNullOrEmpty(AccountData.initialDepositType.ToString()))
+            if (string.IsNullOrEmpty(AccountData.initialDepositType?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("InitialDepositType");
@@ -675,7 +675,7 @@
                 _accountLead.initialDepositType = AccountData.initialDepositType;
             }
 
-            if (string.IsNullOrEmpty(AccountData.InitialDeposit.ToString()))
+            if (string.IsNullOrEmpty(AccountData.InitialDeposit?.ToString()))
             {
                 ValidationError = 1;
                 errorText.Add("InitialDeposit");
@@ -694,7 +694,7 @@
             if (_accountLead.productCategory == "PCAT04" || _accountLead.productCategory == "PCAT05")
             {
 
-                if (string.IsNullOrEmpty(AccountData.tenureInMonths.ToString()))
+                if (string.IsNullOrEmpty(AccountData.tenureInMonths?.ToString()))
                 {
                     ValidationError = 1;
                     errorText.Add("TenureInMonths");
@@ -704,7 +704,7 @@
                     _accountLead.tenureInMonths = AccountData.tenureInMonths;
                 }
 
-                if (string.IsNullOrEmpty(AccountData.tenureInDays.ToString()))
+                if (string.IsNullOrEmpty(AccountData.tenureInDays?.ToString()))
                 {
                     ValidationError = 1;
                     errorText.Add("TenureInDays");
@@ -750,7 +750,7 @@
                     {
                        
                         AccountApplicant accountApplicant = new AccountApplicant();
-                        if (string.IsNullOrEmpty(item.UCIC.ToString()))
+                        if (string.IsNullOrEmpty(item.UCIC?.ToString()))
                         {
                             ValidationError = 1;
                             errorText.Add("UCIC");
@@ -760,7 +760,7 @@
                             accountApplicant.UCIC = item.UCIC.ToString();
                         }
 
-                        if (string.IsNullOrEmpty(item.customerAccountRelation.ToString()))
+                        if (string.IsNullOrEmpty(item.customerAccountRelation?.ToString()))
                         {
                             ValidationError = 1;
                             errorText.Add("CustomerAccountRelation");
@@ -770,7 +770,7 @@
                             accountApplicant.customerAccountRelation = item.customerAccountRelation;
                         }
 
-                        if (string.IsNullOrEmpty(item.isPrimaryHolder.ToString()))
+                        if (string.IsNullOrEmpty(item.isPrimaryHolder?.ToString()))
                         {
                             ValidationError = 1;
                             errorText.Add("isPrimaryHolder");
@@ -781,7 +781,7 @@
                         }
 
                         
-                        if (item.isPrimaryHolder.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder.ToString()))
+                        if (item.isPrimaryHolder?.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder?.ToString()))
                         {
 
                             ValidationError = 1;
