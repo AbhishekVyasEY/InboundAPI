@@ -40,6 +40,16 @@ namespace ManageCase
 
     }
 
+    public class UpdateCaseReturnParam
+    {
+        public string ReturnCode { get; set; }
+        public string CaseID { get; set; }
+        public string Message { get; set; }
+        public string ExecutionTime { get; set; }
+        public string TransactionID { get; set; }
+
+    }
+
     public class CaseStatusRtParam
     {
         public string CaseID { get; set; }

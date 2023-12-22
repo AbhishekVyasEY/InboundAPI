@@ -5,7 +5,7 @@ namespace DigiDocument
     public interface ICommonFunction
     {      
         public Task<string> getDocCategoryId(string product_Cat_Id);
-        public Task<string> getDocSubentityId(string subentity_Id);
+        public Task<string> getDocSubentityId(string subentity_Id, string Cat_code);
         public Task<string> getDocTypeId(string docsubcategory);
         public Task<string> getSystemuserId(string system_user);
         public Task<string> getLeadId(string leadid);

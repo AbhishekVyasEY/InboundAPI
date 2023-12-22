@@ -16,6 +16,7 @@
     using System;
     using System.Reflection.Metadata;
     using Microsoft.Identity.Client;
+    using Microsoft.Azure.KeyVault.Models;
 
     public class DgDocDtlExecution : IDgDocDtlExecution
     {
@@ -219,22 +220,45 @@
             DocUpdateStatus createDocument = new DocUpdateStatus();
             try
             {
+                int error = 0;
+                List<string> errorT = new List<string>();
                 string catId = await this._commonFunc.getDocCategoryId(documentdtl.CategoryCode.ToString());
                 if (!string.IsNullOrEmpty(catId))
                 {
                     odatab.Add("eqs_doccategory@odata.bind", $"eqs_doccategories({catId})");
                 }
-                string subcatId = await this._commonFunc.getDocSubentityId(documentdtl.SubcategoryCode.ToString());
+                else
+                {
+                    error = 1;
+                    errorT.Add("Category");
+                }
+                string subcatId = await this._commonFunc.getDocSubentityId(documentdtl.SubcategoryCode.ToString(), documentdtl.CategoryCode.ToString());
                 if (!string.IsNullOrEmpty(subcatId))
                 {
                     odatab.Add("eqs_docsubcategory@odata.bind", $"eqs_docsubcategories({subcatId})");
+                }
+                else
+                {
+                    error = 1;
+                    errorT.Add("Sub-Category");
                 }
                 string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString());
                 if (!string.IsNullOrEmpty(doctype))
                 {
                     odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
                 }
+                else
+                {
+                    error = 1;
+                    errorT.Add("Doctype");
+                }
 
+                if (error==1)
+                {
+                    createDocument.ErrorMessage = string.Join(",", errorT) + " not found in CRM!";
+                    createDocument.Status = "CRM-ERROR-102";
+                    return createDocument;
+                }
 
                 odatab.Add("eqs_dmsrequestid", documentdtl.DmsDocumentID.ToString());
                 odatab.Add("eqs_issuedat", documentdtl.IssuedAt.ToString());
@@ -322,6 +346,8 @@
         {
             try
             {
+                int error = 0;
+                List<string> errorT = new List<string>();
                 DocUpdateStatus updateDocument = new DocUpdateStatus();
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
                 string DocumentID = await this._commonFunc.getDocumentID(documentdtl.CRMDocumentID.ToString());
@@ -332,15 +358,39 @@
                     {
                         odatab.Add("eqs_doccategory@odata.bind", $"eqs_doccategories({catId})");
                     }
-                    string subcatId = await this._commonFunc.getDocSubentityId(documentdtl.SubcategoryCode.ToString());
+                    else
+                    {
+                        error = 1;
+                        errorT.Add("Category");
+                    }
+
+                    string subcatId = await this._commonFunc.getDocSubentityId(documentdtl.SubcategoryCode.ToString(), documentdtl.CategoryCode.ToString());
                     if (!string.IsNullOrEmpty(subcatId))
                     {
                         odatab.Add("eqs_docsubcategory@odata.bind", $"eqs_docsubcategories({subcatId})");
                     }
+                    else
+                    {
+                        error = 1;
+                        errorT.Add("Sub-Category");
+                    }
+
                     string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString());
                     if (!string.IsNullOrEmpty(doctype))
                     {
                         odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
+                    }
+                    else
+                    {
+                        error = 1;
+                        errorT.Add("Doctype");
+                    }
+
+                    if (error == 1)
+                    {
+                        updateDocument.ErrorMessage = string.Join(",", errorT) + " not found in CRM!";
+                        updateDocument.Status = "CRM-ERROR-102";
+                        return updateDocument;
                     }
 
 
