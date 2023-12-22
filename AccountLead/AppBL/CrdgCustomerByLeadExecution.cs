@@ -210,11 +210,15 @@
                             msgBdy.individualCustomer.address.country = "IN";
                         }
 
+                        DateTime dob = Convert.ToDateTime(AccountDDE[0]["eqs_dob"]);
+                        string yyyy = dob.Year.ToString().PadLeft(4, '0');
+                        string mm = dob.Month.ToString().PadLeft(2, '0');
+                        string dd = dob.Day.ToString().PadLeft(2, '0');
 
-                        string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 2);
-                        string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(3, 2);
-                        string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(6, 4);
-                        msgBdy.individualCustomer.dateOfBirthOrRegistration = yy + mm + dd;
+                        //string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 2);
+                        //string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(3, 2);
+                        //string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(6, 4);
+                        msgBdy.individualCustomer.dateOfBirthOrRegistration = yyyy + mm + dd;
                         msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
                         msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
 
