@@ -450,6 +450,10 @@
         {
             return await this.getIDfromMSDTable("eqs_leadsources", "eqs_name", "eqs_leadsourceid", leadsourceid);
         }
+        public async Task<string> getLeadsourceId(string leadsourceid)
+        {
+            return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_leadsourceidvalue",  leadsourceid);
+        }
         public async Task<string> getSystemuserName(string systemuserid)
         {
             return await this.getIDfromMSDTable("systemusers", "fullname", "systemuserid", systemuserid);

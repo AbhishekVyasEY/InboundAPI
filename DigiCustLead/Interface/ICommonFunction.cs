@@ -65,6 +65,7 @@ namespace DigiCustLead
         public Task<string> getCustomerText(string customerId);
         public Task<string> getAccountapplicantName(string AccountapplicantId);
         public Task<string> getLeadsourceName(string leadsourceid);
+        public Task<string> getLeadsourceId(string leadsourcename);
         public Task<string> getSystemuserName(string systemuserid);
         public Task<string> getBankName(string bankid);
         public Task<JArray> getDDEFinalDocumentDetail(string DDEId, string type);

@@ -242,7 +242,7 @@
 
         public async Task<CreateCustLeadReturn> createDigiCustLeadIndv(dynamic CustLeadData)
         {
-            string Applicent_ID = "", Lead_Id = "", Pan_Number = "";
+            string Applicent_ID = "", Lead_Id = "", Pan_Number = "", leadSourceId = "";
             CreateCustLeadReturn csRtPrm = new CreateCustLeadReturn();
             CustLeadElement custLeadElement = new CustLeadElement();
             Dictionary<string, string> CRMLeadmappingFields = new Dictionary<string, string>();
@@ -250,7 +250,7 @@
             try
             {
                 var productDetails = await this._commonFunc.getProductId(CustLeadData.ProductCode.ToString());
-                if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.ApplicantId.ToString()))
+                if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.ApplicantId?.ToString()))
                 {
                     var applicentDtl = await this._commonFunc.getApplicentData(CustLeadData.IndividualEntry.ApplicantId.ToString());
                     Applicent_ID = applicentDtl[0]["eqs_accountapplicantid"].ToString();
@@ -275,6 +275,23 @@
                     custLeadElement.mobilephone = CustLeadData.IndividualEntry.MobilePhone;
                     custLeadElement.eqs_dob = CustLeadData.IndividualEntry.Dob;
                     custLeadElement.eqs_internalpan = CustLeadData.IndividualEntry.PAN;
+
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadSource?.ToString()))
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId(CustLeadData.LeadSource?.ToString());
+                    }
+                    else
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId("4");
+                    }
+
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+
+                    CRMLeadmappingFields.Add("eqs_leadchannel", "789030000");
+
 
                     CRMLeadmappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("lead", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
 
@@ -354,7 +371,14 @@
                     CRMCustomermappingFields.Add("eqs_name", custLeadElement.firstname + " " + custLeadElement.middlename + " " + custLeadElement.lastname);
                     CRMCustomermappingFields.Add("eqs_mobilenumber", custLeadElement.mobilephone);
                     CRMCustomermappingFields.Add("eqs_dob", custLeadElement.eqs_dob);
-                    
+
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+
+                    CRMCustomermappingFields.Add("eqs_leadchannelnew", "789030000");
+
                     if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()) && !string.IsNullOrEmpty(CustLeadData.IndividualEntry?.PANForm60?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
