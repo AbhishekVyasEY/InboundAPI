@@ -1457,6 +1457,11 @@
                 {
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMCode?.ToString()))
                     {
+                        var smEmployeeId = await this._commonFunc.getRMId(CustCorpData.RMDetails?.ServiceRMCode?.ToString());
+                        if (!string.IsNullOrEmpty(smEmployeeId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_servicermemployeeid@odata.bind", $"eqs_rmemployees({smEmployeeId})");
+                        }
                         CRMDDEmappingFields.Add("eqs_servicermcode", CustCorpData.RMDetails?.ServiceRMCode?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMName?.ToString()))
@@ -1469,6 +1474,11 @@
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMCode?.ToString()))
                     {
+                        var bmEmployeeId = await this._commonFunc.getRMId(CustCorpData.RMDetails?.BusinessRMCode?.ToString());
+                        if (!string.IsNullOrEmpty(bmEmployeeId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_businessrmemployeeid@odata.bind", $"eqs_rmemployees({bmEmployeeId})");
+                        }
                         CRMDDEmappingFields.Add("eqs_businessrmcode", CustCorpData.RMDetails?.BusinessRMCode?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMName?.ToString()))
