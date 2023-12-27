@@ -10,7 +10,7 @@ namespace DigiCustLead
         public Task<string> getRMId(string Code);
         public Task<JArray> getContactData(string contact_id);
         public Task<string> getEntityID(string Entity);
-        public Task<string> getSubentitytypeID(string Subentitytype);
+        public Task<string> getSubentitytypeID(string SubEntityType, string SubEntityKey);
         public Task<string> getSubentitytypeText(string SubentitytypeID);
         public Task<string> getPurposeID(string Purpose);
         public Task<Dictionary<string, string>> getProductId(string ProductCode);
