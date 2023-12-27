@@ -118,11 +118,11 @@
                             ValidationError = 1;
                             errorText.Add("EntityType");
                         }
-                        if (string.IsNullOrEmpty(RequestData.EntityFlagType?.ToString()))
-                        {
-                            ValidationError = 1;
-                            errorText.Add("EntityFlagType");
-                        }
+                        //if (string.IsNullOrEmpty(RequestData.EntityFlagType?.ToString()))
+                        //{
+                        //    ValidationError = 1;
+                        //    errorText.Add("EntityFlagType");
+                        //}
                         if (string.IsNullOrEmpty(RequestData.SubEntityType?.ToString()))
                         {
                             ValidationError = 1;
