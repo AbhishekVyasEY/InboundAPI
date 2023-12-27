@@ -10,7 +10,7 @@ namespace DigiCustLead
         public Task<string> getRMId(string Code);
         public Task<JArray> getContactData(string contact_id);
         public Task<string> getEntityID(string Entity);
-        public Task<string> getSubentitytypeID(string Subentitytype);
+        public Task<string> getSubentitytypeID(string SubEntityType, string SubEntityKey);
         public Task<string> getSubentitytypeText(string SubentitytypeID);
         public Task<string> getPurposeID(string Purpose);
         public Task<Dictionary<string, string>> getProductId(string ProductCode);
@@ -65,6 +65,7 @@ namespace DigiCustLead
         public Task<string> getCustomerText(string customerId);
         public Task<string> getAccountapplicantName(string AccountapplicantId);
         public Task<string> getLeadsourceName(string leadsourceid);
+        public Task<string> getLeadsourceId(string leadsourcename);
         public Task<string> getSystemuserName(string systemuserid);
         public Task<string> getBankName(string bankid);
         public Task<JArray> getDDEFinalDocumentDetail(string DDEId, string type);

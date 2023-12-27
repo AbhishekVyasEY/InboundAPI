@@ -200,7 +200,7 @@
                 }
                 else if (string.IsNullOrEmpty(this.DDEId))
                 {
-                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty(Applicant_Data["eqs_internalpan"]?.ToString()))
                     {
                         if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
                         {
@@ -676,9 +676,9 @@
                     }
 
                 }
-
-
-
+                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_sourcingchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
                 string postDataParametr1 = JsonConvert.SerializeObject(CRMDDEmappingFields1);
@@ -814,6 +814,15 @@
                             if (!string.IsNullOrEmpty(cityId))
                             {
                                 CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.StateId?.ToString()))
+                        {
+                            var stateId = await this._commonFunc.getStateID(CustIndvDataItem.StateId?.ToString());
+                            if (!string.IsNullOrEmpty(stateId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({stateId})");
                             }
                         }
 
@@ -1139,7 +1148,7 @@
                 }
                 else if (string.IsNullOrEmpty(this.DDEId))
                 {
-                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty(Applicant_Data["eqs_internalpan"]?.ToString()))
                     {
                         if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
                         {
@@ -1306,6 +1315,10 @@
                         CRMDDEmappingFields1.Add("eqs_ispermaddrandcurraddrsame", Convert.ToBoolean(CustCorpData.General.IsCommAddrSameAsOfficeAddr?.ToString()));
                     }
                 }
+
+                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_leadchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
 
 
                 /***********About Prospect * ********/
