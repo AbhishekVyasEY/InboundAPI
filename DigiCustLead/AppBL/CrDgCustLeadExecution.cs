@@ -416,10 +416,11 @@
                     {
                         CRMCustomermappingFields.Add("eqs_leadchannelnew", "789030000");
                     }
+                    CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
 
                     if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()) && !string.IsNullOrEmpty(CustLeadData.IndividualEntry?.PANForm60?.ToString()))
                     {
-                        CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
+                        
                         CRMCustomermappingFields.Add("eqs_internalpan", custLeadElement.eqs_internalpan);
 
                         if (CustLeadData.IndividualEntry?.PANForm60?.ToString() == "PAN Card")
