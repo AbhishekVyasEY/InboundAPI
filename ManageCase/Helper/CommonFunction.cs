@@ -222,6 +222,16 @@ namespace ManageCase
             return await this.getIDfromMSDTable("eqs_products", "eqs_productid", "eqs_productcode", productcode);
         }
 
+        public async Task<string> getNationalityId(string countrycode)
+        {
+            return await this.getIDfromMSDTable("eqs_countries", "eqs_countryid", "eqs_countryalphacpde", countrycode);
+        }
+
+        public async Task<string> getPurposeOfCreationId(string purposeofcreation)
+        {
+            return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_purposeofcreationid", "eqs_name", purposeofcreation);
+        }
+
         public async Task<string> getCustomerAddressId(string customerid, string addtesstypecode)
         {
             try

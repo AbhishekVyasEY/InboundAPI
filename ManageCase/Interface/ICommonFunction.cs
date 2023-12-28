@@ -23,6 +23,8 @@ namespace ManageCase
         public Task<string> getSubCategoryName(string SubCategoryId);
         public Task<string> getBranchId(string branchid);
         public Task<string> getProductId(string productcode);
+        public Task<string> getNationalityId(string countrycode);
+        public Task<string> getPurposeOfCreationId(string purposeofcreation);
         public Task<string> getCustomerAddressId(string customerid, string addtesstypecode);
         public Task<bool> checkDuplicate(string UCIC, string Account, string Classification, string Category, string SubCategory);
         public Task<JArray> getCaseAdditionalFields(string subCategoryCode);
