@@ -172,16 +172,19 @@
                 customerDetailReturn.General.NPO = CuatomerDetails[0]["eqs_npoflag"].ToString();
                 customerDetailReturn.General.EntityFlag = CuatomerDetails[0]["eqs_entityflag"].ToString();
                 customerDetailReturn.General.EntityKey = CuatomerDetails[0]["eqs_subentitykey"].ToString();
+                customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["eqs_purposeofcreation"].ToString();
+                customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatype"].ToString();
+                customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panformslot"].ToString();
 
                 //Lookup
-                if (CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"] != null)
-                    customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                //if (CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"] != null)
+                //    customerDetailReturn.General.PurposeOfCreation = CuatomerDetails[0]["_eqs_purposeofcreationlo_value@OData.Community.Display.V1.FormattedValue"].ToString();
 
                 //Option set
-                if (CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"] != null)
-                    customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"].ToString();
-                if (CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"] != null)
-                    customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
+                //if (CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"] != null)
+                //    customerDetailReturn.General.NRIVisaType = CuatomerDetails[0]["eqs_nrivisatyype@OData.Community.Display.V1.FormattedValue"].ToString();
+                //if (CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"] != null)
+                //    customerDetailReturn.General.Form60 = CuatomerDetails[0]["eqs_panform60@OData.Community.Display.V1.FormattedValue"].ToString();
 
                 if (!string.IsNullOrEmpty(CuatomerDetails[0]["eqs_rmemployeeid"].ToString()))
                 {

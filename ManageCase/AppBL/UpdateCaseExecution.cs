@@ -478,7 +478,7 @@
                                 {
                                     //update
                                     string postDataParametr = JsonConvert.SerializeObject(odatab);
-                                    var Customer_details = await this._queryParser.HttpApiCall($"eqs_addresses({customerid})?$select=eqs_addressid", HttpMethod.Patch, postDataParametr);
+                                    var Customer_details = await this._queryParser.HttpApiCall($"eqs_addresses({addressid})?$select=eqs_addressid", HttpMethod.Patch, postDataParametr);
                                     addressid = CommonFunction.GetIdFromPostRespons201(Customer_details[0]["responsebody"], "eqs_addressid");
                                 }
 
@@ -517,6 +517,7 @@
                     }
                 }
 
+                caseRtPrm.CaseID = RequestData.CaseId.ToString();
                 caseRtPrm.ReturnCode = "CRM-SUCCESS";
                 caseRtPrm.Message = "API executed successfully";
             }
