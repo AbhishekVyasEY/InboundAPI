@@ -384,53 +384,22 @@
         public async Task<string> getAccessToken()
         {
             string Token_Id;
-            string TokenId;
             try
             {
                 if (!this.GetMvalue<string>("wso2token", out Token_Id))
                 {
-                    HttpClient httpClient = new HttpClient();
-                    string requestUri = this._keyVaultService.ReadSecret("wso2AuthUrl");
+                    Token_Id = this._keyVaultService.ReadSecret("CBSToken");
 
-                    string username = this._keyVaultService.ReadSecret("CBSUsername"); 
-                    string password = this._keyVaultService.ReadSecret("CBSPassword"); 
-                    string encoded = System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(username + ":" + password));
-
-                    List<KeyValuePair<string, string>> Data = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                };
-
-                    var content = new FormUrlEncodedContent(Data);
-                    content.Headers.Clear();
-                    content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                    HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
-                    requestMessage.Headers.Add("Authorization", "Basic " + encoded);
-                    requestMessage.Content = content;
-
-                    var response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
-                    string responJsonText = await response.Content.ReadAsStringAsync();
-                    dynamic responsej = JsonConvert.DeserializeObject(responJsonText);
-
-                    TokenId = responsej.access_token.ToString();
-
-
-                    this.SetMvalue<string>("wso2token", 15, TokenId);
-                }
-                else
-                {
-                    TokenId = Token_Id;
+                    this.SetMvalue<string>("wso2token", 1440, Token_Id);
                 }
             }
             catch (Exception ex)
             {
-                _errorLogger.LogError("getAccessToken", $"Error from get wso2Aut access token : {ex.Message}");
+                _errorLogger.LogError("getAccessToken", $"Error while fetching WSO2 Access Token : {ex.Message}");
                 throw;
             }
-            
 
-
-            return TokenId;
+            return Token_Id;
         }
 
 

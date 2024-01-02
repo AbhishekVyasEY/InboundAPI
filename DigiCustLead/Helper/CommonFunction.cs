@@ -238,9 +238,9 @@
         {
             return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_name", "eqs_entitytypeid", EntityId);
         }
-        public async Task<string> getSubentitytypeID(string Subentitytype)
+        public async Task<string> getSubentitytypeID(string SubEntityType, string SubEntityKey)
         {
-            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_subentitytypeid", "eqs_key", Subentitytype);
+            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_subentitytypeid", $"eqs_flagtype eq '{SubEntityType}' and eqs_key", SubEntityKey);
         }
         public async Task<string> getSubentitytypeText(string SubentitytypeID)
         {
@@ -449,6 +449,10 @@
         public async Task<string> getLeadsourceName(string leadsourceid)
         {
             return await this.getIDfromMSDTable("eqs_leadsources", "eqs_name", "eqs_leadsourceid", leadsourceid);
+        }
+        public async Task<string> getLeadsourceId(string leadsourceid)
+        {
+            return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_leadsourceidvalue",  leadsourceid);
         }
         public async Task<string> getSystemuserName(string systemuserid)
         {

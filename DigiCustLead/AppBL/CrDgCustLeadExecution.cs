@@ -93,18 +93,43 @@
                         int ValidationError = 0;
                         List<string> errorText = new List<string>();
 
-                        if (RequestData.ProductCode == null || string.IsNullOrEmpty(RequestData.ProductCode.ToString()) || RequestData.ProductCode.ToString() == "")
+                        if (RequestData.ProductCode == null || string.IsNullOrEmpty(RequestData.ProductCode?.ToString()) || RequestData.ProductCode?.ToString() == "")
                         {
                             ValidationError = 1;
                             errorText.Add("ProductCode");
                         }
-                        if (RequestData.BranchCode == null || string.IsNullOrEmpty(RequestData.BranchCode.ToString()) || RequestData.BranchCode.ToString() == "")
+                        if (RequestData.BranchCode == null || string.IsNullOrEmpty(RequestData.BranchCode?.ToString()) || RequestData.BranchCode?.ToString() == "")
                         {
                             ValidationError = 1;
                             errorText.Add("BranchCode");
                         }
+                        if (string.IsNullOrEmpty(RequestData.LeadSource?.ToString()))
+                        {
+                            ValidationError = 1;
+                            errorText.Add("LeadSource");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.LeadChannel?.ToString()))
+                        {
+                            ValidationError = 1;
+                            errorText.Add("LeadChannel");
+                        }
+                        if (string.IsNullOrEmpty(RequestData.EntityType?.ToString()))
+                        {
+                            ValidationError = 1;
+                            errorText.Add("EntityType");
+                        }
+                        //if (string.IsNullOrEmpty(RequestData.EntityFlagType?.ToString()))
+                        //{
+                        //    ValidationError = 1;
+                        //    errorText.Add("EntityFlagType");
+                        //}
+                        if (string.IsNullOrEmpty(RequestData.SubEntityType?.ToString()))
+                        {
+                            ValidationError = 1;
+                            errorText.Add("SubEntityType");
+                        }
 
-                        if (string.Equals(RequestData.EntityType.ToString(), "Individual"))
+                        if (string.Equals(RequestData.EntityType?.ToString(), "Individual"))
                         {
                             var IndvData = RequestData.IndividualEntry;
                             if (IndvData.Title == null || string.IsNullOrEmpty(IndvData.Title.ToString()) || IndvData.Title.ToString() == "")
@@ -153,7 +178,7 @@
                             
                            
                         }
-                        else if (string.Equals(RequestData.EntityType.ToString(), "Corporate"))
+                        else if (string.Equals(RequestData.EntityType?.ToString(), "Corporate"))
                         {
                             var CorpData = RequestData.CorporateEntry;
                             if (CorpData.CompanyName == null || string.IsNullOrEmpty(CorpData.CompanyName.ToString()) || CorpData.CompanyName.ToString() == "")
@@ -242,7 +267,7 @@
 
         public async Task<CreateCustLeadReturn> createDigiCustLeadIndv(dynamic CustLeadData)
         {
-            string Applicent_ID = "", Lead_Id = "", Pan_Number = "";
+            string Applicent_ID = "", Lead_Id = "", Pan_Number = "", leadSourceId = "";
             CreateCustLeadReturn csRtPrm = new CreateCustLeadReturn();
             CustLeadElement custLeadElement = new CustLeadElement();
             Dictionary<string, string> CRMLeadmappingFields = new Dictionary<string, string>();
@@ -250,7 +275,7 @@
             try
             {
                 var productDetails = await this._commonFunc.getProductId(CustLeadData.ProductCode.ToString());
-                if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.ApplicantId.ToString()))
+                if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.ApplicantId?.ToString()))
                 {
                     var applicentDtl = await this._commonFunc.getApplicentData(CustLeadData.IndividualEntry.ApplicantId.ToString());
                     Applicent_ID = applicentDtl[0]["eqs_accountapplicantid"].ToString();
@@ -266,7 +291,7 @@
                 {
                     string EntityID = await this._commonFunc.getEntityID(CustLeadData.EntityType.ToString());
                     string TitleId = await this._commonFunc.getTitleId(CustLeadData.IndividualEntry.Title.ToString());
-                    string SubEntityID = await this._commonFunc.getSubentitytypeID(CustLeadData.EntityFlagType.ToString());
+                    string SubEntityID = await this._commonFunc.getSubentitytypeID(CustLeadData.EntityFlagType.ToString(), CustLeadData.SubEntityType.ToString());
 
                     custLeadElement.leadsourcecode = 15;
                     custLeadElement.firstname = CustLeadData.IndividualEntry.FirstName;
@@ -275,6 +300,29 @@
                     custLeadElement.mobilephone = CustLeadData.IndividualEntry.MobilePhone;
                     custLeadElement.eqs_dob = CustLeadData.IndividualEntry.Dob;
                     custLeadElement.eqs_internalpan = CustLeadData.IndividualEntry.PAN;
+
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadSource?.ToString()))
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId(CustLeadData.LeadSource?.ToString());
+                    }
+                    else
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId("4");
+                    }
+
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadChannel?.ToString()))
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadchannel", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadchannel", CustLeadData.LeadChannel.ToString()));
+                    }
+                    else
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadchannel", "789030000");
+                    }
+
 
                     CRMLeadmappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("lead", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
 
@@ -354,10 +402,24 @@
                     CRMCustomermappingFields.Add("eqs_name", custLeadElement.firstname + " " + custLeadElement.middlename + " " + custLeadElement.lastname);
                     CRMCustomermappingFields.Add("eqs_mobilenumber", custLeadElement.mobilephone);
                     CRMCustomermappingFields.Add("eqs_dob", custLeadElement.eqs_dob);
-                    
+
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadChannel?.ToString()))
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadchannelnew", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_leadchannelnew", CustLeadData.LeadChannel.ToString()));
+                    }
+                    else
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadchannelnew", "789030000");
+                    }
+                    CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
+
                     if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()) && !string.IsNullOrEmpty(CustLeadData.IndividualEntry?.PANForm60?.ToString()))
                     {
-                        CRMCustomermappingFields.Add("eqs_panform60code", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_panform60code", CustLeadData.IndividualEntry.PANForm60.ToString()));
                         CRMCustomermappingFields.Add("eqs_internalpan", custLeadElement.eqs_internalpan);
 
                         if (CustLeadData.IndividualEntry?.PANForm60?.ToString() == "PAN Card")
@@ -400,6 +462,7 @@
 
                     CRMCustomermappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMCustomermappingFields.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({SubEntityID})");
+                    CRMCustomermappingFields.Add("eqs_mothermaidenname", CustLeadData.IndividualEntry?.MotherMaidenName?.ToString());
 
                     string purpose = "";
                     if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation.ToString()))
@@ -423,7 +486,7 @@
                             CRMCustomermappingFields.Add("eqs_leadid@odata.bind", $"leads({Lead_ID})");
                             postDataParametr = JsonConvert.SerializeObject(CRMCustomermappingFields);
                             List<JObject> Customer_details;
-                            if (Applicent_ID == "")
+                            if (string.IsNullOrEmpty(Applicent_ID))
                             {
                                 Customer_details = await this._queryParser.HttpApiCall("eqs_accountapplicants()?$select=eqs_applicantid", HttpMethod.Post, postDataParametr);
                             }
@@ -484,7 +547,7 @@
 
         public async Task<CreateCustLeadReturn> createDigiCustLeadCorp(dynamic CustLeadData)
         {
-            string Applicent_ID = "", Pan_Number = "";
+            string Applicent_ID = "", Pan_Number = "", leadSourceId = "";
             CreateCustLeadReturn csRtPrm = new CreateCustLeadReturn();
             CustLeadElementCorp custLeadElement = new CustLeadElementCorp();
             Dictionary<string, string> CRMLeadmappingFields = new Dictionary<string, string>();
@@ -506,7 +569,7 @@
                 if (ProductId != "")
                 {
                     string EntityID = await this._commonFunc.getEntityID(CustLeadData.EntityType.ToString());
-                    string SubEntityID = await this._commonFunc.getSubentitytypeID(CustLeadData.EntityFlagType.ToString());
+                    string SubEntityID = await this._commonFunc.getSubentitytypeID(CustLeadData.EntityFlagType.ToString(), CustLeadData.SubEntityType.ToString());
                     custLeadElement.leadsourcecode = 15;
                     custLeadElement.eqs_companynamepart1 = CustLeadData.CorporateEntry.CompanyName;
                     custLeadElement.eqs_companynamepart2 = CustLeadData.CorporateEntry.CompanyName2;
@@ -535,8 +598,28 @@
                     {
                         custLeadElement.eqs_internalpan = CustLeadData.CorporateEntry.PAN;
                     }
-                   
-                    
+
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadSource?.ToString()))
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId(CustLeadData.LeadSource?.ToString());
+                    }
+                    else
+                    {
+                        leadSourceId = await this._commonFunc.getLeadsourceId("4");
+                    }
+
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadChannel?.ToString()))
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadchannel", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadchannel", CustLeadData.LeadChannel.ToString()));
+                    }
+                    else
+                    {
+                        CRMLeadmappingFields.Add("eqs_leadchannel", "789030000");
+                    }
 
                     CRMLeadmappingFields.Add("firstname", CustLeadData.CorporateEntry.CompanyName.ToString());
                     CRMLeadmappingFields.Add("lastname", CustLeadData.CorporateEntry.CompanyName2.ToString());
@@ -600,7 +683,6 @@
 
                   
                     CRMCustomermappingFields.Add("eqs_panform60code", "615290000");
-                    //  CRMCustomermappingFields.Add("eqs_pan", "**********");
 
                     if (!string.IsNullOrEmpty(Applicent_ID?.ToString()))
                     {

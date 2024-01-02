@@ -212,6 +212,41 @@ namespace ManageCase
             return await this.getIDfromMSDTable("ccs_subcategories", "ccs_name", "ccs_subcategoryid", SubCategoryId);
         }
 
+        public async Task<string> getBranchId(string branchid)
+        {
+            return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchid", "eqs_branchidvalue", branchid);
+        }
+
+        public async Task<string> getProductId(string productcode)
+        {
+            return await this.getIDfromMSDTable("eqs_products", "eqs_productid", "eqs_productcode", productcode);
+        }
+
+        public async Task<string> getNationalityId(string countrycode)
+        {
+            return await this.getIDfromMSDTable("eqs_countries", "eqs_countryid", "eqs_countryalphacpde", countrycode);
+        }
+
+        public async Task<string> getPurposeOfCreationId(string purposeofcreation)
+        {
+            return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_purposeofcreationid", "eqs_name", purposeofcreation);
+        }
+
+        public async Task<string> getCustomerAddressId(string customerid, string addtesstypecode)
+        {
+            try
+            {
+                string query_url = $"eqs_addresses()?$select=eqs_addressid&$filter=(_eqs_customer_value eq {customerid} and eqs_addresstypeid eq {addtesstypecode})";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string addressId = await this.getIDFromGetResponce("eqs_addressid", responsdtails);
+                return addressId;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCustomerAddressId", ex.Message);
+                throw ex;
+            }
+        }
 
         public async Task<string> getSubCategoryId(string subCategoryCode, string CategoryID)
         {
@@ -266,6 +301,39 @@ namespace ManageCase
 
         }
 
+        public async Task<JArray> getExistingCase(string CaseID)
+        {
+            try
+            {
+                string query_url = $"incidents()?$filter=title eq '{CaseID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseStatus", ex.Message);
+                throw ex;
+            }
+
+        }
+
+        public async Task<JArray> getCustomerData(string customerid)
+        {
+            try
+            {
+                string query_url = $"contacts({customerid})?$select=_eqs_entitytypeid_value";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseStatus", ex.Message);
+                throw ex;
+            }
+
+        }
         public async Task<JArray> getCaseAdditionalDetails(string CaseID, string idfield)
         {
             try

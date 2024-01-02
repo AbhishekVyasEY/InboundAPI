@@ -200,7 +200,7 @@
                 }
                 else if (string.IsNullOrEmpty(this.DDEId))
                 {
-                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty(Applicant_Data["eqs_internalpan"]?.ToString()))
                     {
                         if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
                         {
@@ -210,40 +210,41 @@
                             return csRtPrm;
                         }
                     }
-
-                    CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
-                    CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
-                    CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
-                    CRMDDEmappingFields.Add("eqs_sourcebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.SourceBranch?.ToString())})");
-                    CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
-                    CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
-                    CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
-                    CRMDDEmappingFields.Add("eqs_firstname", Applicant_Data["eqs_firstname"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"]?.ToString());
-                    CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"]?.ToString());
-
-                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_dob"]?.ToString()))
-                    {
-                        DateTime dt = ((DateTime)((JObject)Applicant_Data)["eqs_dob"]);
-                        //dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(8, 2);
-                        //mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(5, 2);
-                        //yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 4);
-                        CRMDDEmappingFields.Add("eqs_dob", dt.ToString("yyyy-MM-dd"));
-                    }
-
-                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
-                    {
-                        CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
-                    }
-                    if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
-                    {
-                        CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
-                    }
-
-                    string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
-                    CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
-                    CRMDDEmappingFields.Add("eqs_mobilenumber", Applicant_Data["eqs_mobilenumber"]?.ToString());
                 }
+
+                CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
+                CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_sourcebranchId@odata.bind", $"eqs_branchs({await this._commonFunc.getBranchId(CustIndvData.General?.SourceBranch?.ToString())})");
+                CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
+                CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_firstname", Applicant_Data["eqs_firstname"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_middlename", Applicant_Data["eqs_middlename"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_lastname", Applicant_Data["eqs_lastname"]?.ToString());
+
+                if (!string.IsNullOrEmpty(Applicant_Data["eqs_dob"]?.ToString()))
+                {
+                    DateTime dt = ((DateTime)((JObject)Applicant_Data)["eqs_dob"]);
+                    //dd = Applicant_Data["eqs_dob"]?.ToString()?.Substring(8, 2);
+                    //mm = Applicant_Data["eqs_dob"]?.ToString()?.Substring(5, 2);
+                    //yyyy = Applicant_Data["eqs_dob"]?.ToString()?.Substring(0, 4);
+                    CRMDDEmappingFields.Add("eqs_dob", dt.ToString("yyyy-MM-dd"));
+                }
+
+                if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
+                {
+                    CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
+                }
+                if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
+                {
+                    CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
+                }
+
+                string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
+                CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
+                CRMDDEmappingFields.Add("eqs_mobilenumber", Applicant_Data["eqs_mobilenumber"]?.ToString());
+
 
                 List<string> fields = new List<string>();
                 int haserror = 0;
@@ -676,9 +677,9 @@
                     }
 
                 }
-
-
-
+                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_sourcingchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
                 string postDataParametr1 = JsonConvert.SerializeObject(CRMDDEmappingFields1);
@@ -814,6 +815,15 @@
                             if (!string.IsNullOrEmpty(cityId))
                             {
                                 CRMDDEmappingFields.Add("eqs_cityid@odata.bind", $"eqs_cities({cityId})");
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(CustIndvDataItem.StateId?.ToString()))
+                        {
+                            var stateId = await this._commonFunc.getStateID(CustIndvDataItem.StateId?.ToString());
+                            if (!string.IsNullOrEmpty(stateId))
+                            {
+                                CRMDDEmappingFields.Add("eqs_stateid@odata.bind", $"eqs_states({stateId})");
                             }
                         }
 
@@ -1139,7 +1149,7 @@
                 }
                 else if (string.IsNullOrEmpty(this.DDEId))
                 {
-                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty("eqs_internalpan"))
+                    if (Applicant_Data["eqs_panform60code"]?.ToString() != "615290000" && !string.IsNullOrEmpty(Applicant_Data["eqs_internalpan"]?.ToString()))
                     {
                         if (Applicant_Data["eqs_panvalidationmode"]?.ToString() != "958570001")
                         {
@@ -1307,6 +1317,10 @@
                     }
                 }
 
+                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                CRMDDEmappingFields.Add("eqs_leadchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
+
 
                 /***********About Prospect * ********/
 
@@ -1444,6 +1458,11 @@
                 {
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMCode?.ToString()))
                     {
+                        var smEmployeeId = await this._commonFunc.getRMId(CustCorpData.RMDetails?.ServiceRMCode?.ToString());
+                        if (!string.IsNullOrEmpty(smEmployeeId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_servicermemployeeid@odata.bind", $"eqs_rmemployees({smEmployeeId})");
+                        }
                         CRMDDEmappingFields.Add("eqs_servicermcode", CustCorpData.RMDetails?.ServiceRMCode?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.ServiceRMName?.ToString()))
@@ -1456,6 +1475,11 @@
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMCode?.ToString()))
                     {
+                        var bmEmployeeId = await this._commonFunc.getRMId(CustCorpData.RMDetails?.BusinessRMCode?.ToString());
+                        if (!string.IsNullOrEmpty(bmEmployeeId))
+                        {
+                            CRMDDEmappingFields.Add("eqs_businessrmemployeeid@odata.bind", $"eqs_rmemployees({bmEmployeeId})");
+                        }
                         CRMDDEmappingFields.Add("eqs_businessrmcode", CustCorpData.RMDetails?.BusinessRMCode?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustCorpData.RMDetails?.BusinessRMName?.ToString()))
