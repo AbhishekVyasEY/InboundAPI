@@ -420,7 +420,6 @@
 
                     if (!string.IsNullOrEmpty(custLeadElement?.eqs_internalpan?.ToString()) && !string.IsNullOrEmpty(CustLeadData.IndividualEntry?.PANForm60?.ToString()))
                     {
-                        
                         CRMCustomermappingFields.Add("eqs_internalpan", custLeadElement.eqs_internalpan);
 
                         if (CustLeadData.IndividualEntry?.PANForm60?.ToString() == "PAN Card")
@@ -463,6 +462,7 @@
 
                     CRMCustomermappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMCustomermappingFields.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({SubEntityID})");
+                    CRMCustomermappingFields.Add("eqs_mothermaidenname", CustLeadData.IndividualEntry?.MotherMaidenName?.ToString());
 
                     string purpose = "";
                     if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation.ToString()))
