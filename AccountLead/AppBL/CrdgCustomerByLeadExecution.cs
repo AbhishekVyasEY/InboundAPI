@@ -231,8 +231,21 @@
                         msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
                         msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
                         msgBdy.individualCustomer.isStaff = "Y";
-                        msgBdy.individualCustomer.sex = (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") ? "M" : "F";
-
+                        if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_gendercode"].ToString()))
+                        {
+                            if (AccountDDE[0]["eqs_gendercode"].ToString() == "789030000") {
+                                msgBdy.individualCustomer.sex = "M";
+                            }
+                            else if (AccountDDE[0]["eqs_gendercode"].ToString() == "789030001")
+                            {
+                                msgBdy.individualCustomer.sex = "F";
+                            }
+                            else if (AccountDDE[0]["eqs_gendercode"].ToString() == "789030002")
+                            {
+                                msgBdy.individualCustomer.sex = "T";
+                            }
+                        }
+                        
                         msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
 
 
@@ -240,8 +253,7 @@
                         string wso_request = JsonConvert.SerializeObject(Request_Template);
                         string postDataParametr = await EncriptRespons(wso_request, "FI0060");
                         Lead_details = await this._queryParser.HttpCBSApiCall(Token, HttpMethod.Post, "CBSCreateCustomer", postDataParametr);
-                        responsD = JsonConvert.DeserializeObject(Lead_details);
-                        
+                        responsD = JsonConvert.DeserializeObject(Lead_details);                        
 
 
                         if (responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
