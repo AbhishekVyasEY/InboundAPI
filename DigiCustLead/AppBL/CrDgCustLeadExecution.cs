@@ -381,6 +381,24 @@
                         CRMCustomermappingFields.Add("eqs_branchid@odata.bind", $"eqs_branchs({BranchId})");
                     }
 
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry?.MotherMaidenName?.ToString()))
+                    {
+                        CRMLeadmappingFields.Add("eqs_mothermaidenname", CustLeadData.IndividualEntry?.MotherMaidenName?.ToString());
+                        CRMCustomermappingFields.Add("eqs_mothermaidenname", CustLeadData.IndividualEntry?.MotherMaidenName?.ToString());
+                    }
+
+                    string purpose = "";
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation.ToString()))
+                    {
+                        purpose = await this._commonFunc.getPurposeID(CustLeadData.IndividualEntry.PurposeOfCreation.ToString());
+                    }
+
+                    if (!string.IsNullOrEmpty(purpose))
+                    {
+                        CRMLeadmappingFields.Add("eqs_purposeofcreationid@odata.bind", $"eqs_purposeofcreations({purpose})");
+                        CRMCustomermappingFields.Add("eqs_purposeofcreationid@odata.bind", $"eqs_purposeofcreations({purpose})");
+                    }
+
                     string postDataParametr = JsonConvert.SerializeObject(custLeadElement);
                     string postDataParametr1 = JsonConvert.SerializeObject(CRMLeadmappingFields);
 
@@ -462,19 +480,6 @@
 
                     CRMCustomermappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMCustomermappingFields.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({SubEntityID})");
-                    CRMCustomermappingFields.Add("eqs_mothermaidenname", CustLeadData.IndividualEntry?.MotherMaidenName?.ToString());
-
-                    string purpose = "";
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation.ToString()))
-                    {
-                        purpose = await this._commonFunc.getPurposeID(CustLeadData.IndividualEntry.PurposeOfCreation.ToString());
-                    }
-                    
-                    if (!string.IsNullOrEmpty(purpose))
-                    {
-                        CRMCustomermappingFields.Add("eqs_purposeofcreationid@odata.bind", $"eqs_purposeofcreations({purpose})");
-                    }
-
 
                     if (Lead_details.Count > 0)
                     {
