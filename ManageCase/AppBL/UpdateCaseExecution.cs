@@ -109,13 +109,6 @@
                             errors.Add("AccountNumber");
                         }
 
-                        if (!string.IsNullOrEmpty(CaseData.CRMModification?.Customer?.Account.ToString())
-                            && string.IsNullOrEmpty(CaseData.CRMModification?.Customer?.Account?.AccountNumber.ToString()))
-                        {
-                            ValidationError = 1;
-                            errors.Add("AccountNumber");
-                        }
-
                         if (!string.IsNullOrEmpty(CaseData.Address?.ToString()))
                         {
                             dynamic addresses = CaseData.Address;
@@ -179,26 +172,16 @@
             if (caseData.Count > 0)
             {
                 string caseid = caseData[0]["incidentid"].ToString();
+                string currentstate = caseData[0]["statecode"].ToString();
+                if (currentstate != "0")
+                {
+                    caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                    caseRtPrm.Message = "Unable to update, case is already closed.";
+                    return caseRtPrm;
+                }
                 string statuscode = await this._queryParser.getOptionSetTextToValue("incident", "statuscode", RequestData.CaseStatus.ToString());
 
-
-                if (statuscode == "615290000") //Auto Closed
-                {
-                    Dictionary<string, string> incidentresolution = new Dictionary<string, string>
-                    {
-                        { "subject", "Case Auto Closed" },
-                        { "incidentid@odata.bind", $"/incidents({caseid})" },
-                        { "description", "Resolved via Inbound API" }
-                    };
-
-                    Dictionary<string, object> odatab = new Dictionary<string, object>();
-                    odatab.Add("IncidentResolution", incidentresolution);
-                    odatab.Add("Status", statuscode);
-
-                    string caseDataParametr = JsonConvert.SerializeObject(odatab);
-                    var Case_details = await this._queryParser.HttpApiCall($"CloseIncident", HttpMethod.Post, caseDataParametr);
-                }
-                else
+                if (statuscode == "615290002") //Queued for Manual Processing
                 {
                     Dictionary<string, object> odatab = new Dictionary<string, object>();
                     odatab.Add("statuscode", statuscode);
@@ -213,6 +196,14 @@
                         caseRtPrm.Message = "Error occurred while updating case.";
                         return caseRtPrm;
                     }
+
+                    caseRtPrm.CaseID = RequestData.CaseId.ToString();
+                    caseRtPrm.ReturnCode = "CRM-SUCCESS";
+                    caseRtPrm.Message = "API executed successfully";
+                }
+                else if (statuscode == "615290000") //Auto Closed
+                {
+                    Dictionary<string, object> odatab;
 
                     if (!string.IsNullOrEmpty(RequestData.CRMModification?.Customer?.ToString()))
                     {
@@ -340,7 +331,7 @@
                             odatab.Add("eqs_companycoordinatorphone", CustData.Corporate?.CompanyCoordinatorPhone.ToString());
                             odatab.Add("eqs_purposeofcreation", CustData.Corporate?.purposeofcreation.ToString());
                             odatab.Add("eqs_ckycnumber", CustData.Corporate?.Ckycnumber.ToString());
-                            odatab.Add("eqs_programslot", CustData.Individual?.Program.ToString());
+                            odatab.Add("eqs_programslot", CustData.Corporate?.Program.ToString());
 
                             if (!string.IsNullOrEmpty(CustData.Corporate?.Dateofincorprotation.ToString()))
                             {
@@ -352,9 +343,9 @@
                             else
                                 odatab.Add("eqs_dateofincorporation", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Program.ToString()))
+                            if (!string.IsNullOrEmpty(CustData.Corporate?.Program.ToString()))
                             {
-                                odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Individual?.Program.ToString()));
+                                odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Corporate?.Program.ToString()));
                             }
                             else
                                 odatab.Add("eqs_program", null);
@@ -465,6 +456,18 @@
                                 odatab.Add("eqs_mobilenumber", address.MobileNumber.ToString());
                                 odatab.Add("eqs_faxnumber", address.FaxNumber.ToString());
 
+                                if (!string.IsNullOrEmpty(address.CityId?.ToString()))
+                                {
+                                    var City_Details = await this._commonFunc.getCityDetails(address.CityId.ToString());
+                                    if (City_Details != null && City_Details.Count > 0)
+                                    {
+                                        odatab.Add("eqs_cityid@odata.bind", "/eqs_cities(" + City_Details[0]["eqs_cityid"].ToString() + ")");
+                                        if (!string.IsNullOrEmpty(City_Details[0]["_eqs_stateid_value"].ToString()))
+                                            odatab.Add("eqs_stateid@odata.bind", "/eqs_states(" + City_Details[0]["_eqs_stateid_value"].ToString() + ")");
+                                        if (!string.IsNullOrEmpty(City_Details[0]["_eqs_countryid_value"].ToString()))
+                                            odatab.Add("eqs_countryid@odata.bind", "/eqs_countries(" + City_Details[0]["_eqs_countryid_value"].ToString() + ")");
+                                    }
+                                }
                                 if (string.IsNullOrEmpty(addressid))
                                 {
                                     //create
@@ -488,6 +491,38 @@
                                     caseRtPrm.Message = "Error occurred while updating address.";
                                     return caseRtPrm;
                                 }
+
+                                //Create Current Address with same details as Permanent Address
+                                if (!string.IsNullOrEmpty(address.IsPermAddrAndCurrAddrSame?.ToString()) && address.IsPermAddrAndCurrAddrSame.ToString().ToLower() == "yes")
+                                {
+                                    addresstypecode = "789030001"; //Current Address
+                                    string curraddressid = await this._commonFunc.getCustomerAddressId(customerid, addresstypecode);
+                                    
+                                    if (string.IsNullOrEmpty(curraddressid))
+                                    {
+                                        //create
+                                        odatab["eqs_addresstypeid"] = addresstypecode;
+                                        odatab["eqs_customer@odata.bind"] = $"/contacts({customerid})";
+                                        string postDataParametr = JsonConvert.SerializeObject(odatab);
+                                        var CustomerAdd_details = await this._queryParser.HttpApiCall($"eqs_addresses()?$select=eqs_addressid", HttpMethod.Post, postDataParametr);
+                                        curraddressid = CommonFunction.GetIdFromPostRespons201(CustomerAdd_details[0]["responsebody"], "eqs_addressid");
+                                    }
+                                    else
+                                    {
+                                        //update
+                                        string postDataParametr = JsonConvert.SerializeObject(odatab);
+                                        var Customer_details = await this._queryParser.HttpApiCall($"eqs_addresses({curraddressid})?$select=eqs_addressid", HttpMethod.Patch, postDataParametr);
+                                        curraddressid = CommonFunction.GetIdFromPostRespons201(Customer_details[0]["responsebody"], "eqs_addressid");
+                                    }
+
+                                    if (string.IsNullOrEmpty(curraddressid))
+                                    {
+                                        caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                                        caseRtPrm.Message = "Error occurred while copying Permanent Address to Current Address.";
+                                        return caseRtPrm;
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -509,17 +544,37 @@
 
                         if (string.IsNullOrEmpty(noteid))
                         {
-                            this._logger.LogError("UpdateCase", JsonConvert.SerializeObject(Case_details), caseDataParametr);
+                            this._logger.LogError("UpdateCase", JsonConvert.SerializeObject(Note_details), noteDataParameter);
                             caseRtPrm.ReturnCode = "CRM-ERROR-102";
                             caseRtPrm.Message = "Error occurred while other modifications in case.";
                             return caseRtPrm;
                         }
                     }
-                }
 
-                caseRtPrm.CaseID = RequestData.CaseId.ToString();
-                caseRtPrm.ReturnCode = "CRM-SUCCESS";
-                caseRtPrm.Message = "API executed successfully";
+                    Dictionary<string, string> incidentresolution = new Dictionary<string, string>
+                    {
+                        { "subject", "Case Auto Closed" },
+                        { "incidentid@odata.bind", $"/incidents({caseid})" },
+                        { "description", "Resolved via Inbound API" }
+                    };
+
+                    odatab = new Dictionary<string, object>();
+                    odatab.Add("IncidentResolution", incidentresolution);
+                    odatab.Add("Status", statuscode);
+
+                    string caseDataParametr = JsonConvert.SerializeObject(odatab);
+                    var Case_details = await this._queryParser.HttpApiCall($"CloseIncident", HttpMethod.Post, caseDataParametr);
+
+                    caseRtPrm.CaseID = RequestData.CaseId.ToString();
+                    caseRtPrm.ReturnCode = "CRM-SUCCESS";
+                    caseRtPrm.Message = "API executed successfully";
+                }
+                else
+                {
+                    caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                    caseRtPrm.Message = "Invalid case status.";
+                    return caseRtPrm;
+                }
             }
             else
             {
