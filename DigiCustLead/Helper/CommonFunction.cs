@@ -492,15 +492,29 @@
         public async Task<string> getDDEFinalAccountIndvData(string AccountNumber)
         {
             string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
-            return await this.getIDfromMSDTable("eqs_ddeindividualcustomers", "eqs_ddeindividualcustomerid", $"eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value", AccountNumber);
+            string query_url = $"eqs_ddeindividualcustomers()?$filter=eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value eq {AccountNumber}";
+            var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var Account_dtails = await this.getDataFromResponce(Accountdtails);
+            if (Account_dtails.Count > 0)
+            {
+                return Account_dtails[0]["eqs_ddeindividualcustomerid"].ToString();
+            }
+            else { return null; }
             
         }
                 
         public async Task<string> getDDEFinalAccountCorpData(string AccountNumber)
         {
             string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
-            return await this.getIDfromMSDTable("eqs_ddecorporatecustomers", "eqs_ddecorporatecustomerid", $"eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value", AccountNumber);
-                       
+            string query_url = $"eqs_ddecorporatecustomers()?$filter=eqs_dataentrystage eq {finalValue} and _eqs_accountapplicantid_value eq {AccountNumber}";
+            var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var Account_dtails = await this.getDataFromResponce(Accountdtails);            
+            if (Account_dtails.Count > 0)
+            {
+                return Account_dtails[0]["eqs_ddecorporatecustomerid"].ToString();
+            }
+            else { return null; }
+
         }
 
         public async Task<JArray> getApplicentData(string Applicent_id)
