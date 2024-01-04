@@ -578,23 +578,23 @@
                     custLeadElement.eqs_contactperson = CustLeadData.CorporateEntry.PocName;
 
                     
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber?.ToString()))
                     {
                         custLeadElement.eqs_cinnumber = CustLeadData.CorporateEntry.CinNumber;
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.TanNumber))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.TanNumber?.ToString()))
                     {
                         custLeadElement.eqs_tannumber = CustLeadData.CorporateEntry.TanNumber;
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.GstNumber))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.GstNumber?.ToString()))
                     {
                         custLeadElement.eqs_gstnumber = CustLeadData.CorporateEntry.GstNumber;
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CstNumber))
-                    {
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CstNumber?.ToString()))
+                    {   
                         custLeadElement.eqs_cstvatnumber = CustLeadData.CorporateEntry.CstNumber;
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.PAN))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.PAN?.ToString()))
                     {
                         custLeadElement.eqs_internalpan = CustLeadData.CorporateEntry.PAN;
                     }
@@ -656,26 +656,26 @@
 
                     CRMCustomermappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMCustomermappingFields.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({SubEntityID})");
-                    CRMCustomermappingFields.Add("eqs_companynamepart1", CustLeadData.CorporateEntry.CompanyName.ToString());
-                    CRMCustomermappingFields.Add("eqs_companynamepart2", CustLeadData.CorporateEntry.CompanyName2.ToString());
-                    CRMCustomermappingFields.Add("eqs_companynamepart3", CustLeadData.CorporateEntry.CompanyName3.ToString());
-                    CRMCustomermappingFields.Add("eqs_contactperson", CustLeadData.CorporateEntry.PocName.ToString());
-                    CRMCustomermappingFields.Add("eqs_contactmobilenumber", CustLeadData.CorporateEntry.PocNumber.ToString());
-                    CRMCustomermappingFields.Add("eqs_dateofincorporation", CustLeadData.CorporateEntry.DateOfIncorporation.ToString());
+                    CRMCustomermappingFields.Add("eqs_companynamepart1", CustLeadData.CorporateEntry.CompanyName?.ToString());
+                    CRMCustomermappingFields.Add("eqs_companynamepart2", CustLeadData.CorporateEntry.CompanyName2?.ToString());
+                    CRMCustomermappingFields.Add("eqs_companynamepart3", CustLeadData.CorporateEntry.CompanyName3?.ToString());
+                    CRMCustomermappingFields.Add("eqs_contactperson", CustLeadData.CorporateEntry.PocName?.ToString());
+                    CRMCustomermappingFields.Add("eqs_contactmobilenumber", CustLeadData.CorporateEntry.PocNumber?.ToString());
+                    CRMCustomermappingFields.Add("eqs_dateofincorporation", CustLeadData.CorporateEntry.DateOfIncorporation?.ToString());
 
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_cinnumber", CustLeadData.CorporateEntry.CinNumber.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.TanNumber.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.TanNumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_tannumber", CustLeadData.CorporateEntry.TanNumber.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.GstNumber.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.GstNumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_gstnumber", CustLeadData.CorporateEntry.GstNumber.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CstNumber.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CstNumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_cstvatnumber", CustLeadData.CorporateEntry.CstNumber.ToString());
                     }
