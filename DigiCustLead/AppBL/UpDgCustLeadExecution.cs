@@ -236,10 +236,7 @@
                 {
                     CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
                 }
-                if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
-                {
-                    CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
-                }
+                
 
                 string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
                 CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
@@ -426,6 +423,14 @@
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.SpouseName?.ToString()))
                     {
                         CRMDDEmappingFields.Add("eqs_spousename", CustIndvData.ProspectDetails?.SpouseName?.ToString());
+                    }
+                    if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Gender?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_gendercode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_gendercode", CustIndvData.ProspectDetails?.Gender?.ToString()));
+                    }
+                    else if (!string.IsNullOrEmpty(Applicant_Data["eqs_gendercode"]?.ToString()) && Applicant_Data["eqs_gendercode"]?.ToString() != "")
+                    {
+                        CRMDDEmappingFields.Add("eqs_gendercode", Applicant_Data["eqs_gendercode"]?.ToString());
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.CountryID?.ToString()))
                     {
