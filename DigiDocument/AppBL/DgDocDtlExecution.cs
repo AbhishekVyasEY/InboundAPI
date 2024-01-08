@@ -121,10 +121,17 @@
                                     updateDocumentReturn.Add(updateDocument);
                                 }
                             }
-                        }
+                        
                         ldRtPrm.DocUpdateStatus = updateDocumentReturn;
                         ldRtPrm.ReturnCode = "CRM-SUCCESS";
                         ldRtPrm.Message = OutputMSG.Case_Success;
+                        }
+                        else
+                        {
+                            this._logger.LogInformation("ValidateDocumentInput", "Documents data is incorrect.");
+                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                            ldRtPrm.Message = "Documents data is incorrect.";
+                        }
                     }
                     else
                     {
