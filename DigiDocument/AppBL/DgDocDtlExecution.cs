@@ -82,7 +82,6 @@
 
         }
 
-
         public async Task<UpdateDgDocDtlReturn> ValidateDocumentInput(dynamic RequestData)
         {
             UpdateDgDocDtlReturn ldRtPrm = new UpdateDgDocDtlReturn();
@@ -94,84 +93,36 @@
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
-                        if (RequestData.Document.Count > 0)
+                        var catId = await this._commonFunc.getDocumentDateConfig();
+                        
+                        foreach (var item in RequestData.Document)
                         {
-                            var catId = await this._commonFunc.getDocumentDateConfig();
-                            var expirydateCategories = (from c in catId where c.Key == "docid_issue_expirydate" select c.Value)?.FirstOrDefault()?.ToString();
-                            var issuedateCategories = (from c in catId where c.Key == "docid_issuedat" select c.Value)?.FirstOrDefault()?.ToString();
-
-                            foreach (var item in RequestData.Document)
+                            DocUpdateStatus updateDocument = new DocUpdateStatus();
+                            var Fieldvalidation = this.ValidateDocumentData(item, catId);
+                            if (Fieldvalidation == "ok")
                             {
-                                DocUpdateStatus updateDocument = new DocUpdateStatus();
-                                updateDocument.SubCategoryCode = item.SubcategoryCode?.ToString();
-                                updateDocument.DocId = item.CRMDocumentID?.ToString();
-                                if (expirydateCategories.Contains(item.SubcategoryCode.ToString()) || issuedateCategories.Contains(item.SubcategoryCode.ToString()))
+                                if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
                                 {
-                                    if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) || (string.IsNullOrEmpty(item.IssueDate.ToString()))))
-                                    {
-                                        if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) && (string.IsNullOrEmpty(item.IssueDate.ToString()))))
-                                        {
-                                            updateDocument.Status = "Error";
-                                            updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate && IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
-                                        }
-                                        else
-                                        {
-                                            if (string.IsNullOrEmpty(item.ExpiryDate.ToString()))
-                                            {
-                                                updateDocument.Status = "Error";
-                                                updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
-                                            }
-                                            if (string.IsNullOrEmpty(item.IssueDate.ToString()))
-                                            {
-                                                updateDocument.Status = "Error";
-                                                updateDocument.ErrorMessage += $"Document can't be updated as IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
-                                            }
-                                        }
-                                        updateDocumentReturn.Add(updateDocument);
-                                    }
-                                    else if ((string.IsNullOrEmpty(item.ExpiryDate.ToString()) &&  (string.IsNullOrEmpty(item.IssueDate.ToString()))))
-                                    {
-                                        updateDocument.Status = "Error";
-                                        updateDocument.ErrorMessage = $"Document can't be updated as ExpiryDate && IssueDate cannot be empty for Sub Category {item.SubcategoryCode.ToString()}";
-                                        updateDocumentReturn.Add(updateDocument);
-                                    }
-                                    else
-                                    {
-                                        if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
-                                        {
-                                            updateDocument = await this.UpdateDocument(item);
-                                        }
-                                        else
-                                        {
-                                            updateDocument = await this.CreateDocument(item);
-                                        }
-                                        updateDocumentReturn.Add(updateDocument);
-                                    }
+                                    updateDocument = await this.UpdateDocument(item);
                                 }
                                 else
                                 {
-                                    if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
-                                    {
-                                        updateDocument = await this.UpdateDocument(item);
-                                    }
-                                    else
-                                    {
-                                        updateDocument = await this.CreateDocument(item);
-                                    }
-                                    updateDocumentReturn.Add(updateDocument);
+                                    updateDocument = await this.CreateDocument(item);
                                 }
+                                updateDocumentReturn.Add(updateDocument);
                             }
-                            ldRtPrm.DocUpdateStatus = updateDocumentReturn;
-                            ldRtPrm.ReturnCode = "CRM-SUCCESS";
-                            ldRtPrm.Message = OutputMSG.Case_Success;
-
+                            else
+                            {
+                                updateDocument.Status = "Error";
+                                updateDocument.SubCategoryCode = item.SubcategoryCode.ToString();
+                                updateDocument.DocId = item.DocId;
+                                updateDocument.ErrorMessage = Fieldvalidation;
+                                updateDocumentReturn.Add(updateDocument);
+                            }
                         }
-                        else
-                        {
-                            this._logger.LogInformation("ValidateDocumentInput", "Documents data is incorrect.");
-                            ldRtPrm.ReturnCode = "CRM-ERROR-102";
-                            ldRtPrm.Message = "Documents data is incorrect.";
-                        }
+                        ldRtPrm.DocUpdateStatus = updateDocumentReturn;
+                        ldRtPrm.ReturnCode = "CRM-SUCCESS";
+                        ldRtPrm.Message = OutputMSG.Case_Success;
                     }
                     else
                     {
@@ -186,8 +137,6 @@
                     ldRtPrm.ReturnCode = "CRM-ERROR-102";
                     ldRtPrm.Message = "Appkey is incorrect";
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -196,11 +145,8 @@
                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
                 ldRtPrm.Message = OutputMSG.Incorrect_Input;
             }
-
             return ldRtPrm;
-
         }
-
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -584,7 +530,75 @@
             return ldRtPrm;
         }
 
+        private string ValidateDocumentData(dynamic documentdtl, List<MasterConfiguration> configurations)
+        {
+            int ValidationError = 0;
+            string errorText = string.Empty;
 
+            var expirydateCategories = (from c in configurations where c.Key == "docid_issue_expirydate" select c.Value)?.FirstOrDefault()?.ToString();
+            var issuedateCategories = (from c in configurations where c.Key == "docid_issuedat" select c.Value)?.FirstOrDefault()?.ToString();
+            if (string.IsNullOrEmpty(documentdtl.DocumentType?.ToString()))
+            {
+                errorText += "DocumentType is mandatory";
+                ValidationError = 1;
+            }
+            if (string.IsNullOrEmpty(documentdtl.DmsDocumentID?.ToString()))
+            {
+                errorText += "DmsDocumentID is mandatory";
+                ValidationError = 1;
+            }
+            if (string.IsNullOrEmpty(documentdtl.CategoryCode?.ToString()))
+            {
+                errorText += "CategoryCode is mandatory";
+                ValidationError = 1;
+            }
+            if (string.IsNullOrEmpty(documentdtl.SubcategoryCode?.ToString()))
+            {
+                errorText += "SubcategoryCode is mandatory";
+                ValidationError = 1;
+            }
+            else
+            {
+                if (expirydateCategories.Contains(documentdtl.SubcategoryCode.ToString()) || issuedateCategories.Contains(documentdtl.SubcategoryCode.ToString()))
+                {
+                    if ((string.IsNullOrEmpty(documentdtl.ExpiryDate.ToString()) || (string.IsNullOrEmpty(documentdtl.IssueDate.ToString()))))
+                    {
+                        if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
+                        {
+                            errorText += $"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                            ValidationError = 1;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()))
+                            {
+                                errorText += $"ExpiryDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                                ValidationError = 1;
+                            }
+                            if (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))
+                            {
+                                errorText += $"IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                                ValidationError = 1;
+                            }
+                        }
+                    }
+                    else if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
+                    {
+                        errorText += $"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                        ValidationError = 1;
+                    }
+                }
+            }
+            
+            if (ValidationError > 0)
+            {
+                return string.Join(",", errorText);
+            }
+            else
+            {
+                return "ok";
+            }
+        }
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
