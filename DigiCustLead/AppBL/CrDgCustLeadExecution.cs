@@ -625,7 +625,7 @@
                     {
                         CRMLeadmappingFields.Add("eqs_leadchannel", "789030000");
                     }
-
+                    CRMLeadmappingFields.Add("eqs_createdfrompartnerchannel", "true");
                     CRMLeadmappingFields.Add("firstname", CustLeadData.CorporateEntry.CompanyName.ToString());
                     CRMLeadmappingFields.Add("lastname", CustLeadData.CorporateEntry.CompanyName2.ToString());
                     // CRMLeadmappingFields.Add("yomifullname", CustLeadData.eqs_companynamepart1 + " " + CustLeadData.eqs_companynamepart2);
