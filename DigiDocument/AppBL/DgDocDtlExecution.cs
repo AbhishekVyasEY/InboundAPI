@@ -94,30 +94,32 @@
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
                         var catId = await this._commonFunc.getDocumentDateConfig();
-                        
-                        foreach (var item in RequestData.Document)
+                        if (RequestData.Document?.Count > 0)
                         {
-                            DocUpdateStatus updateDocument = new DocUpdateStatus();
-                            var Fieldvalidation = this.ValidateDocumentData(item, catId);
-                            if (Fieldvalidation == "ok")
+                            foreach (var item in RequestData.Document)
                             {
-                                if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
+                                DocUpdateStatus updateDocument = new DocUpdateStatus();
+                                var Fieldvalidation = this.ValidateDocumentData(item, catId);
+                                if (Fieldvalidation == "ok")
                                 {
-                                    updateDocument = await this.UpdateDocument(item);
+                                    if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
+                                    {
+                                        updateDocument = await this.UpdateDocument(item);
+                                    }
+                                    else
+                                    {
+                                        updateDocument = await this.CreateDocument(item);
+                                    }
+                                    updateDocumentReturn.Add(updateDocument);
                                 }
                                 else
                                 {
-                                    updateDocument = await this.CreateDocument(item);
+                                    updateDocument.Status = "Error";
+                                    updateDocument.SubCategoryCode = item.SubcategoryCode.ToString();
+                                    updateDocument.DocId = item.DocId;
+                                    updateDocument.ErrorMessage = Fieldvalidation;
+                                    updateDocumentReturn.Add(updateDocument);
                                 }
-                                updateDocumentReturn.Add(updateDocument);
-                            }
-                            else
-                            {
-                                updateDocument.Status = "Error";
-                                updateDocument.SubCategoryCode = item.SubcategoryCode.ToString();
-                                updateDocument.DocId = item.DocId;
-                                updateDocument.ErrorMessage = Fieldvalidation;
-                                updateDocumentReturn.Add(updateDocument);
                             }
                         }
                         ldRtPrm.DocUpdateStatus = updateDocumentReturn;
