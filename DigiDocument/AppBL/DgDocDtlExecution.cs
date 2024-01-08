@@ -542,28 +542,28 @@
         private string ValidateDocumentData(dynamic documentdtl, List<MasterConfiguration> configurations)
         {
             int ValidationError = 0;
-            string errorText = string.Empty;
+            List<string> fields = new List<string>();
 
             var expirydateCategories = (from c in configurations where c.Key == "docid_issue_expirydate" select c.Value)?.FirstOrDefault()?.ToString();
             var issuedateCategories = (from c in configurations where c.Key == "docid_issuedat" select c.Value)?.FirstOrDefault()?.ToString();
             if (string.IsNullOrEmpty(documentdtl.DocumentType?.ToString()))
             {
-                errorText += "DocumentType is mandatory";
+                fields.Add("DocumentType");
                 ValidationError = 1;
             }
             if (string.IsNullOrEmpty(documentdtl.DmsDocumentID?.ToString()))
             {
-                errorText += "DmsDocumentID is mandatory";
+                fields.Add("DmsDocumentID");
                 ValidationError = 1;
             }
             if (string.IsNullOrEmpty(documentdtl.CategoryCode?.ToString()))
             {
-                errorText += "CategoryCode is mandatory";
+                fields.Add("CategoryCode");
                 ValidationError = 1;
             }
             if (string.IsNullOrEmpty(documentdtl.SubcategoryCode?.ToString()))
             {
-                errorText += "SubcategoryCode is mandatory";
+                fields.Add("SubcategoryCode");
                 ValidationError = 1;
             }
             else
@@ -574,26 +574,26 @@
                     {
                         if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
                         {
-                            errorText += $"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                            fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
                             ValidationError = 1;
                         }
                         else
                         {
                             if (string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()))
                             {
-                                errorText += $"ExpiryDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                                fields.Add($"ExpiryDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
                                 ValidationError = 1;
                             }
                             if (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))
                             {
-                                errorText += $"IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                                fields.Add($"IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
                                 ValidationError = 1;
                             }
                         }
                     }
                     else if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
                     {
-                        errorText += $"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}";
+                        fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
                         ValidationError = 1;
                     }
                 }
@@ -601,7 +601,7 @@
             
             if (ValidationError > 0)
             {
-                return string.Join(",", errorText);
+                return string.Join(",", fields) + " fields should not be null!";
             }
             else
             {
