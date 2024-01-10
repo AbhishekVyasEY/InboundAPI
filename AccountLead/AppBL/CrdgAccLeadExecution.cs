@@ -489,18 +489,18 @@
                     hasError = 1;
                     errors.Add(applicant.UCIC + " SubentityType");
                 }
-               
-               
 
-               if (applicant.isPrimaryHolder == false && !string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
+
+
+                if (applicant.isPrimaryHolder == false && !string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
                 {
                     odatab.Add("eqs_relationship@odata.bind", $"eqs_relationships({await this._commonFunc.getRelationshipId(applicant.relationToPrimaryHolder)})");
                 }
-                else if (applicant.isPrimaryHolder == false && string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
-                {
-                    hasError = 1;
-                    errors.Add(applicant.UCIC + " RelationToPrimaryHolder");
-                }
+                //else if (applicant.isPrimaryHolder == false && string.IsNullOrEmpty(applicant.relationToPrimaryHolder))
+                //{
+                //    hasError = 1;
+                //    errors.Add(applicant.UCIC + " RelationToPrimaryHolder");
+                //}
 
                 if (hasError==1)
                 {
@@ -781,16 +781,16 @@
                         }
 
                         
-                        if (item.isPrimaryHolder?.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder?.ToString()))
-                        {
+                        //if (item.isPrimaryHolder?.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder?.ToString()))
+                        //{
 
-                            ValidationError = 1;
-                            errorText.Add("relationToPrimaryHolder");
-                        }
-                        else
-                        {
-                            accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
-                        }
+                        //    ValidationError = 1;
+                        //    errorText.Add("relationToPrimaryHolder");
+                        //}
+                        //else
+                        //{
+                        //    accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
+                        //}
 
                         
 
