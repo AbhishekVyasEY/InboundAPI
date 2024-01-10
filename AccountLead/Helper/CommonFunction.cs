@@ -282,7 +282,7 @@ namespace AccountLead
             {
                 string leadaccount_id = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", AccountID);
                 string Stage = await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddeaccounts()?$select=eqs_readyforonboarding,eqs_onboardingvalidationmessage,eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value,_eqs_productcategoryid_value,eqs_instakitcode,eqs_instakitaccountnumber,eqs_applicationdate&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}";
+                string query_url = $"eqs_ddeaccounts()?$select=eqs_readyforonboarding,eqs_onboardingvalidationmessage,eqs_ddeaccountid,_eqs_leadaccountid_value,eqs_accountownershipcode,_eqs_productid_value,_eqs_productcategoryid_value,eqs_instakitcode,eqs_instakitaccountnumber,eqs_applicationdate,eqs_depositamount,eqs_tenureindays,eqs_tenureinmonths&$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;

@@ -323,6 +323,7 @@ namespace AccountLead
                                 }
 
                                 msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
+                                
                             }
                             else
                             {
@@ -357,6 +358,9 @@ namespace AccountLead
                             else if (productCat == "PCAT05")
                             {
                                 msgBdy.Remove("tdaccountPayinRequest");
+                                msgBdy.tdaccountPayinRequest.depositAmount = AccountDDE[0]["eqs_depositamount"].ToString();
+                                msgBdy.tdaccountPayinRequest.termDays = AccountDDE[0]["eqs_tenureindays"].ToString();
+                                msgBdy.tdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
                             }
                             else
                             {
