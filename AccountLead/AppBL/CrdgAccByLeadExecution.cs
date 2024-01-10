@@ -51,14 +51,19 @@ namespace AccountLead
 
         public string appkey { set; get; }
 
-        public string API_Name { set
+        public string API_Name
+        {
+            set
             {
                 _logger.API_Name = value;
             }
         }
-        public string Input_payload { set {
+        public string Input_payload
+        {
+            set
+            {
                 _logger.Input_payload = value;
-            } 
+            }
         }
 
         private readonly IKeyVaultService _keyVaultService;
@@ -67,14 +72,14 @@ namespace AccountLead
         private AccountLead _accountLead;
         private LeadParam _leadParam;
         private List<AccountApplicant> _accountApplicants;
-       
+
         private ICommonFunction _commonFunc;
 
         public CrdgAccByLeadExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
         {
-                    
+
             this._logger = logger;
-            
+
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
             this._commonFunc = commonFunction;
@@ -83,7 +88,7 @@ namespace AccountLead
             _accountLead = new AccountLead();
             _accountApplicants = new List<AccountApplicant>();
 
-            
+
         }
 
 
@@ -92,7 +97,7 @@ namespace AccountLead
             AccountByLeadReturn ldRtPrm = new AccountByLeadReturn();
             RequestData = await this.getRequestData(RequestData, "CreateDigiAccountByLead");
             try
-            { 
+            {
 
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "CreateDigiAccountByLeadappkey"))
                 {
@@ -130,7 +135,7 @@ namespace AccountLead
                 this._logger.LogError("ValidateLeadtInput", ex.Message);
                 throw ex;
             }
-            
+
         }
 
 
@@ -138,15 +143,15 @@ namespace AccountLead
         {
             AccountByLeadReturn accountLeadReturn = new AccountByLeadReturn();
             try
-            {               
+            {
 
                 string Token = await this._queryParser.getAccessToken();
-                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"WIZARDAUTH3\",\"token\":\"1001\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20161104\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"9834\",\"area\":\"91\",\"number\":\"916345343425\",\"extn\":\"2342\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\"},\"emailId\":\"sjfjg@hgsd.com\",\"name\":\"PAAVAI\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"916352673569\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\",\"line4\":\"string\",\"city\":\"Erode\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"638103\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Podiya\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMILNADU\",\"zip\":\"638103\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"137770003\",\"customerName\":\"IlangoSelvam\",\"relation\":\"SOW\"}],\"customerID\":\"137770003\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"transactionType\":\"A\",\"minorAcctStatus\":false,\"productCode\":2005,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"termMonths\":0}}}}";
+                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"WIZARDAUTH3\",\"token\":\"1001\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20161104\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"9834\",\"area\":\"91\",\"number\":\"916345343425\",\"extn\":\"2342\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\"},\"emailId\":\"sjfjg@hgsd.com\",\"name\":\"PAAVAI\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"916352673569\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\",\"line4\":\"string\",\"city\":\"Erode\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"638103\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Podiya\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMILNADU\",\"zip\":\"638103\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"137770003\",\"customerName\":\"IlangoSelvam\",\"relation\":\"SOW\"}],\"customerID\":\"137770003\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"transactionType\":\"A\",\"minorAcctStatus\":false,\"productCode\":2005,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"providerAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termMonths\":0}}}}";
                 dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                 dynamic msgHdr = Request_Template.createAccountRequest.msgHdr;
                 dynamic msgBdy = Request_Template.createAccountRequest.msgBdy;
                 Guid ReferenceId = Guid.NewGuid();
-                msgHdr.conversationID = ReferenceId.ToString().Replace("-","");
+                msgHdr.conversationID = ReferenceId.ToString().Replace("-", "");
                 msgHdr.externalReferenceId = ReferenceId.ToString().Replace("-", "");
                 Request_Template.createAccountRequest.msgHdr = msgHdr;
 
@@ -155,17 +160,17 @@ namespace AccountLead
                 var AccountDDE = await this._commonFunc.getAccountLeadData(accountLead);
                 if (AccountDDE.Count > 0)
                 {
-					if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
+                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_readyforonboarding"].ToString()) && Convert.ToBoolean(AccountDDE[0]["eqs_readyforonboarding"].ToString()))
                     {
                         string Lead_details = "";
                         dynamic responsD = "";
-                        
+
 
                         string Instrakit_Text = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_instakitcode", AccountDDE[0]["eqs_instakitcode"].ToString());
                         if (Instrakit_Text == "Insta Kit")
                         {
                             var ApplicentDDE = await this._commonFunc.getApplicentFinalDDEbyAccountLead((AccountDDE[0]["eqs_ddeaccountid"].ToString()));
-                            if (ApplicentDDE.Count >0)
+                            if (ApplicentDDE.Count > 0)
                             {
                                 RequestTemplate = "{\"activateWizInstantAccountReq\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"string\",\"externalReferenceId\":\"\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"9999\",\"userID\":\"WIZARDAUTH3\"}},\"msgBdy\":{\"accountId\":\"100048413491\",\"accountTitle\":\"NandhaKannan\",\"acctOperatingInstr\":\"Single\",\"custDtls\":{\"businessType\":\"\",\"countryOfResidence\":\"IN\",\"custEducation\":\"\",\"custIC\":\"13971357\",\"custType\":\"I\",\"customerMobilePhone\":\"918667266490\",\"dateOfBirthReg\":\"1988-12-17\",\"designation\":\"\",\"empID\":\"\",\"firstName\":\"KARTHIKA\",\"gender\":\"F\",\"icType\":\"\",\"incomeTaxNo\":\"PEZEZ9616J\",\"lastName\":\"C\",\"mailAddEmail\":\"a_karthikac@equitasbank.com\",\"mailPhoneRes\":\"0918667266490\",\"mailPhoneoff\":\"\",\"mailingAddress\":{\"city\":\"PERUNGUDI.\",\"country\":\"IN\",\"line1\":\"Westmambalam\",\"line2\":\"Westmambalam\",\"line3\":\"Ramnagar\",\"state\":\"TAMIL NADU\",\"zip\":\"600096\"},\"maritalStatus\":\"2\",\"middleName\":\"\",\"motherMaidenName\":\"Dfgh\",\"namPrefix\":\"MRS.\",\"nationality\":\"IN\",\"professionCode\":\"15\",\"repPermAdd\":\"N\",\"shortName\":\"KARTHIKAC\",\"signType\":\"1\",\"staff\":\"N\"},\"custId\":\"13971357\",\"dateAcctOpen\":\"2023-09-21\",\"flgBA525\":\"Y\",\"flgCM01\":\"N\",\"limitProfile\":\"\",\"nomineeDtls\":{\"guardianAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"34/65\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMIL NADU\",\"zip\":\"600033\"},\"guardianEmailId\":\"\",\"guardianMobile\":\"\",\"guardianName\":\"Chandru\",\"guardianPhoneArea\":\"91\",\"guardianPhoneCntry\":\"91\",\"guardianPhoneExt\":\"91\",\"guardianRel\":\"1\",\"isBankCustomer\":\"N\",\"nomAddress\":{\"city\":\"WESTMAMBALAM\",\"country\":\"IN\",\"line1\":\"32/45\",\"line2\":\"Ramcolony\",\"line3\":\"Westmambalam\",\"state\":\"TAMILNADU\",\"zip\":\"600033\"},\"nomCustId\":\"\",\"nomDOB\":\"1998-07-16\",\"nomEmailId\":\"\",\"nomMobile\":\"\",\"nomName\":\"Mithraan\",\"nomPhoneArea\":\"91\",\"nomPhoneCntry\":\"91\",\"nomPhoneExt\":\"91\",\"nomRegNo\":\"\",\"nomRel\":\"4\"}}}}";
                                 Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
@@ -198,7 +203,7 @@ namespace AccountLead
                                 msgBdy.custDtls.lastName = ApplicentDDE[0]["eqs_lastname"].ToString();
                                 msgBdy.custDtls.mailAddEmail = ApplicentDDE[0]["eqs_emailid"].ToString();
                                 msgBdy.custDtls.mailPhoneRes = ApplicentDDE[0]["eqs_mobilenumber"].ToString();
-                               // msgBdy.custDtls.namPrefix = ApplicentDDE[0]["custid"].ToString();
+                                // msgBdy.custDtls.namPrefix = ApplicentDDE[0]["custid"].ToString();
                                 msgBdy.custDtls.shortName = ApplicentDDE[0]["eqs_shortname"].ToString();
 
                                 var address = await this._commonFunc.getAddressData(ApplicentDDE[0]["eqs_ddeindividualcustomerid"].ToString());
@@ -218,11 +223,11 @@ namespace AccountLead
                                     dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
                                     mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
                                     yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
-                           
+
                                     msgBdy.nomineeDtls.nomDOB = yy + mm + dd;
                                     msgBdy.nomineeDtls.nomName = Nominee[0]["eqs_nomineename"].ToString();
 
-                                    
+
                                     msgBdy.nomineeDtls.nomAddress.line1 = Nominee[0]["eqs_addressline1"].ToString();
                                     msgBdy.nomineeDtls.nomAddress.line2 = Nominee[0]["eqs_addressline2"].ToString();
                                     msgBdy.nomineeDtls.nomAddress.line3 = Nominee[0]["eqs_addressline3"].ToString();
@@ -232,7 +237,7 @@ namespace AccountLead
 
                                     msgBdy.nomineeDtls.guardianName = Nominee[0]["eqs_guardianname"].ToString();
 
-                                
+
                                     msgBdy.nomineeDtls.guardianAddress.line1 = Nominee[0]["eqs_guardianaddressline1"].ToString();
                                     msgBdy.nomineeDtls.guardianAddress.line2 = Nominee[0]["eqs_guardianaddressline2"].ToString();
                                     msgBdy.nomineeDtls.guardianAddress.line3 = Nominee[0]["eqs_guardianaddressline3"].ToString();
@@ -244,7 +249,7 @@ namespace AccountLead
                                 {
                                     msgBdy.Remove("nomineeDtls");
                                 }
-                                
+
 
                                 Request_Template.activateWizInstantAccountReq.msgBdy = msgBdy;
                                 string wso_request = JsonConvert.SerializeObject(Request_Template);
@@ -257,9 +262,9 @@ namespace AccountLead
                                 accountLeadReturn.Message = "ApplicentDDE Final not found!";
                                 accountLeadReturn.ReturnCode = "CRM-ERROR-102";
                             }
-                            
+
                         }
-                        
+
                         else
                         {
                             var Nominee = await this._commonFunc.getAccountNominee(AccountDDE[0]["eqs_ddeaccountid"].ToString());
@@ -323,7 +328,7 @@ namespace AccountLead
                                 }
 
                                 msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
-                                
+
                             }
                             else
                             {
@@ -351,6 +356,28 @@ namespace AccountLead
                             msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
                             msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
 
+
+                            msgBdy.tdaccountPayinRequest.depositAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
+                            msgBdy.tdaccountPayinRequest.termDays = AccountDDE[0]["eqs_tenureindays"].ToString();
+                            msgBdy.tdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString()))
+                                msgBdy.tdaccountPayinRequest.fromAccountNo = AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString();
+                            else
+                            {
+                                msgBdy.tdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
+                                msgBdy.tdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
+                            }
+
+                            msgBdy.rdaccountPayinRequest.installmentAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
+                            msgBdy.rdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString()))
+                                msgBdy.rdaccountPayinRequest.providerAccountNo = AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString();
+                            else
+                            {
+                                msgBdy.rdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
+                                msgBdy.rdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
+                            }
+
                             if (productCat == "PCAT04")
                             {
                                 msgBdy.Remove("rdaccountPayinRequest");
@@ -358,9 +385,6 @@ namespace AccountLead
                             else if (productCat == "PCAT05")
                             {
                                 msgBdy.Remove("tdaccountPayinRequest");
-                                msgBdy.tdaccountPayinRequest.depositAmount = AccountDDE[0]["eqs_depositamount"].ToString();
-                                msgBdy.tdaccountPayinRequest.termDays = AccountDDE[0]["eqs_tenureindays"].ToString();
-                                msgBdy.tdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
                             }
                             else
                             {
@@ -379,30 +403,30 @@ namespace AccountLead
                             responsD = JsonConvert.DeserializeObject(Lead_details);
                         }
 
-						if(responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
-						{
-							accountLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
-							accountLeadReturn.ReturnCode = "CRM-ERROR-102";
-						}
-						else if(responsD.createAccountResponse!= null && responsD.createAccountResponse.msgBdy != null)
-						{
-							Dictionary<string,string> fieldInput = new Dictionary<string,string>();
-							
-							accountLeadReturn.AccountNo = responsD.createAccountResponse.msgBdy.accountNo.ToString();
-							fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
-							string postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                        if (responsD.msgHdr != null && responsD.msgHdr.result.ToString() == "ERROR")
+                        {
+                            accountLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
+                            accountLeadReturn.ReturnCode = "CRM-ERROR-102";
+                        }
+                        else if (responsD.createAccountResponse != null && responsD.createAccountResponse.msgBdy != null)
+                        {
+                            Dictionary<string, string> fieldInput = new Dictionary<string, string>();
 
-							await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
-							
-							accountLeadReturn.Message = OutputMSG.Case_Success;
-							accountLeadReturn.ReturnCode = "CRM-SUCCESS";
-						}
-						else
-						{
-							accountLeadReturn.Message = Lead_details;
-							accountLeadReturn.ReturnCode = "CRM-ERROR-101";
-						}
-					}
+                            accountLeadReturn.AccountNo = responsD.createAccountResponse.msgBdy.accountNo.ToString();
+                            fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
+                            string postDataParametr = JsonConvert.SerializeObject(fieldInput);
+
+                            await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
+
+                            accountLeadReturn.Message = OutputMSG.Case_Success;
+                            accountLeadReturn.ReturnCode = "CRM-SUCCESS";
+                        }
+                        else
+                        {
+                            accountLeadReturn.Message = Lead_details;
+                            accountLeadReturn.ReturnCode = "CRM-ERROR-101";
+                        }
+                    }
                     else
                     {
                         accountLeadReturn.Message = "Lead cannot be onboarded. " + AccountDDE[0]["eqs_onboardingvalidationmessage"].ToString().Replace("\r\n", ", ").Trim().Trim(',');
@@ -414,7 +438,7 @@ namespace AccountLead
                     accountLeadReturn.Message = OutputMSG.Resource_n_Found;
                     accountLeadReturn.ReturnCode = "CRM-ERROR-101";
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -428,9 +452,9 @@ namespace AccountLead
         }
 
 
-       
 
-       
+
+
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -443,9 +467,9 @@ namespace AccountLead
                 return false;
             }
         }
-                        
 
-       
+
+
 
         public async Task<string> EncriptRespons(string ResponsData, string Bankcode)
         {

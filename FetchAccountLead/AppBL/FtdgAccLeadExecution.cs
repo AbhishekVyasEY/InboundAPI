@@ -219,17 +219,17 @@
             ProductDetails productDetails = new ProductDetails();
             productDetails.MinimumDepositAmount = LeadData[0]["eqs_minimumdepositamount"].ToString();
             productDetails.MaximumDepositAmount = LeadData[0]["eqs_maximumdepositamount"].ToString();
-            productDetails.CompoundingFrequency = LeadData[0]["eqs_compoundingfrequency"].ToString();
+            productDetails.CompoundingFrequency = LeadData[0]["eqs_compoundingfrequencytype"].ToString();
             productDetails.MinimumTenureMonths = LeadData[0]["eqs_minimumtenuremonths"].ToString();
             productDetails.MaximumTenureMonths = LeadData[0]["eqs_maximumtenuremonths"].ToString();
-            productDetails.PayoutFrequency = LeadData[0]["eqs_payoutfrequency"].ToString();
+            productDetails.PayoutFrequency = LeadData[0]["eqs_payoutfrequencytype"].ToString();
             productDetails.MinimumTenureDays = LeadData[0]["eqs_minimumtenuredays"].ToString();
             productDetails.MaximumTenureDays = LeadData[0]["eqs_maximumtenuredays"].ToString();
             productDetails.InterestCompoundFrequency = LeadData[0]["eqs_interestcompoundfrequency"].ToString();
 
             DepositDetails depositDetails = new DepositDetails();
             depositDetails.DepositVariancePercentage = LeadData[0]["eqs_depositvariance"].ToString();
-            depositDetails.DepositAmount = LeadData[0]["eqs_depositamount"].ToString();
+            depositDetails.DepositAmount = LeadData[0]["eqs_depositamountslot"].ToString();
             depositDetails.FromESFBAccountNumber = LeadData[0]["eqs_fromesfbaccountnumber"].ToString();
             depositDetails.FromESFBGLAccount = LeadData[0]["eqs_fromesfbglaccount"].ToString();
             depositDetails.CurrencyofDeposit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_currencyofdepositcode", LeadData[0]["eqs_currencyofdepositcode"].ToString());
@@ -400,7 +400,7 @@
             accountLead.rateOfInterest = LeadData[0]["eqs_rateofinterest"].ToString();
             accountLead.fundsTobeDebitedFrom = LeadData[0]["eqs_fundstobedebitedfrom"].ToString();
             accountLead.InitialDeposit = await this._queryParser.getOptionSetValuToText("eqs_leadaccount", "eqs_initialdepositamountcode", LeadData[0]["eqs_initialdepositamountcode"].ToString());
-            accountLead.depositAmount = LeadData[0]["eqs_depositamount"].ToString();
+            accountLead.depositAmount = LeadData[0]["eqs_depositamountslot"].ToString();
             accountLead.mopRemarks = LeadData[0]["eqs_modeofoperationremarks"].ToString();
             accountLead.fdAccOpeningDate = LeadData[0]["eqs_fdvaluedate"].ToString();
             accountLead.sweepFacility = LeadData[0]["eqs_sweepfacility"].ToString();
