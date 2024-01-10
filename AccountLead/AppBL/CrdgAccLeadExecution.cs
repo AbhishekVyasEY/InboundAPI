@@ -780,7 +780,10 @@
                             accountApplicant.isPrimaryHolder = item.isPrimaryHolder;
                         }
 
-                        
+                        if (!string.IsNullOrEmpty(item.relationToPrimaryHolder?.ToString()))
+                        {
+                            accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
+                        }
                         //if (item.isPrimaryHolder?.ToString() == "false" && string.IsNullOrEmpty(item.relationToPrimaryHolder?.ToString()))
                         //{
 
@@ -792,9 +795,9 @@
                         //    accountApplicant.relationToPrimaryHolder = item.relationToPrimaryHolder;
                         //}
 
-                        
 
-                            _accountApplicants.Add(accountApplicant);
+
+                        _accountApplicants.Add(accountApplicant);
                        
                        
                     }
