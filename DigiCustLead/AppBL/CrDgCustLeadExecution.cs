@@ -480,6 +480,9 @@
 
                     CRMCustomermappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMCustomermappingFields.Add("eqs_subentity@odata.bind", $"eqs_subentitytypes({SubEntityID})");
+                    CRMCustomermappingFields.Add("eqs_productid@odata.bind", $"eqs_products({ProductId})");
+                    CRMCustomermappingFields.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({Productcategoryid})");
+                    CRMCustomermappingFields.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({Businesscategoryid})");
 
                     if (Lead_details.Count > 0)
                     {
@@ -684,9 +687,11 @@
                     {
                         CRMCustomermappingFields.Add("eqs_cstvatnumber", CustLeadData.CorporateEntry.CstNumber.ToString());
                     }
-                  
+                    CRMCustomermappingFields.Add("eqs_productid@odata.bind", $"eqs_products({ProductId})");
+                    CRMCustomermappingFields.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({Productcategoryid})");
+                    CRMCustomermappingFields.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({Businesscategoryid})");
 
-                  
+
                     CRMCustomermappingFields.Add("eqs_panform60code", "615290000");
 
                     if (!string.IsNullOrEmpty(Applicent_ID?.ToString()))
