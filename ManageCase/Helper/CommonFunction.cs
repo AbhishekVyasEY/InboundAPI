@@ -282,7 +282,22 @@ namespace ManageCase
 
         }
 
+        public async Task<JArray> getCityDetails(string CityID)
+        {
+            try
+            {
+                string query_url = $"eqs_cities?$select=eqs_cityid,_eqs_countryid_value,_eqs_stateid_value&$filter=eqs_citycode eq '{CityID}'";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseStatus", ex.Message);
+                throw ex;
+            }
 
+        }
 
         public async Task<JArray> getCaseStatus(string CaseID)
         {

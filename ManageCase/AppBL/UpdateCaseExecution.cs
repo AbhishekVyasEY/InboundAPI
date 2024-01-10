@@ -109,13 +109,6 @@
                             errors.Add("AccountNumber");
                         }
 
-                        if (!string.IsNullOrEmpty(CaseData.CRMModification?.Customer?.Account.ToString())
-                            && string.IsNullOrEmpty(CaseData.CRMModification?.Customer?.Account?.AccountNumber.ToString()))
-                        {
-                            ValidationError = 1;
-                            errors.Add("AccountNumber");
-                        }
-
                         if (!string.IsNullOrEmpty(CaseData.Address?.ToString()))
                         {
                             dynamic addresses = CaseData.Address;
@@ -179,26 +172,16 @@
             if (caseData.Count > 0)
             {
                 string caseid = caseData[0]["incidentid"].ToString();
+                string currentstate = caseData[0]["statecode"].ToString();
+                if (currentstate != "0")
+                {
+                    caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                    caseRtPrm.Message = "Unable to update, case is already closed.";
+                    return caseRtPrm;
+                }
                 string statuscode = await this._queryParser.getOptionSetTextToValue("incident", "statuscode", RequestData.CaseStatus.ToString());
 
-
-                if (statuscode == "615290000") //Auto Closed
-                {
-                    Dictionary<string, string> incidentresolution = new Dictionary<string, string>
-                    {
-                        { "subject", "Case Auto Closed" },
-                        { "incidentid@odata.bind", $"/incidents({caseid})" },
-                        { "description", "Resolved via Inbound API" }
-                    };
-
-                    Dictionary<string, object> odatab = new Dictionary<string, object>();
-                    odatab.Add("IncidentResolution", incidentresolution);
-                    odatab.Add("Status", statuscode);
-
-                    string caseDataParametr = JsonConvert.SerializeObject(odatab);
-                    var Case_details = await this._queryParser.HttpApiCall($"CloseIncident", HttpMethod.Post, caseDataParametr);
-                }
-                else
+                if (statuscode == "615290002") //Queued for Manual Processing
                 {
                     Dictionary<string, object> odatab = new Dictionary<string, object>();
                     odatab.Add("statuscode", statuscode);
@@ -214,6 +197,14 @@
                         return caseRtPrm;
                     }
 
+                    caseRtPrm.CaseID = RequestData.CaseId.ToString();
+                    caseRtPrm.ReturnCode = "CRM-SUCCESS";
+                    caseRtPrm.Message = "API executed successfully";
+                }
+                else if (statuscode == "615290000") //Auto Closed
+                {
+                    Dictionary<string, object> odatab;
+
                     if (!string.IsNullOrEmpty(RequestData.CRMModification?.Customer?.ToString()))
                     {
                         string customerid = caseData[0]["_customerid_value"].ToString();
@@ -226,138 +217,148 @@
 
                         if (entityType.ToLower() == "individual")
                         {
-                            odatab.Add("eqs_relationshipmanager", CustData.BasicInfo?.RelationshipManager.ToString());
-                            odatab.Add("eqs_branch", CustData.BasicInfo?.HomeBranch.ToString());
-                            odatab.Add("eqs_titleidslot", CustData.Individual?.Title.ToString());
-                            odatab.Add("firstname", CustData.Individual?.FirstName.ToString());
-                            odatab.Add("middlename", CustData.Individual?.MiddleName.ToString());
-                            odatab.Add("lastname", CustData.Individual?.LastName.ToString());
-                            odatab.Add("eqs_shortname", CustData.Individual?.ShortName.ToString());
-                            odatab.Add("mobilephone", CustData.Individual?.MobilePhone.ToString());
-                            odatab.Add("emailaddress1", CustData.Individual?.EmailID.ToString());
-                            odatab.Add("eqs_pan", CustData.Individual?.PAN.ToString());
-                            odatab.Add("eqs_panformslot", CustData.Individual?.Form60.ToString());
-                            odatab.Add("eqs_aadharreference", CustData.Individual?.Aadhar.ToString());
-                            odatab.Add("eqs_genderslot", CustData.Individual?.Gender.ToString());
-                            odatab.Add("eqs_mothermaidenname", CustData.Individual?.MotherMaidenName.ToString());
-                            odatab.Add("eqs_nationalityid", CustData.Individual?.Nationality.ToString());
-                            odatab.Add("eqs_politicallyexposedperson", CustData.Individual?.PoliticallyExposedPerson.ToString());
-                            odatab.Add("eqs_purposeofcreation", CustData.Individual?.Purposeofcreation.ToString());
-                            odatab.Add("eqs_nrikycmode", CustData.Individual?.Nrikycmode.ToString());
-                            odatab.Add("eqs_nrimobilenopref", CustData.Individual?.Nrimobilenopref.ToString());
-                            odatab.Add("eqs_voterid", CustData.Individual?.Voterid.ToString());
-                            odatab.Add("eqs_dlnumber", CustData.Individual?.Drivinglicense.ToString());
-                            odatab.Add("eqs_passportnumber", CustData.Individual?.Passport.ToString());
-                            odatab.Add("eqs_nrivisatype", CustData.Individual?.Nrivisatype.ToString());
-                            odatab.Add("eqs_ckycnumber", CustData.Individual?.Ckycnumber.ToString());
-                            odatab.Add("eqs_programslot", CustData.Individual?.Program.ToString());
+                            if (CustData.BasicInfo != null)
+                            {
+                                odatab.Add("eqs_relationshipmanager", CustData.BasicInfo?.RelationshipManager?.ToString());
+                                if (!string.IsNullOrEmpty(CustData.BasicInfo?.HomeBranch?.ToString()))
+                                {
+                                    odatab.Add("eqs_branch", CustData.BasicInfo?.HomeBranch?.ToString());
+                                    string branchid = await this._commonFunc.getBranchId(CustData.BasicInfo.HomeBranch.ToString());
+                                    odatab.Add("eqs_branchid@odata.bind", $"/eqs_branchs({branchid})");
+                                }
+                                else
+                                {
+                                    odatab.Add("eqs_branchid", null);
+                                }
+                            }
+                            if (CustData.Individual != null)
+                            {
+                                odatab.Add("eqs_titleidslot", CustData.Individual?.Title?.ToString());
+                                odatab.Add("firstname", CustData.Individual?.FirstName?.ToString());
+                                odatab.Add("middlename", CustData.Individual?.MiddleName?.ToString());
+                                odatab.Add("lastname", CustData.Individual?.LastName?.ToString());
+                                odatab.Add("eqs_shortname", CustData.Individual?.ShortName?.ToString());
+                                odatab.Add("mobilephone", CustData.Individual?.MobilePhone?.ToString());
+                                odatab.Add("emailaddress1", CustData.Individual?.EmailID?.ToString());
+                                odatab.Add("eqs_pan", CustData.Individual?.PAN?.ToString());
+                                odatab.Add("eqs_panformslot", CustData.Individual?.Form60?.ToString());
+                                odatab.Add("eqs_aadharreference", CustData.Individual?.Aadhar?.ToString());
+                                odatab.Add("eqs_genderslot", CustData.Individual?.Gender?.ToString());
+                                odatab.Add("eqs_mothermaidenname", CustData.Individual?.MotherMaidenName?.ToString());
+                                odatab.Add("eqs_nationalityid", CustData.Individual?.Nationality?.ToString());
+                                odatab.Add("eqs_politicallyexposedperson", CustData.Individual?.PoliticallyExposedPerson?.ToString());
+                                odatab.Add("eqs_purposeofcreation", CustData.Individual?.Purposeofcreation?.ToString());
+                                odatab.Add("eqs_nrikycmode", CustData.Individual?.Nrikycmode?.ToString());
+                                odatab.Add("eqs_nrimobilenopref", CustData.Individual?.Nrimobilenopref?.ToString());
+                                odatab.Add("eqs_voterid", CustData.Individual?.Voterid?.ToString());
+                                odatab.Add("eqs_dlnumber", CustData.Individual?.Drivinglicense?.ToString());
+                                odatab.Add("eqs_passportnumber", CustData.Individual?.Passport?.ToString());
+                                odatab.Add("eqs_nrivisatype", CustData.Individual?.Nrivisatype?.ToString());
+                                odatab.Add("eqs_ckycnumber", CustData.Individual?.Ckycnumber?.ToString());
+                                odatab.Add("eqs_programslot", CustData.Individual?.Program?.ToString());
 
-                            if (!string.IsNullOrEmpty(CustData.BasicInfo?.HomeBranch.ToString()))
-                            {
-                                string branchid = await this._commonFunc.getBranchId(CustData.BasicInfo.HomeBranch.ToString());
-                                odatab.Add("eqs_branchid@odata.bind", $"/eqs_branchs({branchid})");
-                            }
-                            else
-                            {
-                                odatab.Add("eqs_branchid", null);
-                            }
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.DOB.ToString()))
-                            {
-                                dd = CustData.Individual?.DOB.ToString().Substring(0, 2);
-                                mm = CustData.Individual?.DOB.ToString().Substring(3, 2);
-                                yyyy = CustData.Individual?.DOB.ToString().Substring(6, 4);
-                                odatab.Add("birthdate", yyyy + "-" + mm + "-" + dd);
-                            }
-                            else
-                                odatab.Add("birthdate", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.IfStaffThenEmployeeID.ToString()))
-                            {
-                                odatab.Add("eqs_isstafffcode", await this._queryParser.getOptionSetTextToValue("contact", "eqs_isstafffcode", "Yes"));
-                                odatab.Add("eqs_ifstaffthenemployeeid", CustData.Individual?.IfStaffThenEmployeeID.ToString());
-                            }
-                            else
-                            {
-                                odatab.Add("eqs_isstafffcode", await this._queryParser.getOptionSetTextToValue("contact", "eqs_isstafffcode", "No"));
-                                odatab.Add("eqs_ifstaffthenemployeeid", null);
-                            }
+                                if (!string.IsNullOrEmpty(CustData.Individual?.DOB?.ToString()))
+                                {
+                                    dd = CustData.Individual?.DOB.ToString().Substring(0, 2);
+                                    mm = CustData.Individual?.DOB.ToString().Substring(3, 2);
+                                    yyyy = CustData.Individual?.DOB.ToString().Substring(6, 4);
+                                    odatab.Add("birthdate", yyyy + "-" + mm + "-" + dd);
+                                }
+                                else
+                                    odatab.Add("birthdate", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Nationality.ToString()))
-                            {
-                                string nationalityid = await this._commonFunc.getNationalityId(CustData.Individual?.Nationality.ToString());
-                                odatab.Add("eqs_nationalitylu@odata.bind", $"/eqs_countries({nationalityid})");
-                            }
-                            else
-                                odatab.Add("eqs_nationalitylu", null);
+                                if (!string.IsNullOrEmpty(CustData.Individual?.IfStaffThenEmployeeID?.ToString()))
+                                {
+                                    odatab.Add("eqs_isstafffcode", await this._queryParser.getOptionSetTextToValue("contact", "eqs_isstafffcode", "Yes"));
+                                    odatab.Add("eqs_ifstaffthenemployeeid", CustData.Individual?.IfStaffThenEmployeeID.ToString());
+                                }
+                                else
+                                {
+                                    odatab.Add("eqs_isstafffcode", await this._queryParser.getOptionSetTextToValue("contact", "eqs_isstafffcode", "No"));
+                                    odatab.Add("eqs_ifstaffthenemployeeid", null);
+                                }
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Purposeofcreation.ToString()))
-                            {
-                                string purposeofcreationid = await this._commonFunc.getPurposeOfCreationId(CustData.Individual?.Purposeofcreation.ToString());
-                                odatab.Add("eqs_purposeofcreationlo@odata.bind", $"/eqs_purposeofcreations({purposeofcreationid})");
-                            }
-                            else
-                                odatab.Add("eqs_purposeofcreationlo", null);
+                                if (!string.IsNullOrEmpty(CustData.Individual?.Nationality?.ToString()))
+                                {
+                                    string nationalityid = await this._commonFunc.getNationalityId(CustData.Individual?.Nationality.ToString());
+                                    odatab.Add("eqs_nationalitylu@odata.bind", $"/eqs_countries({nationalityid})");
+                                }
+                                else
+                                    odatab.Add("eqs_nationalitylu", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Nrivisatype.ToString()))
-                            {
-                                odatab.Add("eqs_nrivisatyype", await this._queryParser.getOptionSetTextToValue("contact", "eqs_nrivisatyype", CustData.Individual?.Nrivisatype.ToString()));
-                            }
-                            else
-                                odatab.Add("eqs_nrivisatyype", null);
+                                if (!string.IsNullOrEmpty(CustData.Individual?.Purposeofcreation?.ToString()))
+                                {
+                                    string purposeofcreationid = await this._commonFunc.getPurposeOfCreationId(CustData.Individual?.Purposeofcreation.ToString());
+                                    odatab.Add("eqs_purposeofcreationlo@odata.bind", $"/eqs_purposeofcreations({purposeofcreationid})");
+                                }
+                                else
+                                    odatab.Add("eqs_purposeofcreationlo", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Gender.ToString()))
-                            {
-                                odatab.Add("eqs_gender", await this._queryParser.getOptionSetTextToValue("contact", "eqs_gender", CustData.Individual?.Gender.ToString()));
-                            }
-                            else
-                                odatab.Add("eqs_gender", null);
+                                if (!string.IsNullOrEmpty(CustData.Individual?.Nrivisatype?.ToString()))
+                                {
+                                    odatab.Add("eqs_nrivisatyype", await this._queryParser.getOptionSetTextToValue("contact", "eqs_nrivisatyype", CustData.Individual?.Nrivisatype.ToString()));
+                                }
+                                else
+                                    odatab.Add("eqs_nrivisatyype", null);
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Program.ToString()))
-                            {
-                                odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Individual?.Program.ToString()));
+                                if (!string.IsNullOrEmpty(CustData.Individual?.Gender?.ToString()))
+                                {
+                                    odatab.Add("eqs_gender", await this._queryParser.getOptionSetTextToValue("contact", "eqs_gender", CustData.Individual?.Gender.ToString()));
+                                }
+                                else
+                                    odatab.Add("eqs_gender", null);
+
+                                if (!string.IsNullOrEmpty(CustData.Individual?.Program?.ToString()))
+                                {
+                                    odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Individual?.Program.ToString()));
+                                }
+                                else
+                                    odatab.Add("eqs_program", null);
                             }
-                            else
-                                odatab.Add("eqs_program", null);
                         }
                         else
                         {
-                            odatab.Add("eqs_titleidslot", CustData.Corporate?.Title.ToString());
-                            odatab.Add("eqs_companyname", CustData.Corporate?.CompanyName1.ToString());
-                            odatab.Add("eqs_companyname2", CustData.Corporate?.CompanyName2.ToString());
-                            odatab.Add("eqs_companyname3", CustData.Corporate?.CompanyName3.ToString());
-                            odatab.Add("eqs_pan", CustData.Corporate?.PANNumber.ToString());
-                            odatab.Add("eqs_panformslot", CustData.Corporate?.Form60.ToString());
-                            odatab.Add("eqs_cstvatnumber", CustData.Corporate?.CSTOrVATNumber.ToString());
-                            odatab.Add("eqs_corporateidentificationnumber", CustData.Corporate?.CorporateIdentificationNumber.ToString());
-                            odatab.Add("eqs_gstnumber", CustData.Corporate?.GSTNumber.ToString());
-                            odatab.Add("eqs_tannumber", CustData.Corporate?.TANNumber.ToString());
-                            odatab.Add("eqs_companyphonenumber", CustData.Corporate?.CompanyPhoneNumber.ToString());
-                            odatab.Add("eqs_companyemailid", CustData.Corporate?.CompanyEmailID.ToString());
-                            odatab.Add("eqs_companycoordinatorucic", CustData.Corporate?.CompanyCoordinatorUCIC.ToString());
-                            odatab.Add("eqs_companycoordinatorname", CustData.Corporate?.CompanyCoordinatorName.ToString());
-                            odatab.Add("eqs_companycoordinatoremail", CustData.Corporate?.CompanyCoordinatorEmail.ToString());
-                            odatab.Add("eqs_companycoordinatorphone", CustData.Corporate?.CompanyCoordinatorPhone.ToString());
-                            odatab.Add("eqs_purposeofcreation", CustData.Corporate?.purposeofcreation.ToString());
-                            odatab.Add("eqs_ckycnumber", CustData.Corporate?.Ckycnumber.ToString());
-                            odatab.Add("eqs_programslot", CustData.Individual?.Program.ToString());
-
-                            if (!string.IsNullOrEmpty(CustData.Corporate?.Dateofincorprotation.ToString()))
+                            if (CustData.Corporate != null)
                             {
-                                dd = CustData.Corporate?.Dateofincorprotation.ToString().Substring(0, 2);
-                                mm = CustData.Corporate?.Dateofincorprotation.ToString().Substring(3, 2);
-                                yyyy = CustData.Corporate?.Dateofincorprotation.ToString().Substring(6, 4);
-                                odatab.Add("eqs_dateofincorporation", yyyy + "-" + mm + "-" + dd);
-                            }
-                            else
-                                odatab.Add("eqs_dateofincorporation", null);
+                                odatab.Add("eqs_titleidslot", CustData.Corporate?.Title?.ToString());
+                                odatab.Add("eqs_companyname", CustData.Corporate?.CompanyName1?.ToString());
+                                odatab.Add("eqs_companyname2", CustData.Corporate?.CompanyName2?.ToString());
+                                odatab.Add("eqs_companyname3", CustData.Corporate?.CompanyName3?.ToString());
+                                odatab.Add("eqs_pan", CustData.Corporate?.PANNumber?.ToString());
+                                odatab.Add("eqs_panformslot", CustData.Corporate?.Form60?.ToString());
+                                odatab.Add("eqs_cstvatnumber", CustData.Corporate?.CSTOrVATNumber?.ToString());
+                                odatab.Add("eqs_corporateidentificationnumber", CustData.Corporate?.CorporateIdentificationNumber?.ToString());
+                                odatab.Add("eqs_gstnumber", CustData.Corporate?.GSTNumber?.ToString());
+                                odatab.Add("eqs_tannumber", CustData.Corporate?.TANNumber?.ToString());
+                                odatab.Add("eqs_companyphonenumber", CustData.Corporate?.CompanyPhoneNumber?.ToString());
+                                odatab.Add("eqs_companyemailid", CustData.Corporate?.CompanyEmailID?.ToString());
+                                odatab.Add("eqs_companycoordinatorucic", CustData.Corporate?.CompanyCoordinatorUCIC?.ToString());
+                                odatab.Add("eqs_companycoordinatorname", CustData.Corporate?.CompanyCoordinatorName?.ToString());
+                                odatab.Add("eqs_companycoordinatoremail", CustData.Corporate?.CompanyCoordinatorEmail?.ToString());
+                                odatab.Add("eqs_companycoordinatorphone", CustData.Corporate?.CompanyCoordinatorPhone?.ToString());
+                                odatab.Add("eqs_purposeofcreation", CustData.Corporate?.purposeofcreation?.ToString());
+                                odatab.Add("eqs_ckycnumber", CustData.Corporate?.Ckycnumber?.ToString());
+                                odatab.Add("eqs_programslot", CustData.Corporate?.Program?.ToString());
 
-                            if (!string.IsNullOrEmpty(CustData.Individual?.Program.ToString()))
-                            {
-                                odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Individual?.Program.ToString()));
+                                if (!string.IsNullOrEmpty(CustData.Corporate?.Dateofincorprotation?.ToString()))
+                                {
+                                    dd = CustData.Corporate?.Dateofincorprotation.ToString().Substring(0, 2);
+                                    mm = CustData.Corporate?.Dateofincorprotation.ToString().Substring(3, 2);
+                                    yyyy = CustData.Corporate?.Dateofincorprotation.ToString().Substring(6, 4);
+                                    odatab.Add("eqs_dateofincorporation", yyyy + "-" + mm + "-" + dd);
+                                }
+                                else
+                                    odatab.Add("eqs_dateofincorporation", null);
+
+                                if (!string.IsNullOrEmpty(CustData.Corporate?.Program?.ToString()))
+                                {
+                                    odatab.Add("eqs_program", await this._queryParser.getOptionSetTextToValue("contact", "eqs_program", CustData.Corporate?.Program.ToString()));
+                                }
+                                else
+                                    odatab.Add("eqs_program", null);
                             }
-                            else
-                                odatab.Add("eqs_program", null);
                         }
 
                         if (odatab.Count > 0)
@@ -381,9 +382,9 @@
                             string accountid = await this._commonFunc.getAccountId(accountNumber);
 
                             odatab = new Dictionary<string, object>();
-                            odatab.Add("eqs_accountcustomertitle", CustData.Account.AccountTitle.ToString());
+                            odatab.Add("eqs_accountcustomertitle", CustData.Account.AccountTitle?.ToString());
 
-                            if (!string.IsNullOrEmpty(CustData.Account.ProductCode.ToString()))
+                            if (!string.IsNullOrEmpty(CustData.Account.ProductCode?.ToString()))
                             {
                                 odatab.Add("eqs_productcode", CustData.Account.ProductCode.ToString());
                                 string productid = await this._commonFunc.getProductId(CustData.Account.ProductCode.ToString());
@@ -395,7 +396,7 @@
                                 odatab.Add("eqs_productid", null);
                             }
 
-                            if (!string.IsNullOrEmpty(CustData.Account.BranchID.ToString()))
+                            if (!string.IsNullOrEmpty(CustData.Account.BranchID?.ToString()))
                             {
                                 odatab.Add("eqs_branch", CustData.Account.BranchID.ToString());
                                 string branchid = await this._commonFunc.getBranchId(CustData.Account.BranchID.ToString());
@@ -407,7 +408,7 @@
                                 odatab.Add("eqs_branchid", null);
                             }
 
-                            if (!string.IsNullOrEmpty(CustData.Account.ModeofOperations.ToString()))
+                            if (!string.IsNullOrEmpty(CustData.Account.ModeofOperations?.ToString()))
                             {
                                 odatab.Add("eqs_modeofperations", CustData.Account.ModeofOperations.ToString());
                                 odatab.Add("eqs_modeofoperationcode", await this._queryParser.getOptionSetTextToValue("eqs_account", "eqs_modeofoperationcode", CustData.Account.ModeofOperations.ToString()));
@@ -418,7 +419,7 @@
                                 odatab.Add("eqs_modeofoperationcode", null);
                             }
 
-                            odatab.Add("eqs_modeofoperationremarks", CustData.Account.ModeofOperationRemarks.ToString());
+                            odatab.Add("eqs_modeofoperationremarks", CustData.Account.ModeofOperationRemarks?.ToString());
 
                             if (odatab.Count > 0)
                             {
@@ -456,15 +457,27 @@
                                 string addressid = await this._commonFunc.getCustomerAddressId(customerid, addresstypecode);
 
                                 odatab = new Dictionary<string, object>();
-                                odatab.Add("eqs_addressline1", address.AddressLine1.ToString());
-                                odatab.Add("eqs_addressline2", address.AddressLine2.ToString());
-                                odatab.Add("eqs_addressline3", address.AddressLine3.ToString());
-                                odatab.Add("eqs_pincode", address.Pincode.ToString());
-                                odatab.Add("eqs_city", address.CityId.ToString());
-                                odatab.Add("eqs_landlinenumber", address.LandlineNumber.ToString());
-                                odatab.Add("eqs_mobilenumber", address.MobileNumber.ToString());
-                                odatab.Add("eqs_faxnumber", address.FaxNumber.ToString());
+                                odatab.Add("eqs_addressline1", address.AddressLine1?.ToString());
+                                odatab.Add("eqs_addressline2", address.AddressLine2?.ToString());
+                                odatab.Add("eqs_addressline3", address.AddressLine3?.ToString());
+                                odatab.Add("eqs_pincode", address.Pincode?.ToString());
+                                odatab.Add("eqs_city", address.CityId?.ToString());
+                                odatab.Add("eqs_landlinenumber", address.LandlineNumber?.ToString());
+                                odatab.Add("eqs_mobilenumber", address.MobileNumber?.ToString());
+                                odatab.Add("eqs_faxnumber", address.FaxNumber?.ToString());
 
+                                if (!string.IsNullOrEmpty(address.CityId?.ToString()))
+                                {
+                                    var City_Details = await this._commonFunc.getCityDetails(address.CityId.ToString());
+                                    if (City_Details != null && City_Details.Count > 0)
+                                    {
+                                        odatab.Add("eqs_cityid@odata.bind", "/eqs_cities(" + City_Details[0]["eqs_cityid"].ToString() + ")");
+                                        if (!string.IsNullOrEmpty(City_Details[0]["_eqs_stateid_value"].ToString()))
+                                            odatab.Add("eqs_stateid@odata.bind", "/eqs_states(" + City_Details[0]["_eqs_stateid_value"].ToString() + ")");
+                                        if (!string.IsNullOrEmpty(City_Details[0]["_eqs_countryid_value"].ToString()))
+                                            odatab.Add("eqs_countryid@odata.bind", "/eqs_countries(" + City_Details[0]["_eqs_countryid_value"].ToString() + ")");
+                                    }
+                                }
                                 if (string.IsNullOrEmpty(addressid))
                                 {
                                     //create
@@ -488,6 +501,38 @@
                                     caseRtPrm.Message = "Error occurred while updating address.";
                                     return caseRtPrm;
                                 }
+
+                                //Create Current Address with same details as Permanent Address
+                                if (!string.IsNullOrEmpty(address.IsPermAddrAndCurrAddrSame?.ToString()) && address.IsPermAddrAndCurrAddrSame?.ToString().ToLower() == "yes")
+                                {
+                                    addresstypecode = "789030001"; //Current Address
+                                    string curraddressid = await this._commonFunc.getCustomerAddressId(customerid, addresstypecode);
+                                    
+                                    if (string.IsNullOrEmpty(curraddressid))
+                                    {
+                                        //create
+                                        odatab["eqs_addresstypeid"] = addresstypecode;
+                                        odatab["eqs_customer@odata.bind"] = $"/contacts({customerid})";
+                                        string postDataParametr = JsonConvert.SerializeObject(odatab);
+                                        var CustomerAdd_details = await this._queryParser.HttpApiCall($"eqs_addresses()?$select=eqs_addressid", HttpMethod.Post, postDataParametr);
+                                        curraddressid = CommonFunction.GetIdFromPostRespons201(CustomerAdd_details[0]["responsebody"], "eqs_addressid");
+                                    }
+                                    else
+                                    {
+                                        //update
+                                        string postDataParametr = JsonConvert.SerializeObject(odatab);
+                                        var Customer_details = await this._queryParser.HttpApiCall($"eqs_addresses({curraddressid})?$select=eqs_addressid", HttpMethod.Patch, postDataParametr);
+                                        curraddressid = CommonFunction.GetIdFromPostRespons201(Customer_details[0]["responsebody"], "eqs_addressid");
+                                    }
+
+                                    if (string.IsNullOrEmpty(curraddressid))
+                                    {
+                                        caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                                        caseRtPrm.Message = "Error occurred while copying Permanent Address to Current Address.";
+                                        return caseRtPrm;
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -509,17 +554,37 @@
 
                         if (string.IsNullOrEmpty(noteid))
                         {
-                            this._logger.LogError("UpdateCase", JsonConvert.SerializeObject(Case_details), caseDataParametr);
+                            this._logger.LogError("UpdateCase", JsonConvert.SerializeObject(Note_details), noteDataParameter);
                             caseRtPrm.ReturnCode = "CRM-ERROR-102";
                             caseRtPrm.Message = "Error occurred while other modifications in case.";
                             return caseRtPrm;
                         }
                     }
-                }
 
-                caseRtPrm.CaseID = RequestData.CaseId.ToString();
-                caseRtPrm.ReturnCode = "CRM-SUCCESS";
-                caseRtPrm.Message = "API executed successfully";
+                    Dictionary<string, string> incidentresolution = new Dictionary<string, string>
+                    {
+                        { "subject", "Case Auto Closed" },
+                        { "incidentid@odata.bind", $"/incidents({caseid})" },
+                        { "description", "Resolved via Inbound API" }
+                    };
+
+                    odatab = new Dictionary<string, object>();
+                    odatab.Add("IncidentResolution", incidentresolution);
+                    odatab.Add("Status", statuscode);
+
+                    string caseDataParametr = JsonConvert.SerializeObject(odatab);
+                    var Case_details = await this._queryParser.HttpApiCall($"CloseIncident", HttpMethod.Post, caseDataParametr);
+
+                    caseRtPrm.CaseID = RequestData.CaseId.ToString();
+                    caseRtPrm.ReturnCode = "CRM-SUCCESS";
+                    caseRtPrm.Message = "API executed successfully";
+                }
+                else
+                {
+                    caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                    caseRtPrm.Message = "Invalid case status.";
+                    return caseRtPrm;
+                }
             }
             else
             {
