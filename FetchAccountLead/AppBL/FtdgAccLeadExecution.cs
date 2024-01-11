@@ -219,10 +219,10 @@
             ProductDetails productDetails = new ProductDetails();
             productDetails.MinimumDepositAmount = LeadData[0]["eqs_minimumdepositamount"].ToString();
             productDetails.MaximumDepositAmount = LeadData[0]["eqs_maximumdepositamount"].ToString();
-            productDetails.CompoundingFrequency = LeadData[0]["eqs_compoundingfrequencytype"].ToString();
+            productDetails.CompoundingFrequency = LeadData[0]["eqs_compoundingfrequency"].ToString();
             productDetails.MinimumTenureMonths = LeadData[0]["eqs_minimumtenuremonths"].ToString();
             productDetails.MaximumTenureMonths = LeadData[0]["eqs_maximumtenuremonths"].ToString();
-            productDetails.PayoutFrequency = LeadData[0]["eqs_payoutfrequencytype"].ToString();
+            productDetails.PayoutFrequency = LeadData[0]["eqs_payoutfrequency"].ToString();
             productDetails.MinimumTenureDays = LeadData[0]["eqs_minimumtenuredays"].ToString();
             productDetails.MaximumTenureDays = LeadData[0]["eqs_maximumtenuredays"].ToString();
             productDetails.InterestCompoundFrequency = LeadData[0]["eqs_interestcompoundfrequency"].ToString();
