@@ -220,11 +220,11 @@
                         fields.Add("LCCode");
                     }
 
-                    if (RequestData.AdditionalDetails != null && string.IsNullOrEmpty(RequestData.AdditionalDetails?.DepositAmount?.ToString()))
-                    {
-                        haserror = 1;
-                        fields.Add("DepositAmount");
-                    }
+                    //if (RequestData.AdditionalDetails != null && string.IsNullOrEmpty(RequestData.AdditionalDetails?.DepositAmount?.ToString()))
+                    //{
+                    //    haserror = 1;
+                    //    fields.Add("DepositAmount");
+                    //}
 
                     if (RequestData.FDRDDetails != null)
                     {
@@ -904,9 +904,10 @@
                     {
                         odatab.Add("eqs_predefinedaccountnumber", ddeData.AdditionalDetails?.PredefinedAccountNumber?.ToString());
                     }
-
-
-
+                    if (!string.IsNullOrEmpty(ddeData.AdditionalDetails?.DepositAmount?.ToString()))
+                    {
+                        odatab.Add("eqs_depositamountslot", ddeData.AdditionalDetails?.DepositAmount?.ToString());
+                    }
                 }
 
 
@@ -929,7 +930,7 @@
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.ProductDetails?.CompoundingFrequency?.ToString()))
                         {
-                            odatab.Add("eqs_compoundingfrequencytype", ddeData.FDRDDetails?.ProductDetails?.CompoundingFrequency?.ToString());
+                            odatab.Add("eqs_compoundingfrequency", ddeData.FDRDDetails?.ProductDetails?.CompoundingFrequency?.ToString());
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.ProductDetails?.MinimumTenureMonths?.ToString()))
                         {
@@ -941,7 +942,7 @@
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.ProductDetails?.PayoutFrequency?.ToString()))
                         {
-                            odatab.Add("eqs_payoutfrequencytype", ddeData.FDRDDetails?.ProductDetails?.PayoutFrequency?.ToString());
+                            odatab.Add("eqs_payoutfrequency", ddeData.FDRDDetails?.ProductDetails?.PayoutFrequency?.ToString());
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.ProductDetails?.MinimumTenureDays?.ToString()))
                         {
@@ -968,7 +969,7 @@
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.DepositDetails?.DepositAmount?.ToString()))
                         {
-                            odatab1.Add("eqs_depositamountslot", ddeData.FDRDDetails?.DepositDetails?.DepositAmount?.ToString());
+                            odatab["eqs_depositamountslot"] = ddeData.FDRDDetails?.DepositDetails?.DepositAmount?.ToString();
                         }
                         if (!string.IsNullOrEmpty(ddeData.FDRDDetails?.DepositDetails?.FromESFBAccountNumber?.ToString()))
                         {
