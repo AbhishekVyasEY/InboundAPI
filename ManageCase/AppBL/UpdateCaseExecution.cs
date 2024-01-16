@@ -81,6 +81,14 @@
         {
             CaseData = await this.getRequestData(CaseData, "UpdateCase");
             UpdateCaseReturnParam caseRtPrm = new UpdateCaseReturnParam();
+
+            if (CaseData.ErrorNo != null && CaseData.ErrorNo.ToString() == "Error99")
+            {
+                caseRtPrm.ReturnCode = "CRM-ERROR-102";
+                caseRtPrm.Message = "API do not have access permission!";
+                return caseRtPrm;
+            }
+
             try
             {
 
@@ -621,7 +629,7 @@
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, APIname);
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";

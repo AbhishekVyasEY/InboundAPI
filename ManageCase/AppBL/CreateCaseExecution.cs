@@ -112,6 +112,14 @@ namespace ManageCase
             CaseData = await this.getRequestData(CaseData, "CreateCase");
             CaseReturnParam ldRtPrm = new CaseReturnParam();
             ldRtPrm.TransactionID = Transaction_ID;
+
+            if (CaseData.ErrorNo != null && CaseData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
+
             try
             {
                 //string channel = CaseData.Channel;
@@ -232,7 +240,13 @@ namespace ManageCase
             CaseStatusRtParam CSRtPrm = new CaseStatusRtParam();
             CaseData = await this.getRequestData(CaseData, "getCaseStatus");
 
-         
+            if (CaseData.ErrorNo != null && CaseData.ErrorNo.ToString() == "Error99")
+            {
+                CSRtPrm.ReturnCode = "CRM-ERROR-102";
+                CSRtPrm.Message = "API do not have access permission!";
+                return CSRtPrm;
+            }
+
             try
             {
                 if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID) && !string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetCaseStatusappkey"))
@@ -720,7 +734,7 @@ namespace ManageCase
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, APIname);
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";
