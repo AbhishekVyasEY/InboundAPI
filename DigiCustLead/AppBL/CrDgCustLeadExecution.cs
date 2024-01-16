@@ -530,6 +530,12 @@
                                 }
                             }
                         }
+                        else if (respons_code.responsecode == 400)
+                        {
+                            this._logger.LogInformation("CreateLead", JsonConvert.SerializeObject(Lead_details));
+                            csRtPrm.ReturnCode = "CRM-ERROR-102";
+                            csRtPrm.Message = $"Lead creation failed.{respons_code.responsebody.error.message.ToString()}";
+                        }
 
                     }
                     else
