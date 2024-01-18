@@ -354,6 +354,15 @@ namespace AccountLead
                                 if (item["eqs_isprimaryholder"].ToString() == "789030001")
                                 {
                                     msgBdy.customerID = item["eqs_customer"].ToString();
+
+                                    if (!string.IsNullOrEmpty(item["eqs_dob"].ToString()))
+                                    {
+                                        int age = GetAgeInYears(item["eqs_dob"].ToString());
+                                        if (age < 18)
+                                        {
+                                            msgBdy.minorAcctStatus = true;
+                                        }
+                                    }
                                 }
                                 relationList.Add(applicentRelation);
                             }
@@ -459,10 +468,17 @@ namespace AccountLead
 
         }
 
+        private int GetAgeInYears(string dobstring)
+        {
+            //int yy = Convert.ToInt32(dobstring.Substring(0, 4));
+            //int mm = Convert.ToInt32(dobstring.Substring(5, 2));
+            //int dd = Convert.ToInt32(dobstring.Substring(8, 2));
+            DateTime dob = Convert.ToDateTime(dobstring);
+            TimeSpan diff = DateTime.Today - dob;
 
-
-
-
+            DateTime zerodate = new DateTime(1, 1, 1);
+            return (zerodate + diff).Year - 1;
+        }
 
         public bool checkappkey(string appkey, string APIKey)
         {

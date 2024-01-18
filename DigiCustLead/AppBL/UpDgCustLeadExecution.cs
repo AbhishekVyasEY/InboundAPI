@@ -216,7 +216,7 @@
                 CRMDDEmappingFields.Add("eqs_dataentryoperator", Applicant_Data.eqs_applicantid?.ToString() + "  - Final");
                 CRMDDEmappingFields.Add("eqs_entitytypeId@odata.bind", $"eqs_entitytypes({Applicant_Data._eqs_entitytypeid_value?.ToString()})");
                 CRMDDEmappingFields.Add("eqs_subentitytypeId@odata.bind", $"eqs_subentitytypes({Applicant_Data._eqs_subentity_value?.ToString()})");
-                
+
                 CRMDDEmappingFields.Add("eqs_accountapplicantid@odata.bind", $"eqs_accountapplicants({Applicant_Data["eqs_accountapplicantid"]?.ToString()})");
                 CRMDDEmappingFields.Add("eqs_dataentrystage", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final"));
                 CRMDDEmappingFields.Add("eqs_titleId@odata.bind", $"eqs_titles({Applicant_Data["_eqs_titleid_value"]?.ToString()})");
@@ -233,7 +233,7 @@
                 if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadage"]?.ToString()) && Applicant_Data["eqs_leadage"]?.ToString() != "")
                 {
                     CRMDDEmappingFields.Add("eqs_age", Applicant_Data["eqs_leadage"]?.ToString());
-                }                
+                }
 
                 string shname = Applicant_Data["eqs_firstname"]?.ToString() + " " + Applicant_Data["eqs_middlename"]?.ToString() + " " + Applicant_Data["eqs_lastname"]?.ToString();
                 CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
@@ -665,9 +665,14 @@
                         CRMDDEmappingFields.Add("eqs_businessrmrole", CustIndvData.RMDetails?.BusinessRMRole?.ToString());
                     }
                 }
-                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                if (!string.IsNullOrEmpty(Applicant_Data._eqs_leadsourceid_value?.ToString()))
+                {
+                    CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                }
+
                 CRMDDEmappingFields.Add("eqs_sourcingchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
                 CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
+                CRMDDEmappingFields.Add("eqs_createdfrompartnerchannel", "true");
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
                 string postDataParametr1 = JsonConvert.SerializeObject(CRMDDEmappingFields1);
@@ -1254,8 +1259,16 @@
                     }
                 }
 
-                CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
-                CRMDDEmappingFields.Add("eqs_leadchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                if (!string.IsNullOrEmpty(Applicant_Data._eqs_leadsourceid_value?.ToString()))
+                {
+                    CRMDDEmappingFields.Add("eqs_leadsourceId@odata.bind", $"eqs_leadsources({Applicant_Data._eqs_leadsourceid_value?.ToString()})");
+                }
+
+                if (!string.IsNullOrEmpty(Applicant_Data["eqs_leadchannelnew"]?.ToString()))
+                {
+                    CRMDDEmappingFields.Add("eqs_leadchannelcode", Applicant_Data["eqs_leadchannelnew"]?.ToString());
+                }
+
                 CRMDDEmappingFields.Add("eqs_panform60code", Applicant_Data["eqs_panform60code"]?.ToString());
                 /***********About Prospect * ********/
                 if (CustCorpData.AboutProspect != null)
@@ -1463,6 +1476,7 @@
                         }
                     }
                 }
+                CRMDDEmappingFields.Add("eqs_createdfrompartnerchannel", "true");
 
                 string postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
                 string postDataParametr1 = JsonConvert.SerializeObject(CRMDDEmappingFields1);

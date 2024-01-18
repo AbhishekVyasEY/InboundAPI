@@ -269,6 +269,11 @@
                             customerLeadReturn.Message = responsD.msgHdr.error[0].reason.ToString();
                             customerLeadReturn.ReturnCode = "CRM-ERROR-102";
                         }
+                        else if(responsD.createCustomerResponse != null && responsD.createCustomerResponse.msgHdr != null && responsD.createCustomerResponse.msgHdr.result.ToString() == "ERROR")
+                        {
+                            customerLeadReturn.Message = responsD.createCustomerResponse.msgHdr.error[0].reason.ToString();
+                            customerLeadReturn.ReturnCode = "CRM-ERROR-102";
+                        }
                         else if (responsD.createCustomerResponse != null && responsD.createCustomerResponse.msgBdy != null)
                         {
                             Dictionary<string, string> fieldInput = new Dictionary<string, string>();

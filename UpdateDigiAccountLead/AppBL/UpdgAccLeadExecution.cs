@@ -559,7 +559,7 @@
                             }
                         }
                     }
-                    
+
 
                     if (RequestData.Nominee != null)
                     {
@@ -667,7 +667,7 @@
                     return accountLeadReturn;
                 }
 
-                
+
                 string errorMessage = await SetLeadAccountDDE(_leadDetails, RequestData);
                 if (string.IsNullOrEmpty(errorMessage))
                 {
@@ -697,7 +697,7 @@
                     {
                         await SetNomineeDDE(RequestData.Nominee);
                     }
-                    
+
                     accountLeadReturn.ReturnCode = "CRM-SUCCESS";
                     accountLeadReturn.Message = OutputMSG.Case_Success;
 
@@ -1169,7 +1169,7 @@
 
                 }
 
-
+                odatab.Add("eqs_createdfrompartnerchannel", "true");
 
 
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
