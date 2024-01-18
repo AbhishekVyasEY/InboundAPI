@@ -232,6 +232,9 @@
             additionalDetails.OtherSourceoffund = LeadData[0]["eqs_othersourceoffund"]?.ToString();
             additionalDetails.PredefinedAccountNumber = LeadData[0]["eqs_predefinedaccountnumber"]?.ToString();
 
+            additionalDetails.CurrencyofDeposit = (LeadData[0]["eqs_tenureindays"]?.ToString() == "")? await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_currencyofdepositcode", LeadData[0]["eqs_currencyofdepositcode"]?.ToString()) : "";
+            additionalDetails.DepositAmount = (LeadData[0]["eqs_tenureindays"]?.ToString() == "") ? LeadData[0]["eqs_depositamountslot"]?.ToString() : "";
+
             ftAccountLeadReturn.AdditionalDetails = additionalDetails;
 
             /****************** FDRD Details  ***********************/
@@ -249,10 +252,11 @@
 
             DepositDetails depositDetails = new DepositDetails();
             depositDetails.DepositVariancePercentage = LeadData[0]["eqs_depositvariance"]?.ToString();
-            depositDetails.DepositAmount = LeadData[0]["eqs_depositamountslot"]?.ToString();
+           
             depositDetails.FromESFBAccountNumber = LeadData[0]["eqs_fromesfbaccountnumber"]?.ToString();
             depositDetails.FromESFBGLAccount = LeadData[0]["eqs_fromesfbglaccount"]?.ToString();
-            depositDetails.CurrencyofDeposit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_currencyofdepositcode", LeadData[0]["eqs_currencyofdepositcode"].ToString());
+            depositDetails.DepositAmount = (LeadData[0]["eqs_tenureindays"]?.ToString() == "") ? "" : LeadData[0]["eqs_depositamountslot"]?.ToString();
+            depositDetails.CurrencyofDeposit = (LeadData[0]["eqs_tenureindays"]?.ToString()=="") ? "" : await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_currencyofdepositcode", LeadData[0]["eqs_currencyofdepositcode"].ToString());
             depositDetails.tenureInDays = LeadData[0]["eqs_tenureindays"]?.ToString();
             depositDetails.SpecialInterestRateRequired = LeadData[0]["eqs_specialinterestraterequired"]?.ToString();
             depositDetails.SpecialInterestRate = LeadData[0]["eqs_specialinterestrate"]?.ToString();
