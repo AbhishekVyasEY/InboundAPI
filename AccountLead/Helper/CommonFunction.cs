@@ -264,7 +264,7 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$select=eqs_customer,eqs_name,eqs_isprimaryholder,_eqs_accountrelationship_value&$filter=_eqs_leadaccountid_value eq '{leadaccountid}'";
+                string query_url = $"eqs_accountapplicants()?$select=eqs_customer,eqs_name,eqs_isprimaryholder,_eqs_accountrelationship_value,eqs_dob&$filter=_eqs_leadaccountid_value eq '{leadaccountid}'";
                 var Applicentdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Applicent_dtails = await this.getDataFromResponce(Applicentdtails);
                 return Applicent_dtails;

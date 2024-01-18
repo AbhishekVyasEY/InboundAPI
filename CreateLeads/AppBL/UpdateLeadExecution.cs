@@ -75,7 +75,12 @@
         {
             UpdateLidStatusReturnParam ldRtPrm = new UpdateLidStatusReturnParam();
             RequestData = await this.getRequestData(RequestData, "UpdateLeadStatus");
-
+            if (RequestData.ErrorNo != null && RequestData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
             try
             {
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "UpdateLeadStatusappkey"))
@@ -93,15 +98,26 @@
                                 {
                                     odatab.Add("eqs_assetleadstatus", await this._queryParser.getOptionSetTextToValue("lead", "eqs_assetleadstatus", RequestData.AssetAccountStatus.ToString()));
                                 }
-                                    
+
                                 odatab.Add("eqs_assetaccountstatusremarks", RequestData.AssetAccountStatusRemark.ToString());
                                 odatab.Add("eqs_accountnumberbylos", RequestData.AccountNumber.ToString());
 
                                 if (!string.IsNullOrEmpty(RequestData.LeadStatus.ToString()))
                                 {
-                                    odatab.Add("eqs_leadstatus", await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", RequestData.LeadStatus.ToString()));
+                                    string leadstatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", RequestData.LeadStatus.ToString());
+                                    if (!string.IsNullOrEmpty(leadstatus) && leadstatus == "2")
+                                    {
+                                        odatab.Add("eqs_leadstatus", leadstatus);
+                                        odatab.Add("statuscode", await this._queryParser.getOptionSetTextToValue("lead", "statuscode", RequestData.LeadStatus.ToString()));
+                                    }
+                                    else
+                                    {
+                                        ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                                        ldRtPrm.Message = "Invalid lead status. Supported value is 'Not Onboarded'.";
+                                        return ldRtPrm;
+                                    }
                                 }
-                                
+
                                 odatab.Add("eqs_notonboardedreason", RequestData.NotOnboardedReason.ToString());
 
                                 string postDataParametr = JsonConvert.SerializeObject(odatab);
@@ -116,7 +132,7 @@
                                 ldRtPrm.ReturnCode = "CRM-ERROR-102";
                                 ldRtPrm.Message = "LeadId not found.";
                             }
-                        }                        
+                        }
                         else
                         {
                             this._logger.LogInformation("ValidateLeadtInput", "ApplicantId can not be null.");
@@ -124,7 +140,7 @@
                             ldRtPrm.Message = "ApplicantId can not be null.";
                         }
 
-                       
+
                     }
                     else
                     {
@@ -181,7 +197,7 @@
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, APIname);
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";
