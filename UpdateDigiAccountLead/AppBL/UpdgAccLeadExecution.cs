@@ -1325,6 +1325,10 @@
                 {
                     inputItem.Add("eqs_emailstatement", item["EmailStatement"].ToString());
                 }
+                if (!string.IsNullOrEmpty(item["physicalStatement"].ToString()))
+                {
+                    inputItem.Add("eqs_physicalstatement", item["physicalStatement"].ToString());
+                }
                 if (!string.IsNullOrEmpty(item["InternationalDCLimitAct"].ToString()))
                 {
                     inputItem.Add("eqs_internationaldclimitact", item["InternationalDCLimitAct"].ToString());
