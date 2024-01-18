@@ -170,7 +170,26 @@ using CRMConnect;
 
         public async Task<string> getNomineeID(string ddeID)
         {
-            return await this.getIDfromMSDTable("eqs_ddeaccountnominees", "eqs_ddeaccountnomineeid", "_eqs_leadaccountddeid_value", ddeID);
+            try
+            {
+                string query_url = $"eqs_ddeaccountnominees()?$select=eqs_ddeaccountnomineeid&$filter=_eqs_leadaccountddeid_value eq '{ddeID}'";
+                var NomineeDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Nominee_dtails = await this._queryParser.getDataFromResponce(NomineeDtl);
+                if (Nominee_dtails.Count > 0)
+                {
+                    return Nominee_dtails[0]["eqs_ddeaccountnomineeid"].ToString();
+                }
+                else
+                {
+                    return "";
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getLeadAccountDetails", ex.Message);
+                throw ex;
+            }            
         }
 
         public async Task<string> getDocTypeId(string Type_code)
