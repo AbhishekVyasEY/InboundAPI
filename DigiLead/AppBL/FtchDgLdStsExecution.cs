@@ -86,7 +86,15 @@
         public async Task<FtchDgLdStsReturn> ValidateFtchDgLdSts(dynamic RequestData)
         {
             FtchDgLdStsReturn ldRtPrm = new FtchDgLdStsReturn();
-            RequestData = await this.getRequestData(RequestData);
+            RequestData = await this.getRequestData(RequestData, "FetchDigiLeadStatus");
+
+            if (RequestData.ErrorNo != null && RequestData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
+
             try
             {
                 string LeadID = RequestData.LeadID;
@@ -295,7 +303,7 @@
 
         
 
-        private async Task<dynamic> getRequestData(dynamic inputData)
+        private async Task<dynamic> getRequestData(dynamic inputData, string APIname)
         {
 
             dynamic rejusetJson;
@@ -304,7 +312,7 @@
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, APIname);
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";

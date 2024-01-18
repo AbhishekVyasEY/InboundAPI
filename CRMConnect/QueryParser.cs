@@ -521,13 +521,20 @@
                     }
                     dynamic ApiPerData = JsonConvert.DeserializeObject(APIPermissions);
                     int match = 0;
-                    foreach (var Item in ApiPerData[BankCode])
+                    try
                     {
-                        if (Item.ToString() == APIName)
+                        foreach (var Item in ApiPerData[BankCode])
                         {
-                            match = 1; 
-                            break;
+                            if (Item.ToString() == APIName)
+                            {
+                                match = 1;
+                                break;
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+
                     }
                     if (match == 0)
                     {
@@ -540,6 +547,7 @@
             }
             catch (Exception ex)
             {
+                _errorLogger.LogError("PayloadDecryption", BankCode + " channel code has not configured! API Name :- " + APIName);
                 return ex.Message;
             }
 

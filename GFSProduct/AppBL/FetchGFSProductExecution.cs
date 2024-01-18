@@ -84,6 +84,14 @@
         {
             GFSProducrListReturn ldRtPrm = new GFSProducrListReturn();
             RequestData = await this.getRequestData(RequestData, "FetchGFSProductList");
+
+            if (RequestData.ErrorNo != null && RequestData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
+
             try
             {
                 string CategoryCode = RequestData.CategoryCode;
@@ -510,7 +518,7 @@
                 var EncryptedData = inputData.req_root.body.payload;
                 string BankCode = inputData.req_root.header.cde.ToString();
                 this.Bank_Code = BankCode;
-                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode);
+                string xmlData = await this._queryParser.PayloadDecryption(EncryptedData.ToString(), BankCode, APIname);
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlData);
                 string xpath = "PIDBlock/payload";
