@@ -309,6 +309,11 @@
                                 haserror = 1;
                                 fields.Add("physicalStatement");
                             }
+                            if (string.IsNullOrEmpty(items.mobileBankingNumber?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("mobileBankingNumber");
+                            }
                         }
                     }
 
@@ -556,6 +561,11 @@
                             {
                                 haserror = 1;
                                 fields.Add("physicalStatement");
+                            }
+                            if (string.IsNullOrEmpty(items.mobileBankingNumber?.ToString()))
+                            {
+                                haserror = 1;
+                                fields.Add("mobileBankingNumber");
                             }
                         }
                     }
@@ -1328,6 +1338,10 @@
                 if (!string.IsNullOrEmpty(item["physicalStatement"].ToString()))
                 {
                     inputItem.Add("eqs_physicalstatement", item["physicalStatement"].ToString());
+                }
+                if (!string.IsNullOrEmpty(item["mobileBankingNumber"].ToString()))
+                {
+                    inputItem.Add("eqs_mobilebankingnumber", item["mobileBankingNumber"].ToString());
                 }
                 if (!string.IsNullOrEmpty(item["InternationalDCLimitAct"].ToString()))
                 {

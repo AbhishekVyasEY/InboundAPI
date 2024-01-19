@@ -331,8 +331,9 @@
                 preference.NetBanking = prefItem["eqs_netbanking"]?.ToString();
                 preference.MobileBanking = prefItem["eqs_mobilebanking"]?.ToString();
                 preference.EmailStatement = prefItem["eqs_emailstatement"]?.ToString();
+                preference.physicalStatement = prefItem["eqs_physicalstatement"]?.ToString();
+                preference.mobileBankingNumber = prefItem["eqs_mobilebankingnumber"]?.ToString();
                 preference.InternationalDCLimitAct = prefItem["eqs_internationaldclimitact"]?.ToString();
-
 
                 directBanking.Preferences.Add(preference);
             }
