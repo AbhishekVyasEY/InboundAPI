@@ -591,6 +591,7 @@
                 if (ProductId != "")
                 {
                     string EntityID = await this._commonFunc.getEntityID(CustLeadData.EntityType.ToString());
+                    string TitleId = await this._commonFunc.getTitleId(CustLeadData.CorporateEntry?.Title?.ToString());
                     string SubEntityID = await this._commonFunc.getSubentitytypeID(CustLeadData.EntityFlagType.ToString(), CustLeadData.SubEntityType.ToString());
                     custLeadElement.leadsourcecode = 15;
                     custLeadElement.eqs_companynamepart1 = CustLeadData.CorporateEntry.CompanyName;
@@ -599,7 +600,7 @@
                     custLeadElement.eqs_contactmobile = CustLeadData.CorporateEntry.PocNumber;
                     custLeadElement.eqs_contactperson = CustLeadData.CorporateEntry.PocName;
 
-                    
+                    CRMLeadmappingFields.Add("eqs_titleid@odata.bind", $"eqs_titles({TitleId})");
                     if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber?.ToString()))
                     {
                         custLeadElement.eqs_cinnumber = CustLeadData.CorporateEntry.CinNumber;
@@ -684,6 +685,7 @@
                     CRMCustomermappingFields.Add("eqs_contactperson", CustLeadData.CorporateEntry.PocName?.ToString());
                     CRMCustomermappingFields.Add("eqs_contactmobilenumber", CustLeadData.CorporateEntry.PocNumber?.ToString());
                     CRMCustomermappingFields.Add("eqs_dateofincorporation", CustLeadData.CorporateEntry.DateOfIncorporation?.ToString());
+                    
 
                     if (!string.IsNullOrEmpty(CustLeadData.CorporateEntry.CinNumber?.ToString()))
                     {
@@ -701,10 +703,23 @@
                     {
                         CRMCustomermappingFields.Add("eqs_cstvatnumber", CustLeadData.CorporateEntry.CstNumber.ToString());
                     }
+                    if (!string.IsNullOrEmpty(leadSourceId))
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({leadSourceId})");
+                    }
+
+                    if (!string.IsNullOrEmpty(CustLeadData.LeadChannel?.ToString()))
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadchannelnew", await this._queryParser.getOptionSetTextToValue("eqs_accountapplicant", "eqs_leadchannelnew", CustLeadData.LeadChannel.ToString()));
+                    }
+                    else
+                    {
+                        CRMCustomermappingFields.Add("eqs_leadchannelnew", "789030000");
+                    }
                     CRMCustomermappingFields.Add("eqs_productid@odata.bind", $"eqs_products({ProductId})");
                     CRMCustomermappingFields.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({Productcategoryid})");
                     CRMCustomermappingFields.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({Businesscategoryid})");
-
+                    CRMCustomermappingFields.Add("eqs_titleid@odata.bind", $"eqs_titles({TitleId})");
 
                     CRMCustomermappingFields.Add("eqs_panform60code", "615290000");
 
