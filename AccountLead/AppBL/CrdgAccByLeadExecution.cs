@@ -394,13 +394,15 @@ namespace AccountLead
                                 msgBdy.rdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
                                 msgBdy.rdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                             }
-
+                            
                             if (productCat == "PCAT04")
                             {
+                                msgBdy.transactionType = "P";
                                 msgBdy.Remove("rdaccountPayinRequest");
                             }
                             else if (productCat == "PCAT05")
                             {
+                                msgBdy.transactionType = "P";
                                 msgBdy.Remove("tdaccountPayinRequest");
                             }
                             else
