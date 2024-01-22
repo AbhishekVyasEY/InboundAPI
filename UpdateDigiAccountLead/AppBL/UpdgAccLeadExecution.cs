@@ -309,11 +309,6 @@
                                 haserror = 1;
                                 fields.Add("physicalStatement");
                             }
-                            if (string.IsNullOrEmpty(items.mobileBankingNumber?.ToString()))
-                            {
-                                haserror = 1;
-                                fields.Add("mobileBankingNumber");
-                            }
                         }
                     }
 
