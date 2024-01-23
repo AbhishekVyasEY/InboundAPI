@@ -14,6 +14,7 @@ namespace FetchAccountLead
         public Task<string> getCityCode(string city_id);
         public Task<string> getTitleCode(string title_id);
         public Task<string> getRelationshipCode(string relationship_id);
+        public Task<string> getRelationshipName(string relationship_id);
 
 
         public Task<string> getUCIC(string accountapplicant_id);

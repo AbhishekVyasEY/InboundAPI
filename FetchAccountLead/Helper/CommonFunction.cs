@@ -204,6 +204,19 @@
         {
             return await this.getIDfromMSDTable("eqs_relationships", "eqs_relationship", "eqs_relationshipid", relationship_id);
         }
+        public async Task<string> getRelationshipName(string relationship_id)
+        {
+            string name = "";
+            string query_url = $"eqs_relationships()?$select=eqs_name&$filter=eqs_relationshipid eq '{relationship_id}'";
+            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            var details = await this.getDataFromResponce(responsdtails);
+
+            if(details != null)
+            {
+                name = details[0]["eqs_name"].ToString();
+            }
+            return name;
+        }
 
         public async Task<string> getCuntryCode(string Country_id)
         {
