@@ -103,8 +103,9 @@
 
                         if (RequestData.ProductCode == null || string.IsNullOrEmpty(RequestData.ProductCode?.ToString()) || RequestData.ProductCode?.ToString() == "")
                         {
-                            ValidationError = 1;
-                            errorText.Add("ProductCode");
+                            //ValidationError = 1;
+                            //errorText.Add("ProductCode");
+                            RequestData.ProductCode = "9999";
                         }
                         if (RequestData.BranchCode == null || string.IsNullOrEmpty(RequestData.BranchCode?.ToString()) || RequestData.BranchCode?.ToString() == "")
                         {
