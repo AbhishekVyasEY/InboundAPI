@@ -1439,7 +1439,14 @@
                         {
                             CRMDDEmappingFields.Add("eqs_contactpersonname", customer_Dtl[0]["fullname"]?.ToString());
                             CRMDDEmappingFields.Add("eqs_pocemailid", customer_Dtl[0]["emailaddress1"]?.ToString());
-                            CRMDDEmappingFields.Add("eqs_pocphonenumber", customer_Dtl[0]["mobilephone"]?.ToString());
+                            if (!string.IsNullOrEmpty(customer_Dtl[0]["mobilephone"]?.ToString()))
+                            {
+                                CRMDDEmappingFields.Add("eqs_pocphonenumber", customer_Dtl[0]["mobilephone"]?.ToString());
+                            }
+                            else
+                            {
+                                CRMDDEmappingFields.Add("eqs_pocphonenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                            }
                             CRMDDEmappingFields.Add("eqs_pocucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
                             CRMDDEmappingFields.Add("eqs_poclookupId@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
                             CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
@@ -1448,6 +1455,7 @@
                         {
                             CRMDDEmappingFields.Add("eqs_contactpersonname", CustCorpData.PointOfContact?.ContactPersonName?.ToString());
                             CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                            CRMDDEmappingFields.Add("eqs_pocphonenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
                         }
                     }
                 }
