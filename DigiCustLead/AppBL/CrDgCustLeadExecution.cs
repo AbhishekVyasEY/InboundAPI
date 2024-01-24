@@ -294,7 +294,10 @@
                 string ProductId = productDetails["ProductId"];
                 string Businesscategoryid = productDetails["businesscategoryid"];
                 string Productcategoryid = productDetails["productcategory"];
-                custLeadElement.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                {
+                    custLeadElement.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                }
 
                 if (ProductId != "")
                 {
@@ -587,7 +590,10 @@
                 string ProductId = productDetails["ProductId"];
                 string Businesscategoryid = productDetails["businesscategoryid"];
                 string Productcategoryid = productDetails["productcategory"];
-                custLeadElement.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                {
+                    custLeadElement.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                }
 
                 if (ProductId != "")
                 {
