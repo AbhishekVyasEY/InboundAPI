@@ -16,6 +16,7 @@
     using System;
     using System.Security.Cryptography.Xml;
     using Azure;
+    using Microsoft.VisualBasic;
 
     public class FtdgAccLeadExecution : IFtdgAccLeadExecution
     {
@@ -198,7 +199,16 @@
 
             general.AccountLeadId = this.LeadAccountid;
             general.AccountNumber = LeadData[0]["eqs_predefinedaccountnumber"]?.ToString();
-            general.ApplicationDate = LeadData[0]["eqs_applicationdate"]?.ToString();
+
+            if (!string.IsNullOrEmpty(LeadData[0]["eqs_applicationdate"]?.ToString()))
+            {
+                DateTime applicationDate = Convert.ToDateTime(LeadData[0]["eqs_applicationdate"]);
+                string yyyy = applicationDate.Year.ToString().PadLeft(4, '0');
+                string mm = applicationDate.Month.ToString().PadLeft(2, '0');
+                string dd = applicationDate.Day.ToString().PadLeft(2, '0');
+
+                general.ApplicationDate = dd + "/" + mm + "/" + yyyy;
+            }
             general.ProductCategory = await this._commonFunc.getProductCategoryCode(LeadData[0]["_eqs_productcategoryid_value"]?.ToString());
             general.Product = await this._commonFunc.getProductCode(LeadData[0]["_eqs_productid_value"]?.ToString());
             general.InstaKit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_instakitcode", LeadData[0]["eqs_instakitcode"].ToString());
@@ -209,7 +219,17 @@
             general.ModeofOperation = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_modeofoperationcode", LeadData[0]["eqs_modeofoperationcode"].ToString());
             general.AccountOwnership = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_accountownershipcode", LeadData[0]["eqs_accountownershipcode"].ToString());
             general.InitialDepositMode = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_initialdepositmodecode", LeadData[0]["eqs_initialdepositmodecode"].ToString());
-            general.TransactionDate = LeadData[0]["eqs_transactiondate"]?.ToString();
+
+            //general.TransactionDate = LeadData[0]["eqs_transactiondate"]?.ToString();
+            if (!string.IsNullOrEmpty(LeadData[0]["eqs_transactiondate"]?.ToString()))
+            {
+                DateTime transactionDate = Convert.ToDateTime(LeadData[0]["eqs_transactiondate"]);
+                string yyyy = transactionDate.Year.ToString().PadLeft(4, '0');
+                string mm = transactionDate.Month.ToString().PadLeft(2, '0');
+                string dd = transactionDate.Day.ToString().PadLeft(2, '0');
+
+                general.TransactionDate = dd + "/" + mm + "/" + yyyy;
+            }
             general.TransactionID = LeadData[0]["eqs_transactionid"]?.ToString();
             general.Fundingchequebank = LeadData[0]["eqs_fundingchequebank"]?.ToString();
             general.FundingchequeNumber = LeadData[0]["eqs_fundingchequenumber"]?.ToString();
@@ -262,7 +282,16 @@
             depositDetails.SpecialInterestRate = LeadData[0]["eqs_specialinterestrate"]?.ToString();
             depositDetails.SpecialInterestRequestID = LeadData[0]["eqs_specialinterestrequestid"]?.ToString();
             depositDetails.BranchCodeGL = LeadData[0]["eqs_branchcodegl"]?.ToString();
-            depositDetails.FDValueDate = LeadData[0]["eqs_fdvaluedate"]?.ToString();
+            //depositDetails.FDValueDate = LeadData[0]["eqs_fdvaluedate"]?.ToString();
+            if (!string.IsNullOrEmpty(LeadData[0]["eqs_fdvaluedate"]?.ToString()))
+            {
+                DateTime FDValueDate = Convert.ToDateTime(LeadData[0]["eqs_fdvaluedate"]);
+                string yyyy = FDValueDate.Year.ToString().PadLeft(4, '0');
+                string mm = FDValueDate.Month.ToString().PadLeft(2, '0');
+                string dd = FDValueDate.Day.ToString().PadLeft(2, '0');
+
+                depositDetails.FDValueDate = dd + "/" + mm + "/" + yyyy;
+            }
             depositDetails.TenureInMonths = LeadData[0]["eqs_tenureinmonths"]?.ToString();
             depositDetails.WaivedOffTDS = LeadData[0]["eqs_waivedofftds"]?.ToString();
 
@@ -352,7 +381,16 @@
                 nominee.nomineeUCICIfCustomer = nomineeobj[0]["eqs_nomineeucic"]?.ToString();
                 nominee.name = nomineeobj[0]["eqs_nomineename"]?.ToString();
 
-                nominee.DOB = nomineeobj[0]["eqs_nomineedob"]?.ToString();
+                //nominee.DOB = nomineeobj[0]["eqs_nomineedob"]?.ToString();
+                if (!string.IsNullOrEmpty(nomineeobj[0]["eqs_nomineedob"]?.ToString()))
+                {
+                    DateTime dob = Convert.ToDateTime(nomineeobj[0]["eqs_nomineedob"]);
+                    string yyyy = dob.Year.ToString().PadLeft(4, '0');
+                    string mm = dob.Month.ToString().PadLeft(2, '0');
+                    string dd = dob.Day.ToString().PadLeft(2, '0');
+                    nominee.DOB = dd + "/" + mm + "/" + yyyy;
+                }
+
                 nominee.NomineeDisplayName = nomineeobj[0]["eqs_nomineedisplayname"]?.ToString();
                 nominee.AddresssameasProspects = nomineeobj[0]["eqs_guardianaddresssameasprospectaddress"]?.ToString();
                 nominee.email = nomineeobj[0]["eqs_emailid"]?.ToString();
@@ -366,14 +404,16 @@
                 nominee.PO = nomineeobj[0]["eqs_pobox"]?.ToString();
                 nominee.Landmark = nomineeobj[0]["eqs_landmark"]?.ToString();
 
-                nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
+                //nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
+                nominee.NomineeRelationship = await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"]?.ToString());
                 nominee.CityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
                 nominee.CountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
                 nominee.State = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
 
                 Guardian guardian = new Guardian();
                 guardian.Name = nomineeobj[0]["eqs_guardianname"]?.ToString();
-                guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString();
+                //guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString();
+                guardian.RelationshipToMinor = await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString());
                 guardian.GuardianUCIC = nomineeobj[0]["eqs_guardianucic"]?.ToString();
                 guardian.GuardianMobile = nomineeobj[0]["eqs_guardianmobile"]?.ToString();
                 guardian.GuardianLandline = nomineeobj[0]["eqs_guardianlandlinenumber"]?.ToString();
