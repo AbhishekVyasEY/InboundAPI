@@ -103,6 +103,7 @@ namespace ManageCase
             this.StatusCodes.Add("4", "Researching");
             this.StatusCodes.Add("6", "Cancelled");
             this.StatusCodes.Add("615290000", "Auto Closed");
+            this.StatusCodes.Add("615290001", "Rejected");
 
         }
 
@@ -657,7 +658,10 @@ namespace ManageCase
                             if (!this._commonFunc.GetMvalue<CaseDetails>("Case" + caseDetails["ticketnumber"].ToString(), out case_dtl))
                             {
                                 case_details.CaseID = caseDetails["ticketnumber"].ToString();
-                                case_details.CaseStatus = this.StatusCodes[caseDetails["statuscode"].ToString()];
+                                if (!string.IsNullOrEmpty(caseDetails["statuscode"].ToString()))
+                                {
+                                    case_details.CaseStatus = this.StatusCodes[caseDetails["statuscode"].ToString()];
+                                }
                                 case_details.Subject = caseDetails["title"].ToString();
                                 case_details.openDate = caseDetails["createdon"].ToString();
                                 case_details.modifiedDate = caseDetails["modifiedon"].ToString();
