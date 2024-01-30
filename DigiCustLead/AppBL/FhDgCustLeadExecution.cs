@@ -384,7 +384,7 @@
                         address.State = await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
                         address.Country = await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
 
-                        address.PinCode = addressItem.eqs_zipcode.ToString();
+                        address.PinCode = addressItem.eqs_pincode.ToString();
                         address.POBox = addressItem.eqs_pobox.ToString();
                         address.Landmark = addressItem.eqs_landmark.ToString();
                         address.LandlineNumber = addressItem.eqs_landlinenumber.ToString();
@@ -464,7 +464,7 @@
                             fATCAAddress.State = await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
                             fATCAAddress.Country = await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
 
-                            fATCAAddress.PinCode = addressDetail[0].eqs_zipcode.ToString();
+                            fATCAAddress.PinCode = addressDetail[0].eqs_pincode.ToString();
                             fATCAAddress.POBox = addressDetail[0].eqs_pobox.ToString();
                             fATCAAddress.Landmark = addressDetail[0].eqs_landmark.ToString();
                             fATCAAddress.LandlineNumber = addressDetail[0].eqs_landlinenumber.ToString();
