@@ -9,7 +9,7 @@ namespace ETC
         public bool GetMvalue<T>(string keyname, out T? Outvalue);
         public void SetMvalue<T>(string keyname, double timevalid, T inputvalue);
         public Task<string> getetcCustomerId(string CustomerCode);
-
+        public Task<string> getetcParentId(string ParentUcic);
 
 
     }
