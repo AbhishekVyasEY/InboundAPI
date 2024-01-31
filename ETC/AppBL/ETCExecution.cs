@@ -243,6 +243,18 @@
                 {
                     odatab.Add("emailaddress1", RequestData.emaiid?.ToString());
                 }
+                if (!string.IsNullOrEmpty(RequestData.DOB.ToString()))
+                {
+                    odatab.Add("birthdate", RequestData.DOB?.ToString());
+                }
+                if (!string.IsNullOrEmpty(RequestData.ParentUCIC.ToString()))
+                {
+                    string ParentId = await this._commonFunc.getetcParentId(RequestData.ParentUCIC.ToString());
+                    if (ParentId != null)
+                    {
+                        odatab.Add("parentcustomerid_contact@odata.bind", $"contacts({ParentId})");
+                    }                    
+                }
 
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
 
@@ -295,6 +307,18 @@
                 if (!string.IsNullOrEmpty(RequestData.emaiid.ToString()))
                 {
                     odatab.Add("emailaddress1", RequestData.emaiid?.ToString());
+                }
+                if (!string.IsNullOrEmpty(RequestData.DOB.ToString()))
+                {
+                    odatab.Add("birthdate", RequestData.DOB?.ToString());
+                }
+                if (!string.IsNullOrEmpty(RequestData.ParentUCIC.ToString()))
+                {
+                    string ParentId = await this._commonFunc.getetcParentId(RequestData.ParentUCIC.ToString());
+                    if (ParentId != null)
+                    {
+                        odatab.Add("parentcustomerid_contact@odata.bind", $"contacts({ParentId})");
+                    }
                 }
 
                 string postDataParametr = JsonConvert.SerializeObject(odatab);

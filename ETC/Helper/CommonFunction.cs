@@ -148,6 +148,10 @@
             return await this.getIDfromMSDTable("contacts", "contactid", "eqs_etcid", CustomerCode);
         }
 
+        public async Task<string> getetcParentId(string ParentUcic)
+        {
+            return await this.getIDfromMSDTable("contacts", "contactid", "eqs_customerid", ParentUcic);
+        }
 
 
         public async Task<string> MeargeJsonString(string json1, string json2)
