@@ -536,22 +536,38 @@
                         yyyy = CustIndvData.IdentificationDetails?.VerificationDate.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_verificationdate", yyyy + "-" + mm + "-" + dd);
                     }
-                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString()))
+
+
+                    CRMDDEmappingFields.Add("eqs_pannumber", Applicant_Data["eqs_internalpan"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_passportnumber", Applicant_Data["eqs_passportnumber"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_voterid", Applicant_Data["eqs_voterid"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_drivinglicensenumber", Applicant_Data["eqs_dlnumber"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_aadharreference", Applicant_Data["eqs_aadhaarreference"]?.ToString());
+
+
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PanNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_taxidentificationnumber", CustIndvData.IdentificationDetails?.TaxIdentificationNumber?.ToString());
+                        CRMDDEmappingFields.Add("eqs_pannumber", CustIndvData.IdentificationDetails.PanNumber.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.OtherIdentificationNumber?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_othertaxnumber", CustIndvData.IdentificationDetails?.OtherIdentificationNumber?.ToString());
+                        CRMDDEmappingFields.Add("eqs_passportnumber", CustIndvData.IdentificationDetails.PassportNumber.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportIssuedAt?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.VoterID?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_passportissuedat", CustIndvData.IdentificationDetails?.PassportIssuedAt?.ToString());
+                        CRMDDEmappingFields.Add("eqs_voterid", CustIndvData.IdentificationDetails.VoterID.ToString());
                     }
-                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.ТахТуре?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.DrivinglicenseNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_taxtype", CustIndvData.IdentificationDetails?.ТахТуре?.ToString());
+                        CRMDDEmappingFields.Add("eqs_drivinglicensenumber", CustIndvData.IdentificationDetails.DrivinglicenseNumber.ToString());
                     }
+                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.AadharReference?.ToString()))
+                    {
+                        CRMDDEmappingFields.Add("eqs_aadharreference", CustIndvData.IdentificationDetails.AadharReference.ToString());
+                    }
+                       
+
+                   
                 }
 
                 /*********** FATCA *********/
