@@ -368,7 +368,6 @@ namespace AccountLead
                                     }
                                     relationList.Add(applicentRelation);
                                 }
-
                                 string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
 
                                 msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
