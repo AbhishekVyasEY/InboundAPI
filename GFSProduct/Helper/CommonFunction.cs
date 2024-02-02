@@ -332,11 +332,12 @@
                     prodSrkey += "nriF";
                 }
 
-                if (string.IsNullOrEmpty(product_Filter.customerSegment))
-                {
-                    filter += $"and eqs_iselite eq false ";
-                    prodSrkey += "elitF";
-                }
+                //Commented based on CRMMSD365-4397. If Customer is not elite, display all Products
+                //if (string.IsNullOrEmpty(product_Filter.customerSegment))
+                //{
+                //    filter += $"and eqs_iselite eq false ";
+                //    prodSrkey += "elitF";
+                //}
 
                 if (string.IsNullOrEmpty(product_Filter.IsStaff))
                 {
