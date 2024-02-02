@@ -160,7 +160,7 @@ namespace CreateLeads
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
@@ -230,7 +230,7 @@ namespace CreateLeads
         {
             try
             {
-                string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}'";
+                string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}' and statecode eq 0";
                 var productdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 string ProductId = await this.getIDFromGetResponce("eqs_productid", productdtails);
                 string businesscategoryid = await this.getIDFromGetResponce("_eqs_businesscategoryid_value", productdtails);
