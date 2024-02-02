@@ -385,6 +385,15 @@ namespace AccountLead
                                     msgBdy.tdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
                                     msgBdy.tdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                                 }
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_productid"]["eqs_compoundingfrequencytype"].ToString()))
+                                {
+                                    msgBdy.tdaccountPayinRequest.intCompoundingFrequency = AccountDDE[0]["eqs_productid"]["eqs_compoundingfrequencytype"].ToString();
+                                }
+
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_productid"]["eqs_payoutfrequencytype"].ToString()))
+                                {
+                                    msgBdy.tdaccountPayinRequest.intPayoutFrequency = AccountDDE[0]["eqs_productid"]["eqs_payoutfrequencytype"].ToString();
+                                }
 
                                 msgBdy.rdaccountPayinRequest.installmentAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
                                 msgBdy.rdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
