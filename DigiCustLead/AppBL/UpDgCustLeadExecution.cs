@@ -547,23 +547,23 @@
 
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PanNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_pannumber", CustIndvData.IdentificationDetails.PanNumber.ToString());
+                        CRMDDEmappingFields["eqs_pannumber"] = CustIndvData.IdentificationDetails.PanNumber.ToString();
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_passportnumber", CustIndvData.IdentificationDetails.PassportNumber.ToString());
+                        CRMDDEmappingFields["eqs_passportnumber"] = CustIndvData.IdentificationDetails.PassportNumber.ToString();
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.VoterID?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_voterid", CustIndvData.IdentificationDetails.VoterID.ToString());
+                        CRMDDEmappingFields["eqs_voterid"] = CustIndvData.IdentificationDetails.VoterID.ToString();
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.DrivinglicenseNumber?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_drivinglicensenumber", CustIndvData.IdentificationDetails.DrivinglicenseNumber.ToString());
+                        CRMDDEmappingFields["eqs_drivinglicensenumber"] = CustIndvData.IdentificationDetails.DrivinglicenseNumber.ToString();
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.AadharReference?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_aadharreference", CustIndvData.IdentificationDetails.AadharReference.ToString());
+                        CRMDDEmappingFields["eqs_aadharreference"] = CustIndvData.IdentificationDetails.AadharReference.ToString();
                     }
                        
 
