@@ -323,7 +323,14 @@
                         }
                     }
                 }
-
+                if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportNumber?.ToString()))
+                {
+                    if (CustIndvData.IdentificationDetails?.PassportNumber?.ToString()?.Length > 10)
+                    {
+                        haserror = 1;
+                        fields.Add("Passport should not be more than 10 characters");
+                    }
+                }
                 if (haserror == 1)
                 {
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
