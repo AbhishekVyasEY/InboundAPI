@@ -239,9 +239,9 @@
                 {
                     odatab.Add("lastname", RequestData.lastname?.ToString());
                 }
-                if (!string.IsNullOrEmpty(RequestData.emaiid.ToString()))
+                if (!string.IsNullOrEmpty(RequestData.emailid.ToString()))
                 {
-                    odatab.Add("emailaddress1", RequestData.emaiid?.ToString());
+                    odatab.Add("emailaddress1", RequestData.emailid?.ToString());
                 }
                 if (!string.IsNullOrEmpty(RequestData.DOB.ToString()))
                 {
@@ -304,9 +304,9 @@
                 {
                     odatab.Add("lastname", RequestData.lastname?.ToString());
                 }
-                if (!string.IsNullOrEmpty(RequestData.emaiid.ToString()))
+                if (!string.IsNullOrEmpty(RequestData.emailid.ToString()))
                 {
-                    odatab.Add("emailaddress1", RequestData.emaiid?.ToString());
+                    odatab.Add("emailaddress1", RequestData.emailid?.ToString());
                 }
                 if (!string.IsNullOrEmpty(RequestData.DOB.ToString()))
                 {

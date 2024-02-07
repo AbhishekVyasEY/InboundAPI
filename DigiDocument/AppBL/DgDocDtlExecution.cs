@@ -446,6 +446,14 @@
             GetDgDocDtlReturn ldRtPrm = new GetDgDocDtlReturn();
 
             RequestData = await this.getRequestData(RequestData, "GetDigiDocumentDetails");
+
+            if (RequestData.ErrorNo != null && RequestData.ErrorNo.ToString() == "Error99")
+            {
+                ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                ldRtPrm.Message = "API do not have access permission!";
+                return ldRtPrm;
+            }
+
             try
             {
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetDigiDocumentappkey"))
