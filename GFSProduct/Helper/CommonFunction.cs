@@ -162,7 +162,7 @@
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
@@ -312,7 +312,7 @@
             try
             {
                 string prodSrkey = product_Filter.productCategory;
-                string filter = $"_eqs_productcategory_value eq '{product_Filter.productCategory}' and statuscode eq 1 ";
+                string filter = $"_eqs_productcategory_value eq '{product_Filter.productCategory}'  and statecode eq 0 ";
 
                 if (string.IsNullOrEmpty(product_Filter.gender))
                 {
@@ -332,11 +332,12 @@
                     prodSrkey += "nriF";
                 }
 
-                if (string.IsNullOrEmpty(product_Filter.customerSegment))
-                {
-                    filter += $"and eqs_iselite eq false ";
-                    prodSrkey += "elitF";
-                }
+                //Commented based on CRMMSD365-4397. If Customer is not elite, display all Products
+                //if (string.IsNullOrEmpty(product_Filter.customerSegment))
+                //{
+                //    filter += $"and eqs_iselite eq false ";
+                //    prodSrkey += "elitF";
+                //}
 
                 if (string.IsNullOrEmpty(product_Filter.IsStaff))
                 {

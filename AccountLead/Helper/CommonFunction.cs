@@ -264,7 +264,7 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$select=eqs_customer,eqs_name,eqs_isprimaryholder,_eqs_accountrelationship_value,eqs_dob&$filter=_eqs_leadaccountid_value eq '{leadaccountid}'";
+                string query_url = $"eqs_accountapplicants()?$select=eqs_customer,eqs_name,eqs_isprimaryholder,_eqs_accountrelationship_value,eqs_dob&$orderby=eqs_isprimaryholder desc&$filter=_eqs_leadaccountid_value eq '{leadaccountid}'";
                 var Applicentdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Applicent_dtails = await this.getDataFromResponce(Applicentdtails);
                 return Applicent_dtails;
@@ -282,7 +282,7 @@ namespace AccountLead
             {
                 string leadaccount_id = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", AccountID);
                 string Stage = await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddeaccounts()?$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}";
+                string query_url = $"eqs_ddeaccounts()?$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}&$expand=eqs_productid($select=eqs_compoundingfrequencytype,eqs_payoutfrequencytype,eqs_productcode),eqs_leadaccountid($select=eqs_crmleadaccountid)";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;

@@ -183,9 +183,16 @@
                                 }
 
                             }
+                            if (!string.IsNullOrEmpty(IndvData.Passport?.ToString()))
+                            {
+                                if (IndvData.Passport?.ToString()?.Length > 10)
+                                {
+                                    ValidationError = 1;
+                                    errorText.Add("Passport should not be more than 10 characters");
+                                }
+                            }
 
-                            
-                           
+
                         }
                         else if (string.Equals(RequestData.EntityType?.ToString(), "Corporate"))
                         {

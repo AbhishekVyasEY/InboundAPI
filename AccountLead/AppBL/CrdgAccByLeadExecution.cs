@@ -344,7 +344,7 @@ namespace AccountLead
                                 {
                                     msgBdy.Remove("accountNominee");
                                 }
-
+                                string productCode = AccountDDE[0]["eqs_productid"]["eqs_productcode"].ToString();
                                 List<ApplicentRelation> relationList = new List<ApplicentRelation>();
                                 foreach (var item in AccApplicent)
                                 {
@@ -356,25 +356,30 @@ namespace AccountLead
                                     if (item["eqs_isprimaryholder"].ToString() == "789030001")
                                     {
                                         msgBdy.customerID = item["eqs_customer"].ToString();
-
                                         if (!string.IsNullOrEmpty(item["eqs_dob"].ToString()))
                                         {
                                             int age = GetAgeInYears(item["eqs_dob"].ToString());
                                             if (age < 18)
                                             {
-                                                msgBdy.minorAcctStatus = true;
+                                                if (productCode == "1048")
+                                                {
+                                                    msgBdy.Remove("minorAcctStatus");
+                                                }
+                                                else
+                                                {
+                                                    msgBdy.minorAcctStatus = true;
+                                                }
                                             }
                                         }
                                     }
                                     relationList.Add(applicentRelation);
                                 }
-
                                 string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
 
                                 msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
                                 msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
-                                msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
-
+                                //msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
+                                msgBdy.productCode = productCode;
 
                                 msgBdy.tdaccountPayinRequest.depositAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
                                 msgBdy.tdaccountPayinRequest.termDays = AccountDDE[0]["eqs_tenureindays"].ToString();
@@ -385,6 +390,51 @@ namespace AccountLead
                                 {
                                     msgBdy.tdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
                                     msgBdy.tdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_productid"]["eqs_compoundingfrequencytype"].ToString()))
+                                {
+                                    msgBdy.tdaccountPayinRequest.intCompoundingFrequency = AccountDDE[0]["eqs_productid"]["eqs_compoundingfrequencytype"].ToString();
+                                }
+
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_productid"]["eqs_payoutfrequencytype"].ToString()))
+                                {
+                                    msgBdy.tdaccountPayinRequest.intPayoutFrequency = AccountDDE[0]["eqs_productid"]["eqs_payoutfrequencytype"].ToString();
+                                }
+                                string accountTitle = "";
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_accounttitle"].ToString()))
+                                {
+                                    accountTitle = AccountDDE[0]["eqs_accounttitle"].ToString();
+                                }
+                                else
+                                {
+                                    accountTitle = AccApplicent[0]["eqs_name"].ToString();
+                                }
+
+                                string payinNarration = $"Equitas TD/{AccountDDE[0]["eqs_leadaccountid"]["eqs_crmleadaccountid"].ToString()}/{accountTitle}";
+                                if (!string.IsNullOrEmpty(payinNarration) && payinNarration.Length > 40)
+                                {
+                                    msgBdy.tdaccountPayinRequest.payinNarration = payinNarration.Substring(0, 40);
+                                }
+                                else
+                                {
+                                    msgBdy.tdaccountPayinRequest.payinNarration = payinNarration;
+                                }
+
+                                string maturityInstructions = AccountDDE[0]["eqs_maturityinstruction"].ToString();
+                                if (!string.IsNullOrEmpty(maturityInstructions))
+                                {
+                                    if (maturityInstructions == "615290000" || maturityInstructions == "615290001") //Close on Maturity Or Redeem Interest and Principal
+                                    {
+                                        msgBdy.tdaccountPayinRequest.payoutType = "1";
+                                    }
+                                    else if (maturityInstructions == "615290002") //Reinvest Principal and Interest
+                                    {
+                                        msgBdy.tdaccountPayinRequest.payoutType = "2";
+                                    }
+                                    else if (maturityInstructions == "615290003") // Reinvest Principal and Redeem interest
+                                    {
+                                        msgBdy.tdaccountPayinRequest.payoutType = "3";
+                                    }
                                 }
 
                                 msgBdy.rdaccountPayinRequest.installmentAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
@@ -436,7 +486,6 @@ namespace AccountLead
                                 accountLeadReturn.AccountNo = responsD.createAccountResponse.msgBdy.accountNo.ToString();
                                 fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
                                 string postDataParametr = JsonConvert.SerializeObject(fieldInput);
-
                                 await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
 
                                 accountLeadReturn.Message = OutputMSG.Case_Success;
@@ -465,7 +514,6 @@ namespace AccountLead
                     accountLeadReturn.Message = OutputMSG.Resource_n_Found;
                     accountLeadReturn.ReturnCode = "CRM-ERROR-101";
                 }
-
             }
             catch (Exception ex)
             {

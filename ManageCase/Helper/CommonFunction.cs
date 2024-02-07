@@ -128,7 +128,7 @@ namespace ManageCase
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
@@ -252,7 +252,7 @@ namespace ManageCase
         {
             try
             {
-                string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}'";
+                string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}' and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 string subCatId = await this.getIDFromGetResponce("ccs_subcategoryid", responsdtails);
                 return subCatId;
@@ -269,7 +269,7 @@ namespace ManageCase
         {
             try
             {
-                string query_url = $"eqs_fieldvisibilitymetadataconfigurations()?$select=eqs_showfield&$filter=_eqs_subcategory_value eq '{subCategoryCode}'";
+                string query_url = $"eqs_fieldvisibilitymetadataconfigurations()?$select=eqs_showfield&$filter=_eqs_subcategory_value eq '{subCategoryCode}'  and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
                 return inputFields;
@@ -286,7 +286,7 @@ namespace ManageCase
         {
             try
             {
-                string query_url = $"eqs_cities?$select=eqs_cityid,_eqs_countryid_value,_eqs_stateid_value&$filter=eqs_citycode eq '{CityID}'";
+                string query_url = $"eqs_cities?$select=eqs_cityid,_eqs_countryid_value,_eqs_stateid_value&$filter=eqs_citycode eq '{CityID}' and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
                 return inputFields;
