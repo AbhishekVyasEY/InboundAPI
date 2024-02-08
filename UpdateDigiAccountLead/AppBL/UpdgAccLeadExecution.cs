@@ -1378,13 +1378,21 @@
                 string nomineeID = await this._commonFunc.getNomineeID(this.DDEId);
 
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
-
+                string dd, mm, yyyy;
                 odatab.Add("eqs_nomineename", ddeNominee?.name?.ToString());
-                odatab.Add("eqs_nomineedob", ddeNominee?.DOB?.ToString());
+                //odatab.Add("eqs_nomineedob", ddeNominee?.DOB?.ToString());
                 string nominRel = await this._commonFunc.getRelationShipId(ddeNominee?.NomineeRelationship?.ToString());
                 if (!string.IsNullOrEmpty(nominRel))
                 {
                     odatab.Add("eqs_nomineerelationshipwithaccountholder@odata.bind", $"eqs_relationships({nominRel})");
+                }
+                if (!string.IsNullOrEmpty(ddeNominee?.DOB?.ToString()))
+                {
+                    dd = ddeNominee?.DOB?.ToString()?.Substring(0, 2);
+                    mm = ddeNominee?.DOB?.ToString()?.Substring(3, 2);
+                    yyyy = ddeNominee?.DOB?.ToString()?.Substring(6, 4);
+                   
+                    odatab.Add("eqs_nomineedob", yyyy + "-" + mm + "-" + dd);
                 }
 
                 //odatab.Add("eqs_nomineeage", ddeNominee?.age?.ToString());
@@ -1466,7 +1474,7 @@
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 if (string.IsNullOrEmpty(nomineeID))
                 {
-                    await this._queryParser.HttpApiCall("eqs_ddeaccountnominees()?$select=eqs_ddeaccountnomineeid", HttpMethod.Post, postDataParametr);
+                    var result = await this._queryParser.HttpApiCall("eqs_ddeaccountnominees()?$select=eqs_ddeaccountnomineeid", HttpMethod.Post, postDataParametr);
                 }
                 else
                 {

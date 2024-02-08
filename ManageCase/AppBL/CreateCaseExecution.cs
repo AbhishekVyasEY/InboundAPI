@@ -194,7 +194,9 @@ namespace ManageCase
                         }
                         else
                         {
+                            this._logger.LogInformation("ValidateCreateCase", "No case with the same Combination. Before Create Case");
                             ldRtPrm = await this.CreateCase(CaseData);
+                            this._logger.LogInformation("ValidateCreateCase", $"Case created successfully. {ldRtPrm.CaseID}");
                         }                   
                     }
                     else

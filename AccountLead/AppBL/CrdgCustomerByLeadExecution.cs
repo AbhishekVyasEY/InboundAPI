@@ -247,8 +247,15 @@
                                 }
                             }
 
-                            msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
-
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_corporatecompanyid_value"]?.ToString()))
+                            {
+                                msgBdy.individualCustomer.employerCode = AccountDDE[0]["eqs_corporatecompanyid"]["eqs_corporatecode"]?.ToString();
+                            }
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_custpreferredbranchid_value"]?.ToString()))
+                            {
+                                msgBdy.individualCustomer.homeBranchCode = AccountDDE[0]["eqs_custpreferredbranchId"]["eqs_branchidvalue"]?.ToString();
+                            }
+                            //msgBdy.individualCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchid_value"].ToString());
 
                             Request_Template.createCustomerRequest.msgBdy = msgBdy;
                             string wso_request = JsonConvert.SerializeObject(Request_Template);
