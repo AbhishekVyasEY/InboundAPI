@@ -436,6 +436,10 @@ namespace AccountLead
                                         msgBdy.tdaccountPayinRequest.payoutType = "3";
                                     }
                                 }
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_esfbaccountnumber_interest"].ToString()))
+                                {
+                                    msgBdy.tdaccountPayinRequest.payoutAccountNo = AccountDDE[0]["eqs_esfbaccountnumber_interest"].ToString();
+                                }
 
                                 msgBdy.rdaccountPayinRequest.installmentAmount = AccountDDE[0]["eqs_depositamountslot"].ToString();
                                 msgBdy.rdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
