@@ -230,11 +230,12 @@ namespace AccountLead
                                     var Nominee = await this._commonFunc.getAccountNominee(AccountDDE[0]["eqs_ddeaccountid"].ToString());
                                     if (Nominee.Count > 0)
                                     {
-                                        dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
-                                        mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
-                                        yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
+                                        DateTime nomineedob = (!string.IsNullOrEmpty(Nominee[0]["eqs_nomineedob"].ToString())) ? (DateTime)Nominee[0]["eqs_nomineedob"] : DateTime.MinValue;
+                                        //mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
+                                        //dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
+                                        //yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
 
-                                        msgBdy.nomineeDtls.nomDOB = yy + mm + dd;
+                                        msgBdy.nomineeDtls.nomDOB = nomineedob.ToString("yyyyMMdd");
                                         msgBdy.nomineeDtls.nomName = Nominee[0]["eqs_nomineename"].ToString();
 
 
@@ -297,11 +298,11 @@ namespace AccountLead
                                     {
                                         msgBdy.accountNominee.country = "IN";    //await this._commonFunc.getCountryName(Nominee[0]["_eqs_country_value"].ToString());
                                     }
-
-                                    string dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
-                                    string mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
-                                    string yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
-                                    msgBdy.accountNominee.dateOfBirth = yy + mm + dd;
+                                    DateTime nomineedob = (!string.IsNullOrEmpty(Nominee[0]["eqs_nomineedob"].ToString())) ? (DateTime)Nominee[0]["eqs_nomineedob"] : DateTime.MinValue;
+                                    //string mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
+                                    //string dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
+                                    //string yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
+                                    msgBdy.accountNominee.dateOfBirth = nomineedob.ToString("yyyyMMdd");
                                     msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
 
                                     msgBdy.accountNominee.nominee.address.line1 = Nominee[0]["eqs_addressline1"].ToString();
