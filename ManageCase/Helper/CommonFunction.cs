@@ -148,19 +148,41 @@ namespace ManageCase
 
         }
 
-        public async Task<string> getclassificationId(string classification)
-        {            
-            return await this.getIDfromMSDTable("ccs_classifications", "ccs_classificationid", "ccs_code", classification);
-        }
-
+       
         public async Task<string> getClassificationName(string classificationId)
         {
             return await this.getIDfromMSDTable("ccs_classifications", "ccs_name", "ccs_classificationid", classificationId);
         }
 
-        public async Task<string> getChannelId(string channelCode)
+        public async Task getChannelId(string channelCode)
         {
-            return await this.getIDfromMSDTable("eqs_casechannels", "eqs_casechannelid", "eqs_channelid", channelCode);
+            string query_url = $"eqs_casechannels()?$select=eqs_casechannelid&$filter=eqs_channelid eq '{channelCode}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
+        }
+        public async Task getSourceId(string SourceCode)
+        {
+            string query_url = $"eqs_casesources()?$select=eqs_casesourceid&$filter=eqs_sourceid eq '{SourceCode}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getCustomer_Id(string uciccode)
+        {
+            string query_url = $"contacts()?$select=contactid&$filter=eqs_customerid eq '{uciccode}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getCategoryId(string CategoryCode)
+        {
+            string query_url = $"ccs_categories()?$select=ccs_categoryid&$filter=ccs_code eq '{CategoryCode}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getAccount_Id(string AccountNumber)
+        {
+            string query_url = $"eqs_accounts()?$select=eqs_accountid&$filter=eqs_accountno eq '{AccountNumber}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
+        }
+        public async Task getclassificationId(string classification)
+        {
+            string query_url = $"ccs_classifications()?$select=ccs_classificationid&$filter=ccs_code eq '{classification}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
         }
 
         public async Task<string> getChannelCode(string channelId)
@@ -187,21 +209,12 @@ namespace ManageCase
         {
             return await this.getIDfromMSDTable("eqs_accounts", "eqs_accountno", "eqs_accountid", AccountId);
         }
-
-        public async Task<string> getSourceId(string SourceCode)
-        {
-            return await this.getIDfromMSDTable("eqs_casesources", "eqs_casesourceid", "eqs_sourceid", SourceCode);
-        }
+        
 
         public async Task<string> getSourceCode(string SourceId)
         {
             return await this.getIDfromMSDTable("eqs_casesources", "eqs_sourceid", "eqs_casesourceid", SourceId);
-        }
-
-        public async Task<string> getCategoryId(string CategoryCode)
-        {            
-            return await this.getIDfromMSDTable("ccs_categories", "ccs_categoryid", "ccs_code", CategoryCode); 
-        }
+        }       
 
         public async Task<string> getCategoryName(string CategoryId)
         {
@@ -402,15 +415,25 @@ namespace ManageCase
         {
             try
             {
-                string customerid = await this.getCustomerId(UCIC);
+                await this.getCustomer_Id(UCIC);
                 string Accountid = "";
                 if (!string.IsNullOrEmpty(Account))
                 {
-                    Accountid = await this.getAccountId(Account);
+                    await this.getAccount_Id(Account);
+                }
+                await this.getclassificationId(Classification);
+                await this.getCategoryId(Category);
+
+                var Batch_results1 = await this._queryParser.GetBatchResult();
+                string customerid = (Batch_results1[0]["contactid"]!=null) ? Batch_results1[0]["contactid"].ToString() : "";
+                if (!string.IsNullOrEmpty(Account))
+                {
+                    Accountid = (Batch_results1[1]["eqs_accountid"] != null) ? Batch_results1[1]["eqs_accountid"].ToString() : "";
                 }
                     
-                string ccs_classification = await this.getclassificationId(Classification);
-                string CategoryId = await this.getCategoryId(Category);
+                string ccs_classification = (Batch_results1[2]["ccs_classificationid"] != null) ? Batch_results1[2]["ccs_classificationid"].ToString() : "";
+                string CategoryId = (Batch_results1[3]["ccs_categoryid"] != null) ? Batch_results1[3]["ccs_categoryid"].ToString() : "";
+
                 string SubCategoryId = await this.getSubCategoryId(SubCategory, CategoryId);
 
                 string query_url = $"incidents()?$select=incidentid,statuscode&$filter=_customerid_value eq '{customerid}' and _ccs_classification_value eq '{ccs_classification}' and _ccs_category_value eq '{CategoryId}' and _ccs_subcategory_value eq '{SubCategoryId}'";

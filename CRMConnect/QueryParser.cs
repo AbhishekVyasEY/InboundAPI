@@ -36,6 +36,7 @@
         private static readonly object SyncObject = new object();
         private readonly IMemoryCache _cache;
         private readonly ILoggers _errorLogger;
+        public List<HttpContent> http_content = new List<HttpContent>();
 
 
         public QueryParser(ILogger<QueryParser> logger, IKeyVaultService keyVaultService, IMemoryCache cache, ILoggers loggers)
@@ -79,6 +80,36 @@
                 _errorLogger.LogError("HttpApiCall", $"Error from CBS connect: {ex.Message} \n {ex.InnerException!} \n {ex.StackTrace!}", $"Query {odataQuery}  \n  post param {parameterToPost}");
                 throw;
             }
+        }
+
+        public async Task SetBatchCall(string odataQuery, HttpMethod httpMethod, string parameterToPost = "", bool isFormattedValueRequired = false)
+        {
+            HttpClient httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(this._keyVaultService.ReadSecret("APIUrl"));
+            odataQuery = httpClient.BaseAddress + odataQuery;
+            List<HttpMessageContent> odataRequestforChild = new List<HttpMessageContent>();
+            if (!string.IsNullOrEmpty(parameterToPost))
+            {
+                odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, 1, parameterToPost, isFormattedValueRequired));
+            }
+            else
+            {
+                odataRequestforChild.Add(this.CreateHttpMessageContent(httpMethod, odataQuery, this._log, isFormattedValueRequired: isFormattedValueRequired));
+            }
+
+            odataRequestforChild.ForEach(x =>
+                        http_content.Add(x)
+                    );
+
+        }
+        public async Task<List<JObject>> GetBatchResult()
+        {
+            HttpClient httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(this._keyVaultService.ReadSecret("APIUrl"));
+            List<JObject> results = await this.SendBatchRequestAsync(httpClient, http_content, this._log).ConfigureAwait(true);
+            http_content = new List<HttpContent>();
+            return await this.getDataFrom_Responce(results);
+            //return results;
         }
 
         public async Task<string> HttpCBSApiCall(string Token, HttpMethod httpMethod, string APIName, string parameterToPost = "")
@@ -716,6 +747,46 @@
                 }
             }
             return new JArray();
+        }
+
+        public async Task<List<JObject>> getDataFrom_Responce(List<JObject> RsponsData)
+        {
+            string resourceID = "";
+            List<JObject> returnArr = new List<JObject>();
+            foreach (JObject item in RsponsData)
+            {
+               
+                if (Enum.TryParse(item["responsecode"].ToString(), out HttpStatusCode responseStatus) && responseStatus == HttpStatusCode.OK)
+                {
+                    dynamic responseValue = item["responsebody"];
+                    JArray resArray = new JArray();
+                    string urlMetaData = string.Empty;
+                    if (responseValue?.value != null)
+                    {
+                        resArray = (JArray)responseValue?.value;                        
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+                    else if (responseValue is JArray)
+                    {
+                        resArray = responseValue;                      
+                    }
+                    else
+                    {
+                        resArray.Add(responseValue);
+                        urlMetaData = responseValue["@odata.context"];
+                    }
+
+                    if (resArray != null && resArray.Any())
+                    {
+                        returnArr.Add((JObject)resArray[0]);
+                    }
+                    else
+                    {
+                        returnArr.Add(new JObject());
+                    }
+                }
+            }
+            return returnArr;
         }
 
         public bool GetMvalue<T>(string keyname, out T? Outvalue)

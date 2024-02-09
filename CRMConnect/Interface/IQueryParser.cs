@@ -13,5 +13,8 @@ namespace CRMConnect
         public Task<string> PayloadDecryption(string V_requestData, string BankCode, string APIName="");
         public Task<JArray> getDataFromResponce(List<JObject> RsponsData);
         public Task<string> getAccessToken();
+
+        public Task SetBatchCall(string odataQuery, HttpMethod httpMethod, string parameterToPost = "", bool isFormattedValueRequired = false);
+        public Task<List<JObject>> GetBatchResult();
     }
 }

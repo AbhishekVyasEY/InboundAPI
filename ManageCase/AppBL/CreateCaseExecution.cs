@@ -103,7 +103,6 @@ namespace ManageCase
             this.StatusCodes.Add("4", "Researching");
             this.StatusCodes.Add("6", "Cancelled");
             this.StatusCodes.Add("615290000", "Auto Closed");
-            this.StatusCodes.Add("615290001", "Rejected");
 
         }
 
@@ -369,7 +368,21 @@ namespace ManageCase
                 string postDataParametr, postDataParametr1;
                 List<JObject> case_details = new List<JObject>();
                 //Channel
-                csProperty.channelId = await this._commonFunc.getChannelId(CaseData.Channel.ToString());
+                await this._commonFunc.getChannelId(CaseData.Channel.ToString());
+                await this._commonFunc.getSourceId(CaseData.Source.ToString());
+                await this._commonFunc.getCustomer_Id(CaseData.UCIC?.ToString());
+                await this._commonFunc.getCategoryId(CaseData.Category?.ToString());
+                await this._commonFunc.getAccount_Id(CaseData.AccountNumber.ToString());
+                await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
+
+                var Batch_results1 = await this._queryParser.GetBatchResult();
+                csProperty.channelId = (Batch_results1[0]["eqs_casechannelid"] != null) ? Batch_results1[0]["eqs_casechannelid"].ToString() : "";
+                csProperty.SourceId = (Batch_results1[1]["eqs_casesourceid"] != null) ? Batch_results1[1]["eqs_casesourceid"].ToString() : "";
+                csProperty.customerid = (Batch_results1[2]["contactid"] != null) ? Batch_results1[2]["contactid"].ToString() : "";
+                csProperty.CategoryId = (Batch_results1[3]["ccs_categoryid"] != null) ? Batch_results1[3]["ccs_categoryid"].ToString() : "";
+                csProperty.Accountid = (Batch_results1[4]["eqs_accountid"] != null) ? Batch_results1[4]["eqs_accountid"].ToString() : "";
+                csProperty.ccs_classification = (Batch_results1[5]["ccs_classificationid"] != null) ? Batch_results1[5]["ccs_classificationid"].ToString() : "";
+
                 if (csProperty.channelId != null && csProperty.channelId.Length > 4)
                 {
                     odatab.Add("eqs_CaseChannel@odata.bind", $"eqs_casechannels({csProperty.channelId})");
@@ -383,7 +396,7 @@ namespace ManageCase
                 }
 
                 //Source
-                csProperty.SourceId = await this._commonFunc.getSourceId(CaseData.Source.ToString());
+                
                 if (csProperty.SourceId != null && csProperty.SourceId.Length > 4)
                 {
                     odatab.Add("eqs_CaseSource@odata.bind", $"eqs_casesources({csProperty.SourceId})");
@@ -399,7 +412,7 @@ namespace ManageCase
                 //UCIC
                 csProperty.eqs_customerid = CaseData.UCIC?.ToString();
                 odatab.Add("eqs_customercode", csProperty.eqs_customerid);
-                csProperty.customerid = await this._commonFunc.getCustomerId(csProperty.eqs_customerid);
+                
                 if (!string.IsNullOrEmpty(csProperty.customerid))
                 {
                     odatab.Add("customerid_contact@odata.bind", $"contacts({csProperty.customerid})");
@@ -416,7 +429,7 @@ namespace ManageCase
                 case_Property.eqs_casetype = this.CaseType[CaseData.CaseType?.ToString()];
                 case_Property.title = CaseData.Subject?.ToString();
 
-                csProperty.CategoryId = await this._commonFunc.getCategoryId(CaseData.Category?.ToString());
+               
                 if (csProperty.CategoryId != null && csProperty.CategoryId.Length > 4)
                 {
                     odatab.Add("ccs_category@odata.bind", $"ccs_categories({csProperty.CategoryId})");
@@ -452,7 +465,7 @@ namespace ManageCase
                 }               
                 if (!string.IsNullOrEmpty(CaseData.AccountNumber?.ToString()))
                 {
-                    csProperty.Accountid = await this._commonFunc.getAccountId(CaseData.AccountNumber.ToString());
+                   
                     if (csProperty.Accountid != null && csProperty.Accountid.Length > 4)
                     {
                         odatab.Add("eqs_account@odata.bind", $"eqs_accounts({csProperty.Accountid})");
@@ -467,7 +480,7 @@ namespace ManageCase
                 }
                 if (!string.IsNullOrEmpty(CaseData.Classification?.ToString()))
                 {
-                    csProperty.ccs_classification = await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
+                    
                     if (csProperty.ccs_classification.Length > 4)
                     {
                         odatab.Add("ccs_classification@odata.bind", $"ccs_classifications({csProperty.ccs_classification})");
@@ -660,10 +673,7 @@ namespace ManageCase
                             if (!this._commonFunc.GetMvalue<CaseDetails>("Case" + caseDetails["ticketnumber"].ToString(), out case_dtl))
                             {
                                 case_details.CaseID = caseDetails["ticketnumber"].ToString();
-                                if (!string.IsNullOrEmpty(caseDetails["statuscode"].ToString()))
-                                {
-                                    case_details.CaseStatus = this.StatusCodes[caseDetails["statuscode"].ToString()];
-                                }
+                                case_details.CaseStatus = this.StatusCodes[caseDetails["statuscode"].ToString()];
                                 case_details.Subject = caseDetails["title"].ToString();
                                 case_details.openDate = caseDetails["createdon"].ToString();
                                 case_details.modifiedDate = caseDetails["modifiedon"].ToString();
