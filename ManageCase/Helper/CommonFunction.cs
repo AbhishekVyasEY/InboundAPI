@@ -14,6 +14,7 @@ using CRMConnect;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Collections.Immutable;
 using System.Timers;
+using System.Threading.Channels;
 
 namespace ManageCase
 {
@@ -149,10 +150,7 @@ namespace ManageCase
         }
 
        
-        public async Task<string> getClassificationName(string classificationId)
-        {
-            return await this.getIDfromMSDTable("ccs_classifications", "ccs_name", "ccs_classificationid", classificationId);
-        }
+        
 
         public async Task getChannelId(string channelCode)
         {
@@ -184,47 +182,52 @@ namespace ManageCase
             string query_url = $"ccs_classifications()?$select=ccs_classificationid&$filter=ccs_code eq '{classification}' and statecode eq 0";
             await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
         }
-
-        public async Task<string> getChannelCode(string channelId)
+        public async Task getClassificationName(string classificationId)
         {
-            return await this.getIDfromMSDTable("eqs_casechannels", "eqs_channelid", "eqs_casechannelid", channelId);
+            string query_url = $"ccs_classifications()?$select=ccs_name&$filter=ccs_classificationid eq '{classificationId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getCategoryName(string CategoryId)
+        {
+            string query_url = $"ccs_categories()?$select=ccs_name&$filter=ccs_categoryid eq '{CategoryId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
+        }
+        public async Task getSubCategoryName(string SubCategoryId)
+        {
+            string query_url = $"ccs_subcategories()?$select=ccs_name&$filter=ccs_subcategoryid eq '{SubCategoryId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getChannelCode(string channelId)
+        {
+            string query_url = $"eqs_casechannels()?$select=eqs_channelid&$filter=eqs_casechannelid eq '{channelId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");
+        }
+        public async Task getSourceCode(string SourceId)
+        {
+            string query_url = $"eqs_casesources()?$select=eqs_sourceid&$filter=eqs_casesourceid eq '{SourceId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");           
+        }
+        public async Task getAccountNumber(string AccountId)
+        {
+            string query_url = $"eqs_accounts()?$select=eqs_accountno&$filter=eqs_accountid eq '{AccountId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
+        }
+        public async Task getCustomerCode(string CustomerId)
+        {
+            string query_url = $"contacts()?$select=eqs_customerid&$filter=contactid eq '{CustomerId}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");            
         }
 
         public async Task<string> getCustomerId(string uciccode)
         {           
             return await this.getIDfromMSDTable("contacts", "contactid", "eqs_customerid", uciccode);
-        }
-
-        public async Task<string> getCustomerCode(string CustomerId)
-        {
-            return await this.getIDfromMSDTable("contacts", "eqs_customerid", "contactid", CustomerId);
-        }
+        }       
 
         public async Task<string> getAccountId(string AccountNumber)
         {
             return await this.getIDfromMSDTable("eqs_accounts", "eqs_accountid", "eqs_accountno", AccountNumber);
-        }
-
-        public async Task<string> getAccountNumber(string AccountId)
-        {
-            return await this.getIDfromMSDTable("eqs_accounts", "eqs_accountno", "eqs_accountid", AccountId);
-        }
+        }            
         
-
-        public async Task<string> getSourceCode(string SourceId)
-        {
-            return await this.getIDfromMSDTable("eqs_casesources", "eqs_sourceid", "eqs_casesourceid", SourceId);
-        }       
-
-        public async Task<string> getCategoryName(string CategoryId)
-        {
-            return await this.getIDfromMSDTable("ccs_categories", "ccs_name", "ccs_categoryid", CategoryId);
-        }
-        public async Task<string> getSubCategoryName(string SubCategoryId)
-        {
-            return await this.getIDfromMSDTable("ccs_subcategories", "ccs_name", "ccs_subcategoryid", SubCategoryId);
-        }
-
         public async Task<string> getBranchId(string branchid)
         {
             return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchid", "eqs_branchidvalue", branchid);
