@@ -209,11 +209,19 @@
 
                 general.ApplicationDate = dd + "/" + mm + "/" + yyyy;
             }
-            general.ProductCategory = await this._commonFunc.getProductCategoryCode(LeadData[0]["_eqs_productcategoryid_value"]?.ToString());
-            general.Product = await this._commonFunc.getProductCode(LeadData[0]["_eqs_productid_value"]?.ToString());
+            await this._commonFunc.getProductCategoryCode(LeadData[0]["_eqs_productcategoryid_value"]?.ToString());
+            await this._commonFunc.getProductCode(LeadData[0]["_eqs_productid_value"]?.ToString());
+            await this._commonFunc.getBranchCode(LeadData[0]["_eqs_accountopeningbranchid_value"].ToString());
+            await this._commonFunc.getBranchCode(LeadData[0]["_eqs_sourcebranchterritoryid_value"].ToString());
+
+            var Batch_results1 = await this._queryParser.GetBatchResult();
+
+            general.ProductCategory = (Batch_results1[0]["eqs_productcategorycode"] != null) ? Batch_results1[0]["eqs_productcategorycode"].ToString() : "";
+            general.Product = (Batch_results1[1]["eqs_productcode"] != null) ? Batch_results1[1]["eqs_productcode"].ToString() : "";
+            general.AccountOpeningBranch = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : "";
+
             general.InstaKit = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_instakitcode", LeadData[0]["eqs_instakitcode"].ToString());
             general.InstaKitAccountNumber = LeadData[0]["eqs_instakitaccountnumber"]?.ToString();
-            general.AccountOpeningBranch = await this._commonFunc.getBranchCode(LeadData[0]["_eqs_accountopeningbranchid_value"].ToString());
             general.PurposeofOpeningAccount = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_purposeofopeningaccountcode", LeadData[0]["eqs_purposeofopeningaccountcode"].ToString());
             general.PurposeOfOpeningAccountOthers = LeadData[0]["eqs_purposeofopeningaaccountothers"]?.ToString();
             general.ModeofOperation = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_modeofoperationcode", LeadData[0]["eqs_modeofoperationcode"].ToString());
@@ -233,7 +241,7 @@
             general.TransactionID = LeadData[0]["eqs_transactionid"]?.ToString();
             general.Fundingchequebank = LeadData[0]["eqs_fundingchequebank"]?.ToString();
             general.FundingchequeNumber = LeadData[0]["eqs_fundingchequenumber"]?.ToString();
-            general.SourceBranchTerritory = await this._commonFunc.getBranchCode(LeadData[0]["_eqs_sourcebranchterritoryid_value"].ToString());
+            general.SourceBranchTerritory = (Batch_results1[3]["eqs_branchidvalue"] != null) ? Batch_results1[3]["eqs_branchidvalue"].ToString() : "";
             general.SweepFacility = LeadData[0]["eqs_sweepfacility"]?.ToString();
             general.LGCode = LeadData[0]["eqs_lgcode"]?.ToString();
             general.LCCode = LeadData[0]["eqs_lccode"]?.ToString();
@@ -405,15 +413,26 @@
                 nominee.Landmark = nomineeobj[0]["eqs_landmark"]?.ToString();
 
                 //nominee.NomineeRelationship = await this._commonFunc.getRelationshipCode(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"].ToString());
-                nominee.NomineeRelationship = await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"]?.ToString());
-                nominee.CityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
-                nominee.CountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
-                nominee.State = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
+                await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_nomineerelationshipwithaccountholder_value"]?.ToString());
+                await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_city_value"].ToString());
+                await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_country_value"].ToString());
+                await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_state_value"].ToString());
+                await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString());
+                await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_guardiancity_value"].ToString());
+                await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_guardiancountry_value"].ToString());
+                await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
+
+                var Batch_results2 = await this._queryParser.GetBatchResult();
+
+                nominee.NomineeRelationship = (Batch_results2[0]["eqs_name"] != null) ? Batch_results2[0]["eqs_name"].ToString() : "";
+                nominee.CityCode = (Batch_results2[1]["eqs_citycode"] != null) ? Batch_results2[1]["eqs_citycode"].ToString() : "";
+                nominee.CountryCode = (Batch_results2[2]["eqs_name"] != null) ? Batch_results2[2]["eqs_name"].ToString() : "";
+                nominee.State = (Batch_results2[3]["eqs_statecode"] != null) ? Batch_results2[3]["eqs_statecode"].ToString() : "";
 
                 Guardian guardian = new Guardian();
                 guardian.Name = nomineeobj[0]["eqs_guardianname"]?.ToString();
                 //guardian.RelationshipToMinor = nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString();
-                guardian.RelationshipToMinor = await this._commonFunc.getRelationshipName(nomineeobj[0]["_eqs_guardianrelationshiptominor_value"]?.ToString());
+                guardian.RelationshipToMinor = (Batch_results2[4]["eqs_name"] != null) ? Batch_results2[4]["eqs_name"].ToString() : "";
                 guardian.GuardianUCIC = nomineeobj[0]["eqs_guardianucic"]?.ToString();
                 guardian.GuardianMobile = nomineeobj[0]["eqs_guardianmobile"]?.ToString();
                 guardian.GuardianLandline = nomineeobj[0]["eqs_guardianlandlinenumber"]?.ToString();
@@ -424,10 +443,10 @@
                 guardian.GuardianLandmark = nomineeobj[0]["eqs_guardianlandmark"]?.ToString();
                 guardian.GuardianPO = nomineeobj[0]["eqs_guardianpobox"]?.ToString();
 
-                guardian.GuardianCityCode = await this._commonFunc.getCityCode(nomineeobj[0]["_eqs_guardiancity_value"].ToString());
+                guardian.GuardianCityCode = (Batch_results2[5]["eqs_citycode"] != null) ? Batch_results2[5]["eqs_citycode"].ToString() : "";
                 guardian.GuardianDistrict = nomineeobj[0]["eqs_guardiandistrict"]?.ToString();
-                guardian.GuardianCountryCode = await this._commonFunc.getCuntryCode(nomineeobj[0]["_eqs_guardiancountry_value"].ToString());
-                guardian.GuardianState = await this._commonFunc.getStateCode(nomineeobj[0]["_eqs_guardianstate_value"].ToString());
+                guardian.GuardianCountryCode = (Batch_results2[6]["eqs_name"] != null) ? Batch_results2[6]["eqs_name"].ToString() : "";
+                guardian.GuardianState = (Batch_results2[7]["eqs_statecode"] != null) ? Batch_results2[7]["eqs_statecode"].ToString() : "";
 
                 nominee.Guardian = guardian;
                 ftAccountLeadReturn.Nominee = nominee;
