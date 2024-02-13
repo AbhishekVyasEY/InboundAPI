@@ -250,24 +250,42 @@
                     /*********** General *********/
                     Generalind general = new Generalind();
                     general.DDEId = DDEDetails[0].eqs_dataentryoperator.ToString();
-                    general.AccountApplicant = await this._commonFunc.getAccountapplicantName(DDEDetails[0]._eqs_accountapplicantid_value.ToString());
+                    await this._commonFunc.getAccountapplicantName(DDEDetails[0]._eqs_accountapplicantid_value.ToString());
                     general.EntityType = await this._commonFunc.getEntityName(DDEDetails[0]._eqs_entitytypeid_value.ToString());
-                    general.SubEntityType = await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
+                    await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
+                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchid_value.ToString());
+                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_custpreferredbranchid_value.ToString());
+                    await this._commonFunc.getAccRelationshipText(DDEDetails[0]._eqs_accountrelationship_value.ToString());
+                    await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
+                    await this._commonFunc.getLeadsourceName(DDEDetails[0]._eqs_leadsourceid_value.ToString());
+                    await this._commonFunc.getSystemuserName(DDEDetails[0]._eqs_leadcreatedby_value.ToString());
+                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_nationalityid_value.ToString());
+                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryofbirthid_value.ToString());
+                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryid_value.ToString());
+                    await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
+                    await this._commonFunc.getcorporatemasterText(DDEDetails[0]._eqs_corporatecompanyid_value.ToString());
+                    await this._commonFunc.getdesignationmasterText(DDEDetails[0]._eqs_designationid_value.ToString());
+
+                    var Batch_results1 = await this._queryParser.GetBatchResult();
+
+                    general.AccountApplicant = (Batch_results1[0]["eqs_name"] != null) ? Batch_results1[0]["eqs_name"].ToString() : "";
+                    general.SubEntityType = (Batch_results1[1]["eqs_key"] != null) ? Batch_results1[1]["eqs_key"].ToString() : "";
+
                     general.IsPrimaryHolder = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isprimaryholder", DDEDetails[0].eqs_isprimaryholder.ToString());
                     general.ResidencyType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_residencytypecode", DDEDetails[0].eqs_residencytypecode.ToString());
                     general.LGCode = DDEDetails[0].eqs_lgcode.ToString();
                     general.LCCode = DDEDetails[0].eqs_lccode.ToString();
 
-                    general.SourceBranch = await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchid_value.ToString());
-                    general.CustomerspreferredBranch = await this._commonFunc.getBranchText(DDEDetails[0]._eqs_custpreferredbranchid_value.ToString());
+                    general.SourceBranch = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : ""; 
+                    general.CustomerspreferredBranch = (Batch_results1[3]["eqs_branchidvalue"] != null) ? Batch_results1[3]["eqs_branchidvalue"].ToString() : "";
 
                     general.RelationshiptoPrimaryHolder = await this._commonFunc.getRelationshipText(DDEDetails[0]._eqs_relationshiptoprimaryholder_value.ToString());
-                    general.AccountRelationship = await this._commonFunc.getAccRelationshipText(DDEDetails[0]._eqs_accountrelationship_value.ToString());
+                    general.AccountRelationship = (Batch_results1[4]["eqs_key"] != null) ? Batch_results1[4]["eqs_key"].ToString() : "";
 
                     general.PhysicalAOFnumber = DDEDetails[0].eqs_physicalaornumber.ToString();
                     general.IsMFICustomer = DDEDetails[0].eqs_ismficustomer.ToString();
                     general.IsDeferral = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_deferralcode", DDEDetails[0].eqs_deferralcode.ToString());
-                    general.PurposeofCreation = await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
+                    general.PurposeofCreation = (Batch_results1[5]["eqs_name"] != null) ? Batch_results1[5]["eqs_name"].ToString() : "";
                     general.InstaKitCustomerId = DDEDetails[0].eqs_instakitcustomerid.ToString();
 
                     general.Deferral = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isdeferral", DDEDetails[0].eqs_isdeferral.ToString());
@@ -275,9 +293,10 @@
                     general.DataValidated = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_datavalidated", DDEDetails[0].eqs_datavalidated.ToString());
                     general.LeadNumber = DDEDetails[0].eqs_leadnumber.ToString();
                     general.LeadChannel = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_sourcingchannelcode", DDEDetails[0].eqs_sourcingchannelcode.ToString());
-                    general.SourceofLead = await this._commonFunc.getLeadsourceName(DDEDetails[0]._eqs_leadsourceid_value.ToString());
+                    general.SourceofLead = (Batch_results1[6]["eqs_name"] != null) ? Batch_results1[6]["eqs_name"].ToString() : "";
                     general.Leadcreatedon = DDEDetails[0].eqs_leadcreatedon.ToString();
-                    general.Leadcreatedby = await this._commonFunc.getSystemuserName(DDEDetails[0]._eqs_leadcreatedby_value.ToString());
+                    general.Leadcreatedby = (Batch_results1[7]["fullname"] != null) ? Batch_results1[7]["fullname"].ToString() : "";
+
 
                     csRtPrm.general = general;
 
@@ -287,14 +306,14 @@
                     prospectDetails.Gender = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_gendercode", DDEDetails[0].eqs_gendercode.ToString());
                     prospectDetails.ShortName = DDEDetails[0].eqs_shortname.ToString();
                     prospectDetails.EmailID = DDEDetails[0].eqs_emailid.ToString();
-                    prospectDetails.Nationality = await this._commonFunc.getCountryText(DDEDetails[0]._eqs_nationalityid_value.ToString());
-                    prospectDetails.Countryofbirth = await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryofbirthid_value.ToString());
+                    prospectDetails.Nationality = (Batch_results1[8]["eqs_countrycode"] != null) ? Batch_results1[8]["eqs_countrycode"].ToString() : "";
+                    prospectDetails.Countryofbirth = (Batch_results1[9]["eqs_countrycode"] != null) ? Batch_results1[9]["eqs_countrycode"].ToString() : "";
 
                     prospectDetails.FathersName = DDEDetails[0].eqs_fathername.ToString();
                     prospectDetails.MothersMaidenName = DDEDetails[0].eqs_mothermaidenname.ToString();
                     prospectDetails.SpouseName = DDEDetails[0].eqs_spousename.ToString();
 
-                    prospectDetails.Country = await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryid_value.ToString());
+                    prospectDetails.Country = (Batch_results1[10]["eqs_countrycode"] != null) ? Batch_results1[10]["eqs_countrycode"].ToString() : "";
                     prospectDetails.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
                     prospectDetails.Program = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_programcode", DDEDetails[0].eqs_programcode.ToString());
                     prospectDetails.Education = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_educationcode", DDEDetails[0].eqs_educationcode.ToString());
@@ -314,7 +333,7 @@
                     prospectDetails.LOBCode = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_lobcode", DDEDetails[0].eqs_lobcode.ToString());
                     prospectDetails.AOBusinessOperation = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_aobocode", DDEDetails[0].eqs_aobocode.ToString());
 
-                    prospectDetails.Title = await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
+                    prospectDetails.Title = (Batch_results1[11]["eqs_name"] != null) ? Batch_results1[11]["eqs_name"].ToString() : "";
                     prospectDetails.Firstname = DDEDetails[0].eqs_firstname.ToString();
                     prospectDetails.MiddleName = DDEDetails[0].eqs_middlename.ToString();
                     prospectDetails.LastName = DDEDetails[0].eqs_lastname.ToString();
@@ -322,8 +341,8 @@
                     prospectDetails.Age = DDEDetails[0].eqs_age.ToString();
                     prospectDetails.MobileNumber = DDEDetails[0].eqs_mobilenumber.ToString();
                     prospectDetails.IsPhysicallyChallenged = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isphysicallychallenged", DDEDetails[0].eqs_isphysicallychallenged.ToString());
-                    prospectDetails.WorkPlaceAddress = await this._commonFunc.getcorporatemasterText(DDEDetails[0]._eqs_corporatecompanyid_value.ToString());
-                    prospectDetails.Designation = await this._commonFunc.getdesignationmasterText(DDEDetails[0]._eqs_designationid_value.ToString());
+                    prospectDetails.WorkPlaceAddress = (Batch_results1[11]["eqs_corporatecode"] != null) ? Batch_results1[11]["eqs_corporatecode"].ToString() : "";
+                    prospectDetails.Designation = (Batch_results1[12]["eqs_name"] != null) ? Batch_results1[12]["eqs_name"].ToString() : "";
                     prospectDetails.LOBType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_lob", DDEDetails[0].eqs_lob.ToString());
 
                     csRtPrm.prospectDetails = prospectDetails;
@@ -378,13 +397,20 @@
                         address.FaxNumber = addressItem.eqs_faxnumber.ToString();
                         address.OverseasMobileNumber = addressItem.eqs_overseasmobilenumber.ToString();
 
-                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();
-                        address.City = await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
+                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();                        
                         address.District = addressItem.eqs_district.ToString();
-                        address.State = await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
-                        address.Country = await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
 
-                        address.PinCode = addressItem.eqs_pincode.ToString();
+                        await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
+                        await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
+                        await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
+
+                        var Batch_results2 = await this._queryParser.GetBatchResult();
+
+                        address.City = (Batch_results2[0]["eqs_citycode"] != null) ? Batch_results2[0]["eqs_citycode"].ToString() : "";
+                        address.State = (Batch_results2[1]["eqs_statecode"] != null) ? Batch_results2[1]["eqs_statecode"].ToString() : "";
+                        address.Country = (Batch_results2[2]["eqs_countrycode"] != null) ? Batch_results2[2]["eqs_countrycode"].ToString() : "";
+
+                        address.PinCode = addressItem.eqs_zipcode.ToString();
                         address.POBox = addressItem.eqs_pobox.ToString();
                         address.Landmark = addressItem.eqs_landmark.ToString();
                         address.LandlineNumber = addressItem.eqs_landlinenumber.ToString();
@@ -437,7 +463,7 @@
                         fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
 
 
-                        fATCAobj.Country = await this._commonFunc.getCountryText(fatcaDetail[0]._eqs_countryid_value.ToString());
+                        fATCAobj.Country = await this._commonFunc.getCountry_Text(fatcaDetail[0]._eqs_countryid_value.ToString());
                         fATCAobj.OtherIdentificationNumber = fatcaitem.eqs_otheridentificationnumber.ToString();
                         fATCAobj.TaxIdentificationNumber = fatcaitem.eqs_taxidentificationnumber.ToString();
                         fATCAobj.AddressType = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_addresstype", fatcaitem.eqs_addresstype.ToString());
@@ -458,13 +484,21 @@
                             fATCAAddress.FaxNumber = addressDetail[0].eqs_faxnumber.ToString();
                             fATCAAddress.OverseasMobileNumber = addressDetail[0].eqs_overseasmobilenumber.ToString();
 
-                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();
-                            fATCAAddress.City = await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
+                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();                            
                             fATCAAddress.District = addressDetail[0].eqs_district.ToString();
-                            fATCAAddress.State = await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
-                            fATCAAddress.Country = await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
 
-                            fATCAAddress.PinCode = addressDetail[0].eqs_pincode.ToString();
+                            await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
+                            await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
+                            await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
+
+                            var Batch_results3 = await this._queryParser.GetBatchResult();
+
+                            fATCAAddress.City = (Batch_results3[0]["eqs_citycode"] != null) ? Batch_results3[0]["eqs_citycode"].ToString() : "";
+                            fATCAAddress.State = (Batch_results3[1]["eqs_statecode"] != null) ? Batch_results3[1]["eqs_statecode"].ToString() : "";
+                            fATCAAddress.Country = (Batch_results3[2]["eqs_countrycode"] != null) ? Batch_results3[2]["eqs_countrycode"].ToString() : "";
+
+
+                            fATCAAddress.PinCode = addressDetail[0].eqs_zipcode.ToString();
                             fATCAAddress.POBox = addressDetail[0].eqs_pobox.ToString();
                             fATCAAddress.Landmark = addressDetail[0].eqs_landmark.ToString();
                             fATCAAddress.LandlineNumber = addressDetail[0].eqs_landlinenumber.ToString();
@@ -532,11 +566,24 @@
 
                     general.Name = DDEDetails[0].eqs_dataentryoperator.ToString();
                     general.EntityType = await this._commonFunc.getEntityName(DDEDetails[0]._eqs_entitytypeid_value.ToString());
-                    general.SubEntityType = await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
-                    general.BankName = await this._commonFunc.getBankName(DDEDetails[0]._eqs_banknameid_value.ToString());
 
-                    general.SourceBranchTerritory = await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchterritoryid_value.ToString());
-                    general.CustomerspreferredBranch = await this._commonFunc.getBranchText(DDEDetails[0]._eqs_preferredhomebranchid_value.ToString());
+                    await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
+                    await this._commonFunc.getBankName(DDEDetails[0]._eqs_banknameid_value.ToString());
+                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchterritoryid_value.ToString());
+                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_preferredhomebranchid_value.ToString());
+                    await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
+                    await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
+                    await this._commonFunc.getBusinessTypeText(DDEDetails[0]._eqs_businesstypeid_value.ToString());
+                    await this._commonFunc.getIndustryText(DDEDetails[0]._eqs_industryid_value.ToString());
+
+                    var Batch_results1 = await this._queryParser.GetBatchResult();
+
+                    general.SubEntityType = (Batch_results1[0]["eqs_key"] != null) ? Batch_results1[0]["eqs_key"].ToString() : "";
+                    general.BankName = (Batch_results1[1]["eqs_name"] != null) ? Batch_results1[1]["eqs_name"].ToString() : "";
+                    general.SourceBranchTerritory = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : "";
+                    general.CustomerspreferredBranch = (Batch_results1[3]["eqs_branchidvalue"] != null) ? Batch_results1[3]["eqs_branchidvalue"].ToString() : "";
+
+
                     general.LGCode = DDEDetails[0].eqs_lgcode.ToString();
                     general.LCCode = DDEDetails[0].eqs_lccode.ToString();
                     general.DataEntryStage = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_dataentrystage", DDEDetails[0].eqs_dataentrystage.ToString());
@@ -544,7 +591,7 @@
                     general.IsPrimaryHolder = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_isprimaryholder", DDEDetails[0].eqs_isprimaryholder.ToString());
                     general.PhysicalAOFnumber = DDEDetails[0].eqs_aofnumber.ToString();
                     general.IsDeferral = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_isdeferral", DDEDetails[0].eqs_isdeferral.ToString());
-                    general.PurposeofCreation = await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
+                    general.PurposeofCreation = (Batch_results1[4]["eqs_name"] != null) ? Batch_results1[4]["eqs_name"].ToString() : "";
                     general.CustomerIdCreated = DDEDetails[0].eqs_customeridcreated.ToString();
                     general.IsCommAddrRgstOfficeAddrSame = DDEDetails[0].eqs_ispermaddrandcurraddrsame.ToString();
 
@@ -555,7 +602,7 @@
 
                     prospectDetails.aboutprospect = new Aboutprospect();
 
-                    prospectDetails.aboutprospect.Title = await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
+                    prospectDetails.aboutprospect.Title = (Batch_results1[5]["eqs_name"] != null) ? Batch_results1[5]["eqs_name"].ToString() : "";
                     prospectDetails.aboutprospect.CompanyName1 = DDEDetails[0].eqs_companyname1.ToString();
                     prospectDetails.aboutprospect.CompanyNamePart2 = DDEDetails[0].eqs_companyname2.ToString();
                     prospectDetails.aboutprospect.CompanyNamePart3 = DDEDetails[0].eqs_companyname3.ToString();
@@ -574,8 +621,8 @@
 
                     prospectDetails.aboutbusiness = new Aboutbusiness();
 
-                    prospectDetails.aboutbusiness.BusinessType = await this._commonFunc.getBusinessTypeText(DDEDetails[0]._eqs_businesstypeid_value.ToString());
-                    prospectDetails.aboutbusiness.Industry = await this._commonFunc.getIndustryText(DDEDetails[0]._eqs_industryid_value.ToString());
+                    prospectDetails.aboutbusiness.BusinessType = (Batch_results1[6]["eqs_name"] != null) ? Batch_results1[6]["eqs_name"].ToString() : "";
+                    prospectDetails.aboutbusiness.Industry = (Batch_results1[7]["eqs_name"] != null) ? Batch_results1[7]["eqs_name"].ToString() : "";
                     prospectDetails.aboutbusiness.IndustryOthers = DDEDetails[0].eqs_industryothers.ToString();
                     prospectDetails.aboutbusiness.CompanyTurnover = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_companyturnovercode", DDEDetails[0].eqs_companyturnovercode.ToString());
                     prospectDetails.aboutbusiness.CompanyTurnoverValue = DDEDetails[0].eqs_companyturnovervalue.ToString();
@@ -638,11 +685,18 @@
                         address.FaxNumber = addressItem.eqs_faxnumber.ToString();
                         address.OverseasMobileNumber = addressItem.eqs_overseasmobilenumber.ToString();
 
-                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();
-                        address.City = await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
+                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();                       
                         address.District = addressItem.eqs_district.ToString();
-                        address.State = await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
-                        address.Country = await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
+
+                        await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
+                        await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
+                        await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
+
+                        var Batch_results2 = await this._queryParser.GetBatchResult();
+
+                        address.City = (Batch_results2[0]["eqs_citycode"] != null) ? Batch_results2[0]["eqs_citycode"].ToString() : "";
+                        address.State = (Batch_results2[1]["eqs_statecode"] != null) ? Batch_results2[1]["eqs_statecode"].ToString() : "";
+                        address.Country = (Batch_results2[2]["eqs_countrycode"] != null) ? Batch_results2[2]["eqs_countrycode"].ToString() : "";
 
                         address.PinCode = addressItem.eqs_zipcode.ToString();
                         address.POBox = addressItem.eqs_pobox.ToString();
@@ -707,7 +761,7 @@
                         //fATCAobj.CityofBirth = "";//DDEDetails[0].eqs_cityofbirth.ToString();
                         fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
 
-                        fATCAobj.Country = await this._commonFunc.getCountryText(fatcaDetail[0]._eqs_countryid_value.ToString());
+                        fATCAobj.Country = await this._commonFunc.getCountry_Text(fatcaDetail[0]._eqs_countryid_value.ToString());
                         fATCAobj.OtherIdentificationNumber = fatcaitem.eqs_otheridentificationnumber.ToString();
                         fATCAobj.TaxIdentificationNumber = fatcaitem.eqs_taxidentificationnumber.ToString();
                         fATCAobj.AddressType = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_addresstype", fatcaitem.eqs_addresstype.ToString());
@@ -728,11 +782,18 @@
                             fATCAAddress.FaxNumber = addressDetail[0].eqs_faxnumber.ToString();
                             fATCAAddress.OverseasMobileNumber = addressDetail[0].eqs_overseasmobilenumber.ToString();
 
-                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();
-                            fATCAAddress.City = await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
+                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();                            
                             fATCAAddress.District = addressDetail[0].eqs_district.ToString();
-                            fATCAAddress.State = await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
-                            fATCAAddress.Country = await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
+                            
+                            await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
+                            await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
+                            await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
+
+                            var Batch_results3 = await this._queryParser.GetBatchResult();
+
+                            fATCAAddress.City = (Batch_results3[0]["eqs_citycode"] != null) ? Batch_results3[0]["eqs_citycode"].ToString() : "";
+                            fATCAAddress.State = (Batch_results3[1]["eqs_statecode"] != null) ? Batch_results3[1]["eqs_statecode"].ToString() : "";
+                            fATCAAddress.Country = (Batch_results3[2]["eqs_countrycode"] != null) ? Batch_results3[2]["eqs_countrycode"].ToString() : "";
 
                             fATCAAddress.PinCode = addressDetail[0].eqs_zipcode.ToString();
                             fATCAAddress.POBox = addressDetail[0].eqs_pobox.ToString();
