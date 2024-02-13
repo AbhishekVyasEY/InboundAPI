@@ -163,7 +163,7 @@
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
@@ -182,11 +182,17 @@
             }
         }
 
+        private async Task SetBatchForMSD(string tablename, string idfield, string filterkey, string filtervalue)
+        {
+            string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
+            await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");
+        }
+
         public async Task<Dictionary<string, string>> getProductId(string ProductCode)
         {
             try
             {
-                string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}' and statecode eq 0";
+                string query_url = $"eqs_products()?$select=eqs_productid,_eqs_businesscategoryid_value,_eqs_productcategory_value,eqs_crmproductcategorycode&$filter=eqs_productcode eq '{ProductCode}'";
                 var productdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 string ProductId = await this.getIDFromGetResponce("eqs_productid", productdtails);
                 string businesscategoryid = await this.getIDFromGetResponce("_eqs_businesscategoryid_value", productdtails);
@@ -217,19 +223,60 @@
             return await this.getIDfromMSDTable("eqs_rmemployees", "eqs_rmemployeeid", "eqs_rmempidslot", Code);
         }
 
-        public async Task<string> getBranchText(string BranchwId)
+        public async Task getBranchText(string BranchwId)
         {
-            return await this.getIDfromMSDTable("eqs_branchs", "eqs_branchidvalue", "eqs_branchid", BranchwId);
+            await this.SetBatchForMSD("eqs_branchs", "eqs_branchidvalue", "eqs_branchid", BranchwId);
+        }
+        public async Task getSubentitytypeText(string SubentitytypeID)
+        {
+            await this.SetBatchForMSD("eqs_subentitytypes", "eqs_key", "eqs_subentitytypeid", SubentitytypeID);
+        }
+        public async Task getAccRelationshipText(string accrelationshipId)
+        {
+            await this.SetBatchForMSD("eqs_accountrelationshipses", "eqs_key", "eqs_accountrelationshipsid", accrelationshipId);
+        }
+        public async Task getPurposeText(string Purpose)
+        {
+            await this.SetBatchForMSD("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", Purpose);
+        }
+        public async Task getLeadsourceName(string leadsourceid)
+        {
+            await this.SetBatchForMSD("eqs_leadsources", "eqs_name", "eqs_leadsourceid", leadsourceid);
+        }
+        public async Task getSystemuserName(string systemuserid)
+        {
+            await this.SetBatchForMSD("systemusers", "fullname", "systemuserid", systemuserid);
+        }
+        public async Task getCountryText(string CountryId)
+        {
+            await this.SetBatchForMSD("eqs_countries", "eqs_countrycode", "eqs_countryid", CountryId);
+        }
+        public async Task getTitleText(string TitleID)
+        {
+            await this.SetBatchForMSD("eqs_titles", "eqs_name", "eqs_titleid", TitleID);
+        }
+        public async Task getcorporatemasterText(string CorporateId)
+        {
+            await this.SetBatchForMSD("eqs_corporatemasters", "eqs_corporatecode", "eqs_corporatemasterid", CorporateId);
+        }
+        public async Task getdesignationmasterText(string DesignatioId)
+        {
+            await this.SetBatchForMSD("eqs_designationmasters", "eqs_name", "eqs_designationmasterid", DesignatioId);
+        }
+        public async Task getCityText(string CityId)
+        {
+            await this.SetBatchForMSD("eqs_cities", "eqs_citycode", "eqs_cityid", CityId);
+        }
+        public async Task getStateText(string StateID)
+        {
+            await this.getIDfromMSDTable("eqs_states", "eqs_statecode", "eqs_stateid", StateID);
         }
 
         public async Task<string> getTitleId(string Title)
         {
             return await this.getIDfromMSDTable("eqs_titles", "eqs_titleid", "eqs_name", Title);
         }
-        public async Task<string> getTitleText(string TitleID)
-        {
-            return await this.getIDfromMSDTable("eqs_titles", "eqs_name", "eqs_titleid", TitleID);
-        }
+        
         public async Task<string> getEntityID(string Entity)
         {
             return await this.getIDfromMSDTable("eqs_entitytypes", "eqs_entitytypeid", "eqs_name", Entity);
@@ -242,10 +289,7 @@
         {
             return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_subentitytypeid", $"eqs_flagtype eq '{SubEntityType}' and eqs_key", SubEntityKey);
         }
-        public async Task<string> getSubentitytypeText(string SubentitytypeID)
-        {
-            return await this.getIDfromMSDTable("eqs_subentitytypes", "eqs_key", "eqs_subentitytypeid", SubentitytypeID);
-        }
+        
 
         public async Task<string> getRelationshipID(string relationshipCode)
         {
@@ -259,15 +303,12 @@
         {
             return await this.getIDfromMSDTable("eqs_accountrelationshipses", "eqs_accountrelationshipsid", "eqs_key", accrelationshipCode);
         }
-        public async Task<string> getAccRelationshipText(string accrelationshipId)
-        {
-            return await this.getIDfromMSDTable("eqs_accountrelationshipses", "eqs_key", "eqs_accountrelationshipsid", accrelationshipId);
-        }
+        
         public async Task<string> getCountryID(string CountryCode)
         {
             return await this.getIDfromMSDTable("eqs_countries", "eqs_countryid", "eqs_countrycode", CountryCode);
         }
-        public async Task<string> getCountryText(string CountryId)
+        public async Task<string> getCountry_Text(string CountryId)
         {
             return await this.getIDfromMSDTable("eqs_countries", "eqs_countrycode", "eqs_countryid", CountryId);
         }
@@ -275,35 +316,22 @@
         {
             return await this.getIDfromMSDTable("eqs_corporatemasters", "eqs_corporatemasterid", "eqs_corporatecode", CorporateCode);
         }
-        public async Task<string> getcorporatemasterText(string CorporateId)
-        {
-            return await this.getIDfromMSDTable("eqs_corporatemasters", "eqs_corporatecode", "eqs_corporatemasterid",  CorporateId);
-        }
+        
         public async Task<string> getdesignationmasterID(string DesignatioCode)
         {
             return await this.getIDfromMSDTable("eqs_designationmasters", "eqs_designationmasterid", "eqs_name", DesignatioCode);
-        }
-        public async Task<string> getdesignationmasterText(string DesignatioId)
-        {
-            return await this.getIDfromMSDTable("eqs_designationmasters", "eqs_name", "eqs_designationmasterid", DesignatioId);
-        }
+        }       
 
         public async Task<string> getStateID(string StateCode)
         {
             return await this.getIDfromMSDTable("eqs_states", "eqs_stateid", "eqs_statecode", StateCode);
         }
-        public async Task<string> getStateText(string StateID)
-        {
-            return await this.getIDfromMSDTable("eqs_states", "eqs_statecode", "eqs_stateid", StateID);
-        }
+        
         public async Task<string> getCityID(string CityCode)
         {
             return await this.getIDfromMSDTable("eqs_cities", "eqs_cityid", "eqs_citycode", CityCode);
         }
-        public async Task<string> getCityText(string CityId)
-        {
-            return await this.getIDfromMSDTable("eqs_cities", "eqs_citycode", "eqs_cityid", CityId);
-        }
+       
         public async Task<string> getPincodeID(string PincodeCode)
         {
             return await this.getIDfromMSDTable("eqs_pincodes", "eqs_pincodeid", "eqs_pincode", PincodeCode);
@@ -312,10 +340,7 @@
         {
             return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_purposeofcreationid", "eqs_name", Purpose);
         }
-        public async Task<string> getPurposeText(string Purpose)
-        {
-            return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", Purpose);
-        }
+        
         public async Task<string> getFatcaAddressID(string FatcaID, string AddressID)
         {
             if (string.IsNullOrEmpty(AddressID))
@@ -442,22 +467,16 @@
         {
             return await this.getIDfromMSDTable("contacts", "fullname", "contactid", customerId);
         }
-        public async Task<string> getAccountapplicantName(string AccountapplicantId)
-        {
-            return await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_name", "eqs_accountapplicantid", AccountapplicantId);
+        public async Task getAccountapplicantName(string AccountapplicantId)
+        {           
+            await this.SetBatchForMSD("eqs_accountapplicants", "eqs_name", "eqs_accountapplicantid", AccountapplicantId);
         }        
-        public async Task<string> getLeadsourceName(string leadsourceid)
-        {
-            return await this.getIDfromMSDTable("eqs_leadsources", "eqs_name", "eqs_leadsourceid", leadsourceid);
-        }
+        
         public async Task<string> getLeadsourceId(string leadsourceid)
         {
             return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_leadsourceidvalue",  leadsourceid);
         }
-        public async Task<string> getSystemuserName(string systemuserid)
-        {
-            return await this.getIDfromMSDTable("systemusers", "fullname", "systemuserid", systemuserid);
-        }
+        
         public async Task<string> getBankName(string bankid)
         {
             return await this.getIDfromMSDTable("eqs_bankmasters", "eqs_name", "eqs_ddecorporatecustomerid", bankid);
