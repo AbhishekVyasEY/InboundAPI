@@ -429,13 +429,20 @@ namespace ManageCase
 
                 var Batch_results1 = await this._queryParser.GetBatchResult();
                 string customerid = (Batch_results1[0]["contactid"]!=null) ? Batch_results1[0]["contactid"].ToString() : "";
+                string ccs_classification, CategoryId;
                 if (!string.IsNullOrEmpty(Account))
                 {
                     Accountid = (Batch_results1[1]["eqs_accountid"] != null) ? Batch_results1[1]["eqs_accountid"].ToString() : "";
+                    ccs_classification = (Batch_results1[2]["ccs_classificationid"] != null) ? Batch_results1[2]["ccs_classificationid"].ToString() : "";
+                    CategoryId = (Batch_results1[3]["ccs_categoryid"] != null) ? Batch_results1[3]["ccs_categoryid"].ToString() : "";
+                }
+                else
+                {
+                    ccs_classification = (Batch_results1[1]["ccs_classificationid"] != null) ? Batch_results1[1]["ccs_classificationid"].ToString() : "";
+                    CategoryId = (Batch_results1[2]["ccs_categoryid"] != null) ? Batch_results1[2]["ccs_categoryid"].ToString() : "";
                 }
                     
-                string ccs_classification = (Batch_results1[2]["ccs_classificationid"] != null) ? Batch_results1[2]["ccs_classificationid"].ToString() : "";
-                string CategoryId = (Batch_results1[3]["ccs_categoryid"] != null) ? Batch_results1[3]["ccs_categoryid"].ToString() : "";
+             
 
                 string SubCategoryId = await this.getSubCategoryId(SubCategory, CategoryId);
 
