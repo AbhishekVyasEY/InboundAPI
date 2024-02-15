@@ -308,6 +308,14 @@
         {
             return await this.getIDfromMSDTable("eqs_countries", "eqs_countryid", "eqs_countrycode", CountryCode);
         }
+        public async Task<string> getEducationId(string Education)
+        {
+            return await this.getIDfromMSDTable("eqs_qualifications", "eqs_qualificationid", "eqs_name", Education);
+        }
+        public async Task<string> getProfessionId(string Qualification)
+        {
+            return await this.getIDfromMSDTable("eqs_occupations", "eqs_occupationid", "eqs_name", Qualification);
+        }
         public async Task<string> getCountry_Text(string CountryId)
         {
             return await this.getIDfromMSDTable("eqs_countries", "eqs_countrycode", "eqs_countryid", CountryId);
