@@ -444,7 +444,11 @@
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Education?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_educationcode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_educationcode", CustIndvData.ProspectDetails?.Education?.ToString()));
+                        string education = await this._commonFunc.getEducationId(CustIndvData.ProspectDetails?.Education?.ToString());
+                        if (!string.IsNullOrEmpty(education))
+                        {
+                            CRMDDEmappingFields.Add("eqs_qualificationid@odata.bind", $"eqs_qualifications({education})");
+                        }
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.MaritalStatus?.ToString()))
                     {
@@ -452,7 +456,11 @@
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.Profession?.ToString()))
                     {
-                        CRMDDEmappingFields.Add("eqs_professioncode", await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_professioncode", CustIndvData.ProspectDetails?.Profession.ToString()));
+                        string Profession = await this._commonFunc.getProfessionId(CustIndvData.ProspectDetails?.Profession?.ToString());
+                        if (!string.IsNullOrEmpty(Profession))
+                        {
+                            CRMDDEmappingFields.Add("eqs_occupationid@odata.bind", $"eqs_occupations({Profession})");
+                        }
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.ProspectDetails?.AnnualIncomeBand?.ToString()))
                     {

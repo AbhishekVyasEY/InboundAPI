@@ -77,7 +77,8 @@ namespace DigiCustLead
         public Task<JArray> getDDEFinalCPDetail(string DDEId);
         public Task<JArray> getDDEFinalBODetail(string DDEId);
         public Task<JArray> getFATCAAddress(string FatcaID);
-
+        public Task<string> getEducationId(string Education);
+        public Task<string> getProfessionId(string Qualification);
 
     }
 }

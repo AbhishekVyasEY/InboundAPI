@@ -340,7 +340,8 @@
         {
             try
             {
-                string query_url = $"eqs_accountrelationships()?$filter=eqs_customerid eq '{CustomerID}'";
+                //string query_url = $"eqs_accountrelationships()?$filter=eqs_customerid eq '{CustomerID}'";
+                string query_url = $"eqs_accountrelationships()?$orderby=eqs_name asc&$filter=eqs_customerid eq '{CustomerID}'";
                 var CustomerDetails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Customer_dtails = await this.getDataFromResponce(CustomerDetails);
                 return Customer_dtails;

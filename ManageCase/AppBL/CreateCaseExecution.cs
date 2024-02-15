@@ -680,6 +680,7 @@ namespace ManageCase
 
                         var caseresponsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                         var CaseList = await this._queryParser.getDataFromResponce(caseresponsdtails);
+                        TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
                         foreach (var caseDetails in CaseList)
                         {
                             CaseDetails case_details = new CaseDetails();
@@ -689,11 +690,22 @@ namespace ManageCase
                                 case_details.CaseID = caseDetails["ticketnumber"].ToString();
                                 case_details.CaseStatus = this.StatusCodes[caseDetails["statuscode"].ToString()];
                                 case_details.Subject = caseDetails["title"].ToString();
-                                case_details.openDate = caseDetails["createdon"].ToString();
-                                case_details.modifiedDate = caseDetails["modifiedon"].ToString();
-                                case_details.closeDate = caseDetails["ccs_resolveddate"].ToString();
-                                case_details.cancellationDate = caseDetails["eqs_casecancellationdate"].ToString();
-
+                                if (!string.IsNullOrEmpty(caseDetails["createdon"]?.ToString()))
+                                {
+                                    case_details.openDate = TimeZoneInfo.ConvertTimeFromUtc((DateTime)caseDetails["createdon"], timeZoneInfo).ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["modifiedon"]?.ToString()))
+                                {
+                                    case_details.modifiedDate = TimeZoneInfo.ConvertTimeFromUtc((DateTime)caseDetails["modifiedon"], timeZoneInfo).ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["ccs_resolveddate"]?.ToString()))
+                                {
+                                    case_details.closeDate = TimeZoneInfo.ConvertTimeFromUtc((DateTime)caseDetails["ccs_resolveddate"], timeZoneInfo).ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["eqs_casecancellationdate"]?.ToString()))
+                                {
+                                    case_details.cancellationDate = TimeZoneInfo.ConvertTimeFromUtc((DateTime)caseDetails["eqs_casecancellationdate"], timeZoneInfo).ToString();
+                                }
                                 if (!string.IsNullOrEmpty(caseDetails["eqs_casetype"].ToString()))
                                 {
                                     case_details.Casetype = this._CaseType[caseDetails["eqs_casetype"].ToString()];
