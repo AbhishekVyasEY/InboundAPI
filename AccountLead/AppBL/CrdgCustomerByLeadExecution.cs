@@ -383,8 +383,12 @@
                             msgBdy.corporateCustomer.name.midName = AccountDDE[0]["eqs_companyname2"].ToString();
                             msgBdy.corporateCustomer.name.shortName = AccountDDE[0]["eqs_companyname1"].ToString();
 
-                            msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;
-                            msgBdy.corporateCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchterritoryid_value"].ToString());
+                            msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;                            
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_preferredhomebranchid_value"]?.ToString()))
+                            {
+                                msgBdy.corporateCustomer.homeBranchCode = AccountDDE[0]["eqs_preferredhomebranchId"]["eqs_branchidvalue"]?.ToString();
+                            }
+                            //msgBdy.corporateCustomer.homeBranchCode = await this._commonFunc.getBranchCode(AccountDDE[0]["_eqs_sourcebranchterritoryid_value"].ToString());
 
                             msgBdy.corporateCustomer.annualTurnover = AccountDDE[0]["eqs_companyturnovervalue"].ToString();
                             string businessregno = "";
