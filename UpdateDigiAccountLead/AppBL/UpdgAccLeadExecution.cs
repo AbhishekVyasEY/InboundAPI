@@ -557,11 +557,6 @@
                                 haserror = 1;
                                 fields.Add("physicalStatement");
                             }
-                            if (string.IsNullOrEmpty(items.mobileBankingNumber?.ToString()))
-                            {
-                                haserror = 1;
-                                fields.Add("mobileBankingNumber");
-                            }
                         }
                     }
 
@@ -741,11 +736,11 @@
                 {
                     this.DDEId = LeadAccount[0]["eqs_ddefinalid"].ToString();
 
-                    var AccountDDE = await this._commonFunc.getAccountLeadData(DDEId);
-                    if (AccountDDE.Count > 0 && !string.IsNullOrEmpty(AccountDDE[0]["eqs_accountnocreated"].ToString()))
-                    {
-                        return "Lead cannot be onboarded because account has been already created for this Lead Account.";
-                    }
+                    //var AccountDDE = await this._commonFunc.getAccountLeadData(DDEId);
+                    //if (AccountDDE.Count > 0 && !string.IsNullOrEmpty(AccountDDE[0]["eqs_accountnocreated"].ToString()))
+                    //{
+                    //    return "Lead cannot be onboarded because account has been already created for this Lead Account.";
+                    //}
                 }
 
                 var leadDetails = await this._commonFunc.getLeadDetails(LeadAccount[0]["_eqs_lead_value"].ToString());
