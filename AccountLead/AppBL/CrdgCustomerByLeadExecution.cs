@@ -288,6 +288,12 @@
 
                                     var resp2 = await this._queryParser.HttpApiCall($"eqs_ddeindividualcustomers({AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString()})", HttpMethod.Patch, postDataParametr);
 
+                                    fieldInput = new Dictionary<string, string>();
+                                    string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "_eqs_leadid_value", "Completed");
+                                    fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
+                                    postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                    await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
+
                                     customerLeadReturn.Message = OutputMSG.Case_Success;
                                     customerLeadReturn.ReturnCode = "CRM-SUCCESS";
                                 }
@@ -437,6 +443,12 @@
                                     var resp1 = await this._queryParser.HttpApiCall($"eqs_accountapplicants({AccountDDE[0]["_eqs_accountapplicantid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 
                                     var resp2 = await this._queryParser.HttpApiCall($"eqs_ddecorporatecustomers({AccountDDE[0]["eqs_ddecorporatecustomerid"].ToString()})", HttpMethod.Patch, postDataParametr);
+
+                                    fieldInput = new Dictionary<string, string>();
+                                    string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "_eqs_leadid_value", "Completed");
+                                    fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
+                                    postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                    await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 
                                     customerLeadReturn.Message = OutputMSG.Case_Success;
                                     customerLeadReturn.ReturnCode = "CRM-SUCCESS";

@@ -493,6 +493,14 @@ namespace AccountLead
                                 string postDataParametr = JsonConvert.SerializeObject(fieldInput);
                                 await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
 
+
+                                fieldInput = new Dictionary<string, string>();
+                                string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "_eqs_leadid_value", "Completed");
+                                fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
+                                postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_primarylead_value"].ToString()})", HttpMethod.Patch, postDataParametr);
+
+
                                 accountLeadReturn.Message = OutputMSG.Case_Success;
                                 accountLeadReturn.ReturnCode = "CRM-SUCCESS";
                             }
