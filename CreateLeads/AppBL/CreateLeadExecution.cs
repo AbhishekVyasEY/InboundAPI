@@ -739,7 +739,7 @@ namespace CreateLeads
             {
                 switch (field.Key)
                 {
-                    //case "mobilephone":
+                    case "mobilephone":
                     case "emailaddress1":
                     case "eqs_jointcallername":
                     case "firstname":
@@ -771,23 +771,34 @@ namespace CreateLeads
 
         private void ValidateFieldRegex(string field, string value, ref StringBuilder msg)
         {
+            
             if (!string.IsNullOrEmpty(value) && regexLeadData.ContainsKey(field))
             {
-                dynamic regexdata = regexLeadData[field];
-                string errormessage = regexdata.eqs_errormessage.ToString();
-                string pattern = regexdata.eqs_value.ToString();
-                if (pattern != null)
+                if (field == "mobilephone")
                 {
-                    if (Regex.IsMatch(value, pattern))
+                    if (value.Length < 10 || value.Length > 15)
                     {
-                        if (!string.IsNullOrEmpty(regexdata.eqs_count.ToString()) && value.Length > Convert.ToInt32(regexdata.eqs_count.ToString()))
+                        msg.Append("MobilePhone should be between 10 to 15 characters" + ", ");
+                    }
+                }
+                else
+                {
+                    dynamic regexdata = regexLeadData[field];
+                    string errormessage = regexdata.eqs_errormessage.ToString();
+                    string pattern = regexdata.eqs_value.ToString();
+                    if (pattern != null)
+                    {
+                        if (Regex.IsMatch(value, pattern))
+                        {
+                            if (!string.IsNullOrEmpty(regexdata.eqs_count.ToString()) && value.Length > Convert.ToInt32(regexdata.eqs_count.ToString()))
+                            {
+                                msg.Append(errormessage + ", ");
+                            }
+                        }
+                        else
                         {
                             msg.Append(errormessage + ", ");
                         }
-                    }
-                    else
-                    {
-                        msg.Append(errormessage + ", ");
                     }
                 }
             }
