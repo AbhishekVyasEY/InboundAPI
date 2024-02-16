@@ -216,7 +216,21 @@
                             //string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(3, 2);
                             //string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(6, 4);
                             msgBdy.individualCustomer.dateOfBirthOrRegistration = yyyy + mm + dd;
-                            msgBdy.individualCustomer.customerMobilePhone = AccountDDE[0]["eqs_mobilenumber"].ToString();
+
+                            string subEntityType = string.Empty; string mobileNumber = "91";
+                            if(!string.IsNullOrEmpty(AccountDDE[0]["_eqs_subentitytypeid_value"]?.ToString()))
+                            {
+                                subEntityType = AccountDDE[0]["eqs_subentitytypeId"]["eqs_name"].ToString();
+                            }
+                            if (!string.IsNullOrEmpty(subEntityType) && !(subEntityType.ToUpper() == "NON RESIDENT INDIVIDUAL" || subEntityType.ToLower() == "foreigners"))
+                            {
+                                mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                            }
+                            else
+                            {
+                                mobileNumber = AccountDDE[0]["eqs_mobilenumber"].ToString();
+                            }
+                            msgBdy.individualCustomer.customerMobilePhone = mobileNumber;
                             msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
 
                             msgBdy.individualCustomer.name.firstName = AccountDDE[0]["eqs_firstname"].ToString();
