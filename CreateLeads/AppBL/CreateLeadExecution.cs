@@ -106,10 +106,10 @@ namespace CreateLeads
                             {
                                 requredFields.Add("FirstName");
                             }
-                            if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
-                            {
-                                requredFields.Add("LastName");
-                            }
+                            //if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
+                            //{
+                            //    requredFields.Add("LastName");
+                            //}
                             if (LeadData.MobileNumber == null || string.IsNullOrEmpty(LeadData.MobileNumber.ToString()) || LeadData.MobileNumber.ToString() == "")
                             {
                                 requredFields.Add("MobileNumber");
@@ -129,10 +129,10 @@ namespace CreateLeads
                             {
                                 requredFields.Add("FirstName");
                             }
-                            if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
-                            {
-                                requredFields.Add("LastName");
-                            }
+                            //if (LeadData.LastName == null || string.IsNullOrEmpty(LeadData.LastName.ToString()) || LeadData.LastName.ToString() == "")
+                            //{
+                            //    requredFields.Add("LastName");
+                            //}
                             if (LeadData.MobileNumber == null || string.IsNullOrEmpty(LeadData.MobileNumber.ToString()) || LeadData.MobileNumber.ToString() == "")
                             {
                                 requredFields.Add("MobileNumber");
@@ -739,11 +739,11 @@ namespace CreateLeads
             {
                 switch (field.Key)
                 {
-                    case "mobilephone":
+                    //case "mobilephone":
                     case "emailaddress1":
                     case "eqs_jointcallername":
                     case "firstname":
-                    case "lastname":
+                    //case "lastname":
                     case "middlename":
                     case "eqs_pincode":
                     case "eqs_mothermaidenname":
