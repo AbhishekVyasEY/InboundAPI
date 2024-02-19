@@ -495,7 +495,7 @@ namespace AccountLead
 
 
                                 fieldInput = new Dictionary<string, string>();
-                                string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "_eqs_leadid_value", "Completed");
+                                string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_onboardingstatus", "Completed");
                                 fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
                                 postDataParametr = JsonConvert.SerializeObject(fieldInput);
                                 await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_primarylead_value"].ToString()})", HttpMethod.Patch, postDataParametr);

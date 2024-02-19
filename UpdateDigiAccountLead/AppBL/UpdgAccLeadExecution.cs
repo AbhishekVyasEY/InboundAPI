@@ -750,6 +750,7 @@
                     odatab.Add("eqs_accountopeningbranchid@odata.bind", $"eqs_branchs({leadDetails[0]["_eqs_branchid_value"].ToString()})");
                     odatab.Add("eqs_leadaccountid@odata.bind", $"eqs_leadaccounts({LeadAccount[0]["eqs_leadaccountid"].ToString()})");
                     odatab.Add("eqs_ddeoperatorname", LeadAccount[0]["eqs_crmleadaccountid"].ToString() + "  - Final");
+                    odatab.Add("eqs_primarylead@odata.bind", $"leads({LeadAccount[0]["_eqs_lead_value"].ToString()})");
                 }
 
 
