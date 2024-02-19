@@ -266,7 +266,6 @@
 
         }
 
-
         public bool checkappkey(string appkey, string APIKey)
         {
             if (this._keyVaultService.ReadSecret(APIKey) == appkey)
@@ -439,6 +438,11 @@
                     CRMCustomermappingFields.Add("eqs_name", custLeadElement.firstname + " " + custLeadElement.middlename + " " + custLeadElement.lastname);
                     CRMCustomermappingFields.Add("eqs_mobilenumber", custLeadElement.mobilephone);
                     CRMCustomermappingFields.Add("eqs_dob", custLeadElement.eqs_dob);
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_dob))
+                    {
+                        int age = GetAgeInYears(custLeadElement.eqs_dob);
+                        CRMCustomermappingFields.Add("eqs_leadage", age.ToString());
+                    }
 
                     if (!string.IsNullOrEmpty(leadSourceId))
                     {
@@ -813,6 +817,14 @@
             return csRtPrm;
         }
 
+        private int GetAgeInYears(string dobstring)
+        {
+            DateTime dob = Convert.ToDateTime(dobstring);
+            TimeSpan diff = DateTime.Today - dob;
+
+            DateTime zerodate = new DateTime(1, 1, 1);
+            return (zerodate + diff).Year - 1;
+        }
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
