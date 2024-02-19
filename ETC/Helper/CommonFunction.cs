@@ -124,7 +124,7 @@
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
