@@ -64,8 +64,7 @@ namespace ManageCase
         }
 
         public static string GetIdFromPostRespons(string PResponseData)
-        {
-           
+        {           
            string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
             return Respons_Id;
         }
@@ -94,7 +93,6 @@ namespace ManageCase
                     else if (responseValue is JArray)
                     {
                         resArray = responseValue;
-
                     }
                     else
                     {
@@ -112,15 +110,12 @@ namespace ManageCase
                         {
                             resourceID = record[primaryField]?.ToString();
                         }
-
                     }
                 }
             }
                 return resourceID;
         }
-
        
-
         public async Task<string> getIDfromMSDTable(string tablename, string idfield, string filterkey, string filtervalue)
         {
             try
@@ -146,7 +141,6 @@ namespace ManageCase
                 this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
                 throw;
             }
-
         }
 
         private async Task SetBatchForMSD(string tablename, string idfield, string filterkey, string filtervalue)
@@ -154,7 +148,6 @@ namespace ManageCase
             string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
             await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");
         }
-
 
         public async Task getChannelId(string channelCode)
         {
@@ -205,9 +198,10 @@ namespace ManageCase
             AccountId = (string.IsNullOrEmpty(AccountId)) ? "00000000-0000-0000-0000-000000000000" : AccountId;
             await this.SetBatchForMSD("eqs_accounts", "eqs_accountno", "eqs_accountid", AccountId);                       
         }
-        public async Task getCustomerCode(string CustomerId)
+        public async Task<string> getCustomerCode(string CustomerId)
         {
-            await this.SetBatchForMSD("contacts", "eqs_customerid", "contactid", CustomerId);                       
+            return await this.getIDfromMSDTable("contacts", "eqs_customerid", "contactid", CustomerId);
+            //await this.SetBatchForMSD("contacts", "eqs_customerid", "contactid", CustomerId);                       
         }
 
         public async Task<string> getCustomerId(string uciccode)
@@ -270,7 +264,6 @@ namespace ManageCase
                 this._logger.LogError("getSubCategoryId", ex.Message);
                 throw ex;
             }
-
         }
 
         public async Task<JArray> getCaseAdditionalFields(string subCategoryCode)
@@ -287,7 +280,6 @@ namespace ManageCase
                 this._logger.LogError("getCaseAdditionalFields", ex.Message);
                 throw ex;
             }
-
         }
 
         public async Task<JArray> getCityDetails(string CityID)
@@ -304,14 +296,13 @@ namespace ManageCase
                 this._logger.LogError("getCaseStatus", ex.Message);
                 throw ex;
             }
-
         }
 
         public async Task<JArray> getCaseStatus(string CaseID)
         {
             try
             {
-                string query_url = $"incidents()?$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}'";
+                string query_url = $"incidents()?$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
                 return inputFields;
@@ -321,7 +312,6 @@ namespace ManageCase
                 this._logger.LogError("getCaseStatus", ex.Message);
                 throw ex;
             }
-
         }
 
         public async Task<JArray> getExistingCase(string CaseID)
@@ -338,7 +328,6 @@ namespace ManageCase
                 this._logger.LogError("getCaseStatus", ex.Message);
                 throw ex;
             }
-
         }
 
         public async Task<JArray> getCustomerData(string customerid)
