@@ -243,6 +243,24 @@
             return await this.getIDfromMSDTable("eqs_purposeofcreations", "eqs_name", "eqs_purposeofcreationid", id);
         }
 
+        
+        public async Task<string> getClassificationID(string classificationName)
+        {
+            return await this.getIDfromMSDTable("ccs_classifications", "ccs_classificationid", "ccs_name", classificationName);
+        }
+        public async Task<string> getCategoryID(string CategoryName, string classification)
+        {
+            return await this.getIDfromMSDTable("ccs_categories",  "ccs_categoryid", $"_ccs_classification_value eq '{classification}' and ccs_name", CategoryName);
+        }
+        public async Task<string> getSubCategoryID(string SubCategoryName, string classification)
+        {
+            return await this.getIDfromMSDTable("ccs_subcategories",  "ccs_subcategoryid", $"_ccs_classification_value eq '{classification}' and ccs_name", SubCategoryName);
+        }
+        public async Task<string> getProductID(string ProductName)
+        {
+            return await this.getIDfromMSDTable("eqs_products", "eqs_productid", "eqs_name", ProductName);
+        }
+
         public async Task<JArray> getNomineDetails(string DDEId)
         {
             string query_url = $"eqs_ddeaccountnominees()?$filter=_eqs_leadaccountddeid_value eq '{DDEId}'";
@@ -291,6 +309,28 @@
             try
             {
                 string query_url = $"eqs_customerpreferences()?$filter=_eqs_leadaccountdde_value eq '{DDeid}'";
+                var Customerdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Customer_dtails = await this.getDataFromResponce(Customerdtails);
+                return Customer_dtails;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getPreferences", ex.Message);
+                throw ex;
+            }
+        }
+        
+        public async Task<JArray> getCustomerCaseDetails(string CustomerID)
+        {
+            try
+            {
+                string Classification_ID = await this.getClassificationID("New Business");
+                string Category_ID = await this.getCategoryID("Document Verification", Classification_ID);
+                string SubCategory_ID = await this.getSubCategoryID("Life Insurance Verification", Classification_ID);
+              
+                string Product_ID = await this.getProductID("Life Insurance");
+
+                string query_url = $"incidents()?$select=eqs_dependentname,eqs_policycoverage,eqs_tppriskprofile,eqs_spcode,ticketnumber,_eqs_planname_value&$filter=eqs_customercode eq '{CustomerID}' and _ccs_category_value eq '{Category_ID}' and _ccs_subcategory_value eq '{SubCategory_ID}' and _ccs_classification_value eq '{Classification_ID}' and _eqs_product_value eq '{Product_ID}'&$expand=eqs_PlanName($select=eqs_name),eqs_incident_eqs_leaddocument($select=eqs_documentid)";
                 var Customerdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Customer_dtails = await this.getDataFromResponce(Customerdtails);
                 return Customer_dtails;

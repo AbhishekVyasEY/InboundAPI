@@ -16,6 +16,26 @@ namespace FetchAccountLead
 
     }
 
+    public class FthInsuranceSRDtlReturn
+    {
+        public List<LifeInsuranceVerificationSRL> lifeInsuranceVerificationSRListRp { get; set; }
+        public string ReturnCode { get; set; }
+        public string Message { get; set; }
+        public string TransactionID { get; set; }
+        public string ExecutionTime { get; set; }
+    }
+
+    public class LifeInsuranceVerificationSRL
+    {
+        public string dependentname { get; set; }
+        public string dmsDocumentID { get; set; }
+        public string insuranceproduct { get; set; }
+        public string policyCoverage { get; set; }
+        public string riskprofile { get; set; }
+        public string spcode { get; set; }
+        public string srNumber { get; set; }
+    }
+
     public class RMDetails
     {
         public string RMCode { get; set; }
