@@ -763,7 +763,7 @@ namespace ManageCase
                                 {
                                     case_details.Accountid = caseDetails["eqs_account"]["eqs_accountno"].ToString();
                                 }
-                                if (string.IsNullOrEmpty(CaseData.CustomerID.ToString()))
+                                if (string.IsNullOrEmpty(CaseData.CustomerID?.ToString()))
                                 {
                                     case_details.customerid = await this._commonFunc.getCustomerCode(caseDetails["_customerid_value"].ToString());
                                 }
