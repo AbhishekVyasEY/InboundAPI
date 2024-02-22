@@ -24,12 +24,12 @@ namespace AccountLead
         public IQueryParser _queryParser;
         private ILoggers _logger;
         public IMemoryCache _cache;
-      
+
         public CommonFunction(IMemoryCache cache, ILoggers logger, IQueryParser queryParser)
         {
             this._queryParser = queryParser;
             this._logger = logger;
-            this._cache = cache;         
+            this._cache = cache;
         }
         public async Task<string> AcquireNewTokenAsync()
         {
@@ -62,13 +62,13 @@ namespace AccountLead
             {
                 return ex.Message;
             }
-            
+
         }
 
         public static string GetIdFromPostRespons(string PResponseData)
         {
-           
-           string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
+
+            string Respons_Id = PResponseData.Substring(PResponseData.IndexOf('(') + 1, PResponseData.IndexOf(')') - PResponseData.IndexOf('(') - 1);
             return Respons_Id;
         }
 
@@ -78,7 +78,7 @@ namespace AccountLead
             return Respons_Id;
         }
 
-        public async Task<string> getIDFromGetResponce(string primaryField ,List<JObject> RsponsData)
+        public async Task<string> getIDFromGetResponce(string primaryField, List<JObject> RsponsData)
         {
             string resourceID = "";
             foreach (JObject item in RsponsData)
@@ -118,7 +118,7 @@ namespace AccountLead
                     }
                 }
             }
-                return resourceID;
+            return resourceID;
         }
 
         public async Task<JArray> getDataFromResponce(List<JObject> RsponsData)
@@ -180,7 +180,7 @@ namespace AccountLead
             }
             catch (Exception ex)
             {
-                this._logger.LogError("getIDfromMSDTable", ex.Message,$"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
+                this._logger.LogError("getIDfromMSDTable", ex.Message, $"Table {tablename} filterkey {filterkey} filtervalue {filtervalue}");
                 throw;
             }
         }
@@ -201,7 +201,7 @@ namespace AccountLead
         }
 
 
-       
+
         public async Task<string> getLeadSourceId(string LeadSource_code)
         {
             return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_name", LeadSource_code);
@@ -212,7 +212,7 @@ namespace AccountLead
             return await this.getIDfromMSDTable("eqs_relationships", "eqs_relationshipid", "eqs_relationship", Relationship_code);
         }
 
-      
+
 
 
         public async Task<Dictionary<string, string>> getProductId(string ProductCode)
@@ -242,7 +242,7 @@ namespace AccountLead
 
         /*--------------------------------*/
 
-       
+
 
         public async Task<JArray> getAccountNominee(string ddeaccountid)
         {
@@ -334,7 +334,7 @@ namespace AccountLead
                 string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicantID);
                 //string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
 
-                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_ddeindividualcustomerid,eqs_readyforonboarding,eqs_onboardingvalidationmessage,_eqs_accountapplicantid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_shortname,eqs_mobilenumber,eqs_emailid,eqs_dob,eqs_mothermaidenname,_eqs_sourcebranchid_value,_eqs_subentitytypeid_value,_eqs_corporatecompanyid_value,eqs_gendercode,_eqs_leadaccountdde_value,_eqs_custpreferredbranchid_value,eqs_customeridcreated,eqs_aadharreference,eqs_pannumber,_eqs_leadid_value&$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_corporatecompanyid($select=eqs_corporatecode),eqs_custpreferredbranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name)";
+                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_ddeindividualcustomerid,eqs_ckycnumber,eqs_readyforonboarding,eqs_onboardingvalidationmessage,_eqs_accountapplicantid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_shortname,eqs_mobilenumber,eqs_emailid,eqs_dob,eqs_mothermaidenname,_eqs_sourcebranchid_value,_eqs_subentitytypeid_value,_eqs_corporatecompanyid_value,eqs_gendercode,_eqs_leadaccountdde_value,_eqs_custpreferredbranchid_value,eqs_customeridcreated,eqs_aadharreference,eqs_pannumber,_eqs_leadid_value&$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_corporatecompanyid($select=eqs_corporatecode),eqs_custpreferredbranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryid($select=eqs_countryalphacpde)";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
@@ -354,7 +354,7 @@ namespace AccountLead
                 string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
 
                 //string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002";
-                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_preferredhomebranchId($select=eqs_branchidvalue)";
+                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_preferredhomebranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryofincorporationId($select=eqs_countryalphacpde)";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
@@ -395,7 +395,7 @@ namespace AccountLead
             try
             {
                 string query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_individualdde_value eq '{individuaID}'";
-                if (type=="corp")
+                if (type == "corp")
                 {
                     query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_corporatedde_value eq '{individuaID}'";
                 }
@@ -422,8 +422,8 @@ namespace AccountLead
         public async Task<string> getCountryName(string CountryId)
         {
             return await this.getIDfromMSDTable("eqs_countries", "eqs_name", "eqs_countryid", CountryId);
-        } 
-        
+        }
+
         public async Task<string> getAccountRelation(string accRelationId)
         {
             return await this.getIDfromMSDTable("eqs_accountrelationshipses", "eqs_key", "eqs_accountrelationshipsid", accRelationId);

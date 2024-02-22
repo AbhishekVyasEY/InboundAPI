@@ -212,9 +212,6 @@
                             string mm = dob.Month.ToString().PadLeft(2, '0');
                             string dd = dob.Day.ToString().PadLeft(2, '0');
 
-                            //string dd = AccountDDE[0]["eqs_dob"].ToString().Substring(0, 2);
-                            //string mm = AccountDDE[0]["eqs_dob"].ToString().Substring(3, 2);
-                            //string yy = AccountDDE[0]["eqs_dob"].ToString().Substring(6, 4);
                             msgBdy.individualCustomer.dateOfBirthOrRegistration = yyyy + mm + dd;
 
                             string subEntityType = string.Empty; string mobileNumber = "91";
@@ -292,24 +289,33 @@
                             {
                                 Dictionary<string, string> fieldInput = new Dictionary<string, string>();
 
-                                customerLeadReturn.customerId = responsD.createCustomerResponse.msgBdy.customerId.ToString();
-                                if (!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
+                                if (!string.IsNullOrEmpty(responsD.createCustomerResponse.msgBdy.customerId?.ToString()))
                                 {
-                                    fieldInput.Add("eqs_customeridcreated", customerLeadReturn.customerId);
-                                    postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                    customerLeadReturn.customerId = responsD.createCustomerResponse.msgBdy.customerId.ToString();
+                                    if (!string.IsNullOrEmpty(customerLeadReturn.customerId) && customerLeadReturn.customerId != "")
+                                    {
+                                        fieldInput.Add("eqs_customeridcreated", customerLeadReturn.customerId);
+                                        postDataParametr = JsonConvert.SerializeObject(fieldInput);
 
-                                    var resp1 = await this._queryParser.HttpApiCall($"eqs_accountapplicants({AccountDDE[0]["_eqs_accountapplicantid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
+                                        var resp1 = await this._queryParser.HttpApiCall($"eqs_accountapplicants({AccountDDE[0]["_eqs_accountapplicantid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 
-                                    var resp2 = await this._queryParser.HttpApiCall($"eqs_ddeindividualcustomers({AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString()})", HttpMethod.Patch, postDataParametr);
+                                        var resp2 = await this._queryParser.HttpApiCall($"eqs_ddeindividualcustomers({AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString()})", HttpMethod.Patch, postDataParametr);
 
-                                    fieldInput = new Dictionary<string, string>();
-                                     string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_onboardingstatus", "Completed");
-                                    fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
-                                    postDataParametr = JsonConvert.SerializeObject(fieldInput);
-                                    var resp3 = await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
+                                        fieldInput = new Dictionary<string, string>();
+                                        string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_onboardingstatus", "Completed");
+                                        fieldInput.Add("eqs_onboardingstatus", OnboardingStatus);
+                                        postDataParametr = JsonConvert.SerializeObject(fieldInput);
+                                        var resp3 = await this._queryParser.HttpApiCall($"leads({AccountDDE[0]["_eqs_leadid_value"].ToString()})", HttpMethod.Patch, postDataParametr);
 
-                                    customerLeadReturn.Message = OutputMSG.Case_Success;
-                                    customerLeadReturn.ReturnCode = "CRM-SUCCESS";
+                                        customerLeadReturn.Message = OutputMSG.Case_Success;
+                                        customerLeadReturn.ReturnCode = "CRM-SUCCESS";
+                                    }
+                                }
+                                else
+                                {
+                                    this._logger.LogInformation("HttpCBSApiCall output", Lead_details);
+                                    customerLeadReturn.Message = Lead_details;
+                                    customerLeadReturn.ReturnCode = "CRM-ERROR-101";
                                 }
                             }
                             else
