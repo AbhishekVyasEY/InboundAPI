@@ -160,8 +160,15 @@
                     {
                         LifeInsuranceVerificationSRL lifeInsuranceVerSRL = new LifeInsuranceVerificationSRL();
                         lifeInsuranceVerSRL.dependentname = item["eqs_dependentname"].ToString();
-                        lifeInsuranceVerSRL.dmsDocumentID = item["eqs_incident_eqs_leaddocument"][0]["eqs_documentid"].ToString();
-                        lifeInsuranceVerSRL.insuranceproduct = item["eqs_PlanName"]["eqs_name"].ToString();
+                        if (item["eqs_incident_eqs_leaddocument"].Count() > 0)
+                        {
+                            lifeInsuranceVerSRL.dmsDocumentID = item["eqs_incident_eqs_leaddocument"][0]["eqs_documentid"].ToString();
+                        }
+                        if (!string.IsNullOrEmpty(item["_eqs_planname_value"].ToString()))
+                        {
+                            lifeInsuranceVerSRL.insuranceproduct = item["eqs_PlanName"]["eqs_name"].ToString();
+                        }
+                        
                         lifeInsuranceVerSRL.policyCoverage = item["eqs_policycoverage"].ToString();
                         lifeInsuranceVerSRL.riskprofile = item["eqs_tppriskprofile"].ToString();
                         lifeInsuranceVerSRL.spcode = item["eqs_spcode"].ToString();
