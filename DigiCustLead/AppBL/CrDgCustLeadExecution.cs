@@ -151,11 +151,11 @@
                                 ValidationError = 1;
                                 errorText.Add("FirstName");
                             }
-                            if (IndvData.LastName == null || string.IsNullOrEmpty(IndvData.LastName.ToString()) || IndvData.LastName.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText.Add("LastName");
-                            }
+                            //if (IndvData.LastName == null || string.IsNullOrEmpty(IndvData.LastName.ToString()) || IndvData.LastName.ToString() == "")
+                            //{
+                            //    ValidationError = 1;
+                            //    errorText.Add("LastName");
+                            //}
                             if (IndvData.MobilePhone == null || string.IsNullOrEmpty(IndvData.MobilePhone.ToString()) || IndvData.MobilePhone.ToString() == "")
                             {
                                 ValidationError = 1;
