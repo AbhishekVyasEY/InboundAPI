@@ -151,11 +151,11 @@
                                 ValidationError = 1;
                                 errorText.Add("FirstName");
                             }
-                            if (IndvData.LastName == null || string.IsNullOrEmpty(IndvData.LastName.ToString()) || IndvData.LastName.ToString() == "")
-                            {
-                                ValidationError = 1;
-                                errorText.Add("LastName");
-                            }
+                            //if (IndvData.LastName == null || string.IsNullOrEmpty(IndvData.LastName.ToString()) || IndvData.LastName.ToString() == "")
+                            //{
+                            //    ValidationError = 1;
+                            //    errorText.Add("LastName");
+                            //}
                             if (IndvData.MobilePhone == null || string.IsNullOrEmpty(IndvData.MobilePhone.ToString()) || IndvData.MobilePhone.ToString() == "")
                             {
                                 ValidationError = 1;
@@ -265,7 +265,6 @@
             }
 
         }
-
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -439,6 +438,11 @@
                     CRMCustomermappingFields.Add("eqs_name", custLeadElement.firstname + " " + custLeadElement.middlename + " " + custLeadElement.lastname);
                     CRMCustomermappingFields.Add("eqs_mobilenumber", custLeadElement.mobilephone);
                     CRMCustomermappingFields.Add("eqs_dob", custLeadElement.eqs_dob);
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_dob))
+                    {
+                        int age = GetAgeInYears(custLeadElement.eqs_dob);
+                        CRMCustomermappingFields.Add("eqs_leadage", age.ToString());
+                    }
 
                     if (!string.IsNullOrEmpty(leadSourceId))
                     {
@@ -813,6 +817,14 @@
             return csRtPrm;
         }
 
+        private int GetAgeInYears(string dobstring)
+        {
+            DateTime dob = Convert.ToDateTime(dobstring);
+            TimeSpan diff = DateTime.Today - dob;
+
+            DateTime zerodate = new DateTime(1, 1, 1);
+            return (zerodate + diff).Year - 1;
+        }
 
         public async Task<string> EncriptRespons(string ResponsData)
         {

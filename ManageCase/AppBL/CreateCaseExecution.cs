@@ -20,7 +20,6 @@ namespace ManageCase
 {
     public class CreateCaseExecution : ICreateCaseExecution
     {
-
         private ILoggers _logger;
         private IQueryParser _queryParser;
         public string Bank_Code { set; get; }
@@ -36,6 +35,7 @@ namespace ManageCase
                 return _logger.Channel_ID;
             }
         }
+
         public string Transaction_ID
         {
             set
@@ -55,31 +55,28 @@ namespace ManageCase
                 _logger.API_Name = value;
             }
         }
-        public string Input_payload { set {
+        public string Input_payload
+        {
+            set
+            {
                 _logger.Input_payload = value;
-            } 
+            }
         }
 
         private readonly IKeyVaultService _keyVaultService;
-
-       
         Dictionary<string, string> CaseType = new Dictionary<string, string>();
         Dictionary<string, string> _CaseType = new Dictionary<string, string>();
         Dictionary<string, int> Priority = new Dictionary<string, int>();
         Dictionary<int, string> _Priority = new Dictionary<int, string>();
-        Dictionary<string, string> StatusCodes = new Dictionary<string, string>();
-        
+        Dictionary<string, string> StatusCodes = new Dictionary<string, string>();        
         private ICommonFunction _commonFunc;
 
         public CreateCaseExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
-        {
-                    
-            this._logger = logger;
-            
+        {                    
+            this._logger = logger;            
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
-            this._commonFunc = commonFunction;
-           
+            this._commonFunc = commonFunction;           
             
             this.CaseType.Add("Request", "789030001");
             this.CaseType.Add("Complaint", "789030003");
@@ -89,9 +86,7 @@ namespace ManageCase
             this._CaseType.Add("789030001", "Request");
             this._CaseType.Add("789030003", "Complaint");
             this._CaseType.Add("1", "Query");
-            this._CaseType.Add("789030002", "Suggestion");
-
-         
+            this._CaseType.Add("789030002", "Suggestion");        
 
            
             this.StatusCodes.Add("5", "Problem Solved");
@@ -103,7 +98,7 @@ namespace ManageCase
             this.StatusCodes.Add("4", "Researching");
             this.StatusCodes.Add("6", "Cancelled");
             this.StatusCodes.Add("615290000", "Auto Closed");
-
+            this.StatusCodes.Add("615290001", "Rejected");
         }
 
 
@@ -169,8 +164,7 @@ namespace ManageCase
                         {
                             ValidationError = 1;
                             errors.Add("SubCategory");
-                        }
-                        
+                        }                        
 
                         if (ValidationError == 1)
                         {
@@ -211,7 +205,6 @@ namespace ManageCase
                     ldRtPrm.ReturnCode = "CRM-ERROR-102";
                     ldRtPrm.Message = "AppKey is incorrect";
                 }
-
                 return ldRtPrm;
             }
             catch (Exception ex)
@@ -220,10 +213,8 @@ namespace ManageCase
                 ldRtPrm.ReturnCode = "CRM-ERROR-101";
                 ldRtPrm.Message = OutputMSG.Resource_n_Found;
                 return ldRtPrm;
-            }
-            
+            }            
         }
-
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -248,13 +239,10 @@ namespace ManageCase
                 CSRtPrm.Message = "API do not have access permission!";
                 return CSRtPrm;
             }
-
             try
             {
                 if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID) && !string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetCaseStatusappkey"))
-                {
-                   
-
+                {                  
                     if (CaseData.CaseID == null || string.IsNullOrEmpty(CaseData.CaseID.ToString()) || CaseData.CaseID.ToString() == "")
                     {                       
                         CSRtPrm.Message = "CaseId is incorrect";
@@ -282,15 +270,28 @@ namespace ManageCase
                                 CSRtPrm.modifiedDate = statusCodeId[0]["modifiedon"];
                                 CSRtPrm.closeDate = statusCodeId[0]["ccs_resolveddate"];
 
-                                await this._commonFunc.getClassificationName(statusCodeId[0]["_ccs_classification_value"].ToString());
-                                await this._commonFunc.getCategoryName(statusCodeId[0]["_ccs_category_value"].ToString());
-                                await this._commonFunc.getSubCategoryName(statusCodeId[0]["_ccs_subcategory_value"].ToString());
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_ccs_classification_value"]?.ToString()))
+                                {
+                                    CSRtPrm.Classification = statusCodeId[0]["ccs_classification"]["ccs_name"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_ccs_category_value"]?.ToString()))
+                                {
+                                    CSRtPrm.category = statusCodeId[0]["ccs_category"]["ccs_name"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_ccs_subcategory_value"]?.ToString()))
+                                {
+                                    CSRtPrm.subcategory = statusCodeId[0]["ccs_subcategory"]["ccs_name"].ToString();
+                                }
 
-                                var Batch_results1 = await this._queryParser.GetBatchResult();
+                                //await this._commonFunc.getClassificationName(statusCodeId[0]["_ccs_classification_value"].ToString());
+                                //await this._commonFunc.getCategoryName(statusCodeId[0]["_ccs_category_value"].ToString());
+                                //await this._commonFunc.getSubCategoryName(statusCodeId[0]["_ccs_subcategory_value"].ToString());
 
-                                CSRtPrm.Classification = (Batch_results1[0]["ccs_name"] != null) ? Batch_results1[0]["ccs_name"].ToString() : "";
-                                CSRtPrm.category = (Batch_results1[1]["ccs_name"] != null) ? Batch_results1[1]["ccs_name"].ToString() : "";
-                                CSRtPrm.subcategory = (Batch_results1[2]["ccs_name"] != null) ? Batch_results1[2]["ccs_name"].ToString() : "";
+                                //var Batch_results1 = await this._queryParser.GetBatchResult();
+
+                                //CSRtPrm.Classification = (Batch_results1[0]["ccs_name"] != null) ? Batch_results1[0]["ccs_name"].ToString() : "";
+                                //CSRtPrm.category = (Batch_results1[1]["ccs_name"] != null) ? Batch_results1[1]["ccs_name"].ToString() : "";
+                                //CSRtPrm.subcategory = (Batch_results1[2]["ccs_name"] != null) ? Batch_results1[2]["ccs_name"].ToString() : "";
 
                                 CSRtPrm.AdditionalField = JsonConvert.DeserializeObject(statusCodeId[0]["eqs_casepayload"].ToString());
 
@@ -332,15 +333,29 @@ namespace ManageCase
                                 CSRtPrm.Description = statusCodeId[0]["description"];
                                 CSRtPrm.Priority = await this._queryParser.getOptionSetValuToText("incident", "eqs_casepriority", statusCodeId[0]["eqs_casepriority"].ToString());
 
-                                await this._commonFunc.getChannelCode(statusCodeId[0]["_eqs_casechannel_value"].ToString());
-                                await this._commonFunc.getSourceCode(statusCodeId[0]["_eqs_casesource_value"].ToString());
-                                await this._commonFunc.getAccountNumber(statusCodeId[0]["_eqs_account_value"].ToString());
-                                await this._commonFunc.getCustomerCode(statusCodeId[0]["_customerid_value"].ToString());
-                                var Batch_results2 = await this._queryParser.GetBatchResult();
-                                CSRtPrm.Channel = (Batch_results2[0]["eqs_channelid"] != null) ? Batch_results2[0]["eqs_channelid"].ToString() : "";
-                                CSRtPrm.Source = (Batch_results2[1]["eqs_sourceid"] != null) ? Batch_results2[1]["eqs_sourceid"].ToString() : "";
-                                CSRtPrm.Accountid = (Batch_results2[2]["eqs_accountno"] != null) ? Batch_results2[2]["eqs_accountno"].ToString() : "";
-                                CSRtPrm.customerid = (Batch_results2[3]["eqs_customerid"] != null) ? Batch_results2[3]["eqs_customerid"].ToString() : "";
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_eqs_casechannel_value"]?.ToString()))
+                                {
+                                    CSRtPrm.Channel = statusCodeId[0]["eqs_CaseChannel"]["eqs_channelid"];
+                                }
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_eqs_casesource_value"]?.ToString()))
+                                {
+                                    CSRtPrm.Source = statusCodeId[0]["eqs_CaseSource"]["eqs_sourceid"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["_eqs_account_value"]?.ToString()))
+                                {
+                                    CSRtPrm.Accountid = statusCodeId[0]["eqs_account"]["eqs_accountno"].ToString();
+                                }                                
+                                CSRtPrm.customerid = await this._commonFunc.getCustomerCode(statusCodeId[0]["_customerid_value"].ToString());
+
+                                //await this._commonFunc.getChannelCode(statusCodeId[0]["_eqs_casechannel_value"].ToString());
+                                //await this._commonFunc.getSourceCode(statusCodeId[0]["_eqs_casesource_value"].ToString());
+                                //await this._commonFunc.getAccountNumber(statusCodeId[0]["_eqs_account_value"].ToString());
+                                //await this._commonFunc.getCustomerCode(statusCodeId[0]["_customerid_value"].ToString());
+                                //var Batch_results2 = await this._queryParser.GetBatchResult();
+                                //CSRtPrm.Channel = (Batch_results2[0]["eqs_channelid"] != null) ? Batch_results2[0]["eqs_channelid"].ToString() : "";
+                                //CSRtPrm.Source = (Batch_results2[1]["eqs_sourceid"] != null) ? Batch_results2[1]["eqs_sourceid"].ToString() : "";
+                                //CSRtPrm.Accountid = (Batch_results2[2]["eqs_accountno"] != null) ? Batch_results2[2]["eqs_accountno"].ToString() : "";
+                                //CSRtPrm.customerid = (Batch_results2[3]["eqs_customerid"] != null) ? Batch_results2[3]["eqs_customerid"].ToString() : "";
 
                                 CSRtPrm.ReturnCode = "CRM-SUCCESS";
 
@@ -350,8 +365,7 @@ namespace ManageCase
                             {
                                 CSRtPrm = case_dtl;
                             }
-                        }
-                        
+                        }                        
                     }
                 }
                 else
@@ -360,8 +374,6 @@ namespace ManageCase
                     CSRtPrm.ReturnCode = "CRM-ERROR-102";
                     CSRtPrm.Message = "Transaction_ID or Channel or AppKey is incorrect";
                 }
-
-
                 return CSRtPrm;
             }
             catch (Exception ex)
@@ -630,7 +642,6 @@ namespace ManageCase
                 return csRtPrm;
             }
         }
-                      
 
         public async Task<CaseListParam> getCaseList(dynamic CaseData)
         {
@@ -670,12 +681,12 @@ namespace ManageCase
                         if (custId==1)
                         {
                             string customerid = await this._commonFunc.getCustomerId(CaseData.CustomerID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}'";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                         }
                         if (AccId == 1)
                         {
                             string Accountid = await this._commonFunc.getAccountId(CaseData.AccountID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'  &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                         }
 
                         var caseresponsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -711,13 +722,26 @@ namespace ManageCase
                                     case_details.Casetype = this._CaseType[caseDetails["eqs_casetype"].ToString()];
                                 }
 
-                                await this._commonFunc.getClassificationName(caseDetails["_ccs_classification_value"].ToString());
-                                await this._commonFunc.getCategoryName(caseDetails["_ccs_category_value"].ToString());
-                                await this._commonFunc.getSubCategoryName(caseDetails["_ccs_subcategory_value"].ToString());
-                                var Batch_results1 = await this._queryParser.GetBatchResult();
-                                case_details.Classification = (Batch_results1[0]["ccs_name"] != null) ? Batch_results1[0]["ccs_name"].ToString() : "";
-                                case_details.category = (Batch_results1[1]["ccs_name"] != null) ? Batch_results1[1]["ccs_name"].ToString() : "";
-                                case_details.subcategory = (Batch_results1[2]["ccs_name"] != null) ? Batch_results1[2]["ccs_name"].ToString() : "";
+                                if (!string.IsNullOrEmpty(caseDetails["_ccs_classification_value"]?.ToString()))
+                                {
+                                    case_details.Classification = caseDetails["ccs_classification"]["ccs_name"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["_ccs_category_value"]?.ToString()))
+                                {
+                                    case_details.category = caseDetails["ccs_category"]["ccs_name"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["_ccs_subcategory_value"]?.ToString()))
+                                {
+                                    case_details.subcategory = caseDetails["ccs_subcategory"]["ccs_name"].ToString();
+                                }
+
+                                //await this._commonFunc.getClassificationName(caseDetails["_ccs_classification_value"].ToString());
+                                //await this._commonFunc.getCategoryName(caseDetails["_ccs_category_value"].ToString());
+                                //await this._commonFunc.getSubCategoryName(caseDetails["_ccs_subcategory_value"].ToString());
+                                //var Batch_results1 = await this._queryParser.GetBatchResult();
+                                //case_details.Classification = (Batch_results1[0]["ccs_name"] != null) ? Batch_results1[0]["ccs_name"].ToString() : "";
+                                //case_details.category = (Batch_results1[1]["ccs_name"] != null) ? Batch_results1[1]["ccs_name"].ToString() : "";
+                                //case_details.subcategory = (Batch_results1[2]["ccs_name"] != null) ? Batch_results1[2]["ccs_name"].ToString() : "";
 
                                 case_details.AdditionalField = (JObject)JsonConvert.DeserializeObject(caseDetails["eqs_casepayload"].ToString());
 
@@ -727,16 +751,35 @@ namespace ManageCase
                                 {
                                     case_details.Priority = await this._queryParser.getOptionSetValuToText("incident", "eqs_casepriority", caseDetails["eqs_casepriority"].ToString()); 
                                 }
-                                
-                                await this._commonFunc.getChannelCode(caseDetails["_eqs_casechannel_value"].ToString());
-                                await this._commonFunc.getSourceCode(caseDetails["_eqs_casesource_value"].ToString());
-                                await this._commonFunc.getAccountNumber(caseDetails["_eqs_account_value"].ToString());
-                                await this._commonFunc.getCustomerCode(caseDetails["_customerid_value"].ToString());
-                                var Batch_results2 = await this._queryParser.GetBatchResult();
-                                case_details.Channel = (Batch_results2[0]["eqs_channelid"] != null) ? Batch_results2[0]["eqs_channelid"].ToString() : "";
-                                case_details.Source = (Batch_results2[1]["eqs_sourceid"] != null) ? Batch_results2[1]["eqs_sourceid"].ToString() : "";
-                                case_details.Accountid = (Batch_results2[2]["eqs_accountno"] != null) ? Batch_results2[2]["eqs_accountno"].ToString() : "";
-                                case_details.customerid = (Batch_results2[3]["eqs_customerid"] != null) ? Batch_results2[3]["eqs_customerid"].ToString() : "";
+                                if (!string.IsNullOrEmpty(caseDetails["_eqs_casechannel_value"]?.ToString()))
+                                {
+                                    case_details.Channel = caseDetails["eqs_CaseChannel"]["eqs_channelid"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["_eqs_casesource_value"]?.ToString()))
+                                {
+                                    case_details.Source = caseDetails["eqs_CaseSource"]["eqs_sourceid"].ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["_eqs_account_value"]?.ToString()))
+                                {
+                                    case_details.Accountid = caseDetails["eqs_account"]["eqs_accountno"].ToString();
+                                }
+                                if (string.IsNullOrEmpty(CaseData.CustomerID?.ToString()))
+                                {
+                                    case_details.customerid = await this._commonFunc.getCustomerCode(caseDetails["_customerid_value"].ToString());
+                                }
+                                else
+                                {
+                                    case_details.customerid = CaseData.CustomerID.ToString();
+                                }
+                                //await this._commonFunc.getChannelCode(caseDetails["_eqs_casechannel_value"].ToString());
+                                //await this._commonFunc.getSourceCode(caseDetails["_eqs_casesource_value"].ToString());
+                                //await this._commonFunc.getAccountNumber(caseDetails["_eqs_account_value"].ToString());
+                                //await this._commonFunc.getCustomerCode(caseDetails["_customerid_value"].ToString());
+                                //var Batch_results2 = await this._queryParser.GetBatchResult();
+                                //case_details.Channel = (Batch_results2[0]["eqs_channelid"] != null) ? Batch_results2[0]["eqs_channelid"].ToString() : "";
+                                //case_details.Source = (Batch_results2[1]["eqs_sourceid"] != null) ? Batch_results2[1]["eqs_sourceid"].ToString() : "";
+                                //case_details.Accountid = (Batch_results2[2]["eqs_accountno"] != null) ? Batch_results2[2]["eqs_accountno"].ToString() : "";
+                                //case_details.customerid = (Batch_results2[3]["eqs_customerid"] != null) ? Batch_results2[3]["eqs_customerid"].ToString() : "";
 
                                 this._commonFunc.SetMvalue<CaseDetails>("Case" + caseDetails["ticketnumber"].ToString(), 60, case_details);
                             }
@@ -756,8 +799,6 @@ namespace ManageCase
                     CSRtPrm.ReturnCode = "CRM-ERROR-102";
                     CSRtPrm.Message = "Appkey is incorrect";
                 }
-
-
                 return CSRtPrm;
             }
             catch (Exception ex)
@@ -767,19 +808,15 @@ namespace ManageCase
                 CSRtPrm.Message = OutputMSG.Resource_n_Found;
                 return CSRtPrm;
             }
-
         }
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
             return await _queryParser.PayloadEncryption(ResponsData, Transaction_ID, this.Bank_Code);
-        }
-
-       
+        }       
 
         private async Task<dynamic> getRequestData(dynamic inputData,string APIname)
         {
-
             dynamic rejusetJson;
             try
             {
@@ -796,25 +833,19 @@ namespace ManageCase
                     JObject rejusetJson1 = (JObject)JsonConvert.DeserializeObject(childrenNode.Value);
 
                     dynamic payload = rejusetJson1[APIname];
-
                     this.appkey = payload.msgHdr.authInfo.token.ToString();
                     this.Transaction_ID = payload.msgHdr.conversationID.ToString();
                     this.Channel_ID = payload.msgHdr.channelID.ToString();
-
                     rejusetJson = payload.msgBdy;
 
                     return rejusetJson;
-
                 }
             }
             catch (Exception ex)
             {
                 this._logger.LogError("getRequestData", ex.Message);
             }
-
             return "";
-
         }
-
     }
 }

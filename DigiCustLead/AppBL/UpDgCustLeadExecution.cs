@@ -1153,7 +1153,7 @@
                     string shname = Applicant_Data["eqs_companynamepart1"]?.ToString() + " " + Applicant_Data["eqs_companynamepart2"]?.ToString() + " " + Applicant_Data["eqs_companynamepart3"]?.ToString();
                     CRMDDEmappingFields.Add("eqs_shortname", (shname.Length > 20) ? shname.Substring(0, 20) : shname);
 
-                    CRMDDEmappingFields.Add("eqs_leadId@odata.bind", $"leads({Applicant_Data["_eqs_leadid_value"]?.ToString()})");
+                    CRMDDEmappingFields.Add("eqs_leadid@odata.bind", $"leads({Applicant_Data["_eqs_leadid_value"]?.ToString()})");
 
                     if (!string.IsNullOrEmpty(Applicant_Data["eqs_dateofincorporation"]?.ToString()))
                     {

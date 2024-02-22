@@ -14,7 +14,7 @@ namespace ManageCase
         public Task getChannelCode(string channelId);
         public Task<string> getCustomerId(string CustomerCode);
         public Task getCustomer_Id(string uciccode);
-        public Task getCustomerCode(string CustomerId);
+        public Task<string> getCustomerCode(string CustomerId);
         public Task getSourceId(string SourceCode);
         public Task getSourceCode(string SourceId);
         public Task getCategoryName(string CategoryId);

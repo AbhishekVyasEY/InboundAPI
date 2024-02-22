@@ -761,7 +761,7 @@
                 /****************** General  ***********************/
                 if (ddeData.General != null)
                 {
-                    if (ddeData.General?.AccountNumber.ToString() != "")
+                    if (ddeData.General?.AccountNumber?.ToString() != "")
                     {
                         string Account = await this._commonFunc.getAccountId(ddeData.General?.AccountNumber?.ToString());
                         if (!string.IsNullOrEmpty(Account))
@@ -778,7 +778,7 @@
                         odatab.Add("eqs_applicationdate", yyyy + "-" + mm + "-" + dd);
                     }
 
-                    if (!string.IsNullOrEmpty(ddeData.General?.ProductCategory.ToString()))
+                    if (!string.IsNullOrEmpty(ddeData.General?.ProductCategory?.ToString()))
                     {
                         string prodCat = await this._commonFunc.getProductCategoryId(ddeData.General?.ProductCategory.ToString());
                         if (!string.IsNullOrEmpty(prodCat))
@@ -1308,7 +1308,14 @@
                 }
                 if (!string.IsNullOrEmpty(item["NameonCard"].ToString()))
                 {
-                    inputItem.Add("eqs_nameoncard", item["NameonCard"].ToString());
+                    if (item["NameonCard"].ToString().Length > 19)
+                    {
+                        inputItem.Add("eqs_nameoncard", item["NameonCard"].ToString().Substring(0, 19));
+                    }
+                    else
+                    {
+                        inputItem.Add("eqs_nameoncard", item["NameonCard"].ToString());
+                    }
                 }
                 if (!string.IsNullOrEmpty(item["SMS"].ToString()))
                 {
