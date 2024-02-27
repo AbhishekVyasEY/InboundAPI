@@ -221,7 +221,14 @@
                             }
                             if (!string.IsNullOrEmpty(subEntityType) && !(subEntityType.ToUpper() == "NON RESIDENT INDIVIDUAL" || subEntityType.ToLower() == "foreigners"))
                             {
-                                mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //if (AccountDDE[0]["eqs_mobilenumber"].ToString().Length == 10 && !AccountDDE[0]["eqs_mobilenumber"].ToString().StartsWith("91"))
+                                //{
+                                    mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //}
+                                //else
+                                //{
+                                //    mobileNumber = AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //}
                             }
                             else
                             {
@@ -236,7 +243,7 @@
                             msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
 
                             msgBdy.individualCustomer.adhrNo = AccountDDE[0]["eqs_aadharreference"].ToString();
-                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_pannumber"].ToString();
+                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_internalpan"].ToString();
 
                             //msgBdy.individualCustomer.employeeId = "";
                             msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
