@@ -21,7 +21,7 @@ namespace ManageCase
         public Task getCategoryId(string CustomerCode);
         public Task getclassificationId(string classification);
         public Task getClassificationName(string classificationId);
-        public Task<string> getSubCategoryId(string CustomerCode, string CategoryId);
+        public Task<JArray> getSubCategoryId(string CustomerCode, string CategoryId);
         public Task getSubCategoryName(string SubCategoryId);
         public Task<string> getBranchId(string branchid);
         public Task<string> getProductId(string productcode);
@@ -29,7 +29,7 @@ namespace ManageCase
         public Task<string> getPurposeOfCreationId(string purposeofcreation);
         public Task<string> getCustomerAddressId(string customerid, string addtesstypecode);
         public Task<JArray> getCityDetails(string CityID);
-        public Task<bool> checkDuplicate(string UCIC, string Account, string Classification, string Category, string SubCategory);
+        public Task<bool> checkDuplicate(string UCIC, string Account, string Category, string SubCategory);
         public Task<JArray> getCaseAdditionalFields(string subCategoryCode);
         public Task<JArray> getExistingCase(string CaseID);
         public Task<JArray> getCustomerData(string customerid);
