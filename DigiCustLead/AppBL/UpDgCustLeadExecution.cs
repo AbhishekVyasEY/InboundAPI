@@ -555,7 +555,8 @@
                     }
 
 
-                    CRMDDEmappingFields.Add("eqs_pannumber", Applicant_Data["eqs_internalpan"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_pannumber", Applicant_Data["eqs_pan"]?.ToString());
+                    CRMDDEmappingFields.Add("eqs_internalpan", Applicant_Data["eqs_internalpan"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_passportnumber", Applicant_Data["eqs_passportnumber"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_voterid", Applicant_Data["eqs_voterid"]?.ToString());
                     CRMDDEmappingFields.Add("eqs_drivinglicensenumber", Applicant_Data["eqs_dlnumber"]?.ToString());
@@ -564,7 +565,8 @@
 
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PanNumber?.ToString()))
                     {
-                        CRMDDEmappingFields["eqs_pannumber"] = CustIndvData.IdentificationDetails.PanNumber.ToString();
+                        CRMDDEmappingFields["eqs_pannumber"] = "**********";
+                        CRMDDEmappingFields["eqs_internalpan"] = CustIndvData.IdentificationDetails.PanNumber.ToString();
                     }
                     if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportNumber?.ToString()))
                     {
