@@ -239,7 +239,7 @@
                             msgBdy.individualCustomer.name.prefix = AccountDDE[0]["eqs_titleId"]["eqs_name"].ToString();
 
                             msgBdy.individualCustomer.adhrNo = AccountDDE[0]["eqs_aadharreference"].ToString();
-                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_pannumber"].ToString();
+                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_internalpan"].ToString();
 
                             if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_equitasstaffcode"].ToString()))
                             {
