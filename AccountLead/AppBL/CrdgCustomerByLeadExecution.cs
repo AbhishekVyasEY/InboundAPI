@@ -187,7 +187,7 @@
                             string Lead_details = "";
                             var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString());
 
-                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"adhrNo\":\"\",\"incomeTaxNumber\":\"\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
+                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"icType\":\"P\",\"riskCategory\":\"3\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"adhrNo\":\"\",\"incomeTaxNumber\":\"\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
                             dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                             dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
                             dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
@@ -204,9 +204,11 @@
                                 msgBdy.individualCustomer.address.zip = address[0]["eqs_pincode"].ToString();
                                 msgBdy.individualCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
                                 msgBdy.individualCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
-                                msgBdy.individualCustomer.address.country = "IN";
+                                msgBdy.individualCustomer.address.country = AccountDDE[0]["eqs_countryId"]["eqs_countryalphacpde"]?.ToString();
                             }
-
+                            msgBdy.individualCustomer.countryOfResidence = AccountDDE[0]["eqs_countryId"]["eqs_countryalphacpde"]?.ToString();
+                            msgBdy.individualCustomer.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
+                            msgBdy.individualCustomer.customerEducation = AccountDDE[0]["eqs_educationcode"]?.ToString();
                             DateTime dob = Convert.ToDateTime(AccountDDE[0]["eqs_dob"]);
                             string yyyy = dob.Year.ToString().PadLeft(4, '0');
                             string mm = dob.Month.ToString().PadLeft(2, '0');
@@ -241,11 +243,24 @@
                             msgBdy.individualCustomer.name.lastName = AccountDDE[0]["eqs_lastname"].ToString();
                             msgBdy.individualCustomer.name.midName = AccountDDE[0]["eqs_middlename"].ToString();
                             msgBdy.individualCustomer.name.shortName = AccountDDE[0]["eqs_shortname"].ToString();
+                            msgBdy.individualCustomer.name.prefix = AccountDDE[0]["eqs_titleId"]["eqs_name"].ToString();
 
                             msgBdy.individualCustomer.adhrNo = AccountDDE[0]["eqs_aadharreference"].ToString();
                             msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_internalpan"].ToString();
 
-                            //msgBdy.individualCustomer.employeeId = "";
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_equitasstaffcode"].ToString()))
+                            {
+                                msgBdy.individualCustomer.employeeId = AccountDDE[0]["eqs_equitasstaffcode"].ToString();
+                            }
+                            
+                            msgBdy.individualCustomer.isStaff = (!string.IsNullOrEmpty(AccountDDE[0]["eqs_isstaffcode"].ToString())) ? "Y" : "N";
+                           
+                            msgBdy.individualCustomer.maritalStatus = (!string.IsNullOrEmpty(AccountDDE[0]["eqs_maritalstatuscode"].ToString())) ? "1" : "0";
+
+                            msgBdy.individualCustomer.professionCode = (!string.IsNullOrEmpty(AccountDDE[0]["eqs_professioncode"].ToString())) ? "1" : "0";
+                            
+                           
+
                             msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
                             msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
                             msgBdy.individualCustomer.isStaff = "Y";
@@ -378,7 +393,7 @@
                             dynamic responsD = "";
                             string Lead_details = "";
                             var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddecorporatecustomerid"].ToString(), "corp");
-                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"corporateCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"C\",\"cifType\":\"C\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"nationalIdentificationCode\":\"234325\",\"businessCode\":\"\",\"alternateEmailId\":\"\",\"annualTurnover\":\"\",\"businessRegistrationNumber\":\"\",\"businessType\":\"\",\"copyMailAddToPermAdd\":\"\",\"dateRegistered\":\"\",\"fax\":\"\",\"telexHandPhone\":\"\",\"riskCategory\":\"\",\"riskCategoryChangeReason\":\"\",\"incomeTaxNumber\":\"\",\"gstNumber\":\"\",\"tan\":\"\",\"cinOrRegNo\":\"\",\"tin\":\"\",\"din\":\"\",\"nrega\":\"\",\"districtCommunication\":\"\",\"nationality\":\"IN\"}}}}";
+                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"corporateCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"C\",\"cifType\":\"C\",\"icType\":\"P\",\"riskCategory\":\"3\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"nationalIdentificationCode\":\"234325\",\"businessCode\":\"\",\"alternateEmailId\":\"\",\"annualTurnover\":\"\",\"businessRegistrationNumber\":\"\",\"businessType\":\"\",\"copyMailAddToPermAdd\":\"\",\"dateRegistered\":\"\",\"fax\":\"\",\"telexHandPhone\":\"\",\"riskCategoryChangeReason\":\"\",\"incomeTaxNumber\":\"\",\"gstNumber\":\"\",\"tan\":\"\",\"cinOrRegNo\":\"\",\"tin\":\"\",\"din\":\"\",\"nrega\":\"\",\"districtCommunication\":\"\",\"nationality\":\"IN\"}}}}";
                             dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                             dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
                             dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
@@ -395,7 +410,7 @@
                                 msgBdy.corporateCustomer.address.zip = address[0]["eqs_pincode"].ToString();
                                 msgBdy.corporateCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
                                 msgBdy.corporateCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
-                                msgBdy.corporateCustomer.address.country = "IN";
+                                msgBdy.corporateCustomer.address.country = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
                             }
 
                             string dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
@@ -405,10 +420,15 @@
                             msgBdy.corporateCustomer.customerMobilePhone = AccountDDE[0]["eqs_pocphonenumber"].ToString();
                             msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
 
+                            msgBdy.corporateCustomers.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
+
+                            msgBdy.corporateCustomer.countryOfResidence = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
+
                             msgBdy.corporateCustomer.name.firstName = AccountDDE[0]["eqs_companyname1"].ToString();
                             msgBdy.corporateCustomer.name.lastName = AccountDDE[0]["eqs_companyname3"].ToString();
                             msgBdy.corporateCustomer.name.midName = AccountDDE[0]["eqs_companyname2"].ToString();
                             msgBdy.corporateCustomer.name.shortName = AccountDDE[0]["eqs_companyname1"].ToString();
+                            msgBdy.corporateCustomer.name.prefix = AccountDDE[0]["eqs_titleId"]["eqs_name"].ToString();
 
                             msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;                            
                             if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_preferredhomebranchid_value"]?.ToString()))
