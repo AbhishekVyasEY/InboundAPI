@@ -223,7 +223,14 @@
                             }
                             if (!string.IsNullOrEmpty(subEntityType) && !(subEntityType.ToUpper() == "NON RESIDENT INDIVIDUAL" || subEntityType.ToLower() == "foreigners"))
                             {
-                                mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //if (AccountDDE[0]["eqs_mobilenumber"].ToString().Length == 10 && !AccountDDE[0]["eqs_mobilenumber"].ToString().StartsWith("91"))
+                                //{
+                                    mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //}
+                                //else
+                                //{
+                                //    mobileNumber = AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                //}
                             }
                             else
                             {
