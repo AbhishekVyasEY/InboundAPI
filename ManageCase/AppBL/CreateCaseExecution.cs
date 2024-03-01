@@ -179,7 +179,7 @@ namespace ManageCase
                                 ldRtPrm.Message = $" {string.Join(", ", errors.ToArray())} are mandatory";
                             }
                         }
-                        else if (await this._commonFunc.checkDuplicate(CaseData.UCIC.ToString(), CaseData.AccountNumber.ToString(), CaseData.Classification.ToString(), CaseData.Category.ToString(), CaseData.SubCategory.ToString()))
+                        else if (await this._commonFunc.checkDuplicate(CaseData.UCIC.ToString(), CaseData.AccountNumber.ToString(), CaseData.Category.ToString(), CaseData.SubCategory.ToString()))
                         {
                             this._logger.LogInformation("ValidateCreateCase", "Case already exists in the system");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
@@ -468,7 +468,8 @@ namespace ManageCase
                     return csRtPrm;
                 }
 
-                csProperty.SubCategoryId = await this._commonFunc.getSubCategoryId(CaseData.SubCategory.ToString(), csProperty.CategoryId);
+                var subCat = await this._commonFunc.getSubCategoryId(CaseData.SubCategory.ToString(), csProperty.CategoryId);
+                csProperty.SubCategoryId = subCat[0]["ccs_subcategoryid"].ToString();
                 if (csProperty.SubCategoryId != null && csProperty.SubCategoryId.Length > 4)
                 {
                     odatab.Add("ccs_subcategory@odata.bind", $"ccs_subcategories({csProperty.SubCategoryId})");
