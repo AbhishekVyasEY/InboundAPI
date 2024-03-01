@@ -250,14 +250,14 @@ namespace ManageCase
             }
         }
 
-        public async Task<string> getSubCategoryId(string subCategoryCode, string CategoryID)
+        public async Task<JArray> getSubCategoryId(string subCategoryCode, string CategoryID)
         {
             try
             {
-                string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}' and statecode eq 0";
+                string query_url = $"ccs_subcategories()?$select=ccs_subcategoryid,eqs_isduplicatecasesallowed&$filter=ccs_code eq '{subCategoryCode}' and _ccs_category_value eq '{CategoryID}' and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-                string subCatId = await this.getIDFromGetResponce("ccs_subcategoryid", responsdtails);
-                return subCatId;
+                var subCat = await this._queryParser.getDataFromResponce(responsdtails);
+                return subCat;
             }
             catch (Exception ex)
             {
@@ -395,7 +395,7 @@ namespace ManageCase
 
         }
 
-        public async Task<bool> checkDuplicate(string UCIC, string Account, string Classification, string Category, string SubCategory)
+        public async Task<bool> checkDuplicate(string UCIC, string Account, string Category, string SubCategory)
         {
             try
             {
@@ -404,30 +404,33 @@ namespace ManageCase
                 if (!string.IsNullOrEmpty(Account))
                 {
                     await this.getAccount_Id(Account);
-                }
-                await this.getclassificationId(Classification);
+                }             
                 await this.getCategoryId(Category);
 
                 var Batch_results1 = await this._queryParser.GetBatchResult();
                 string customerid = (Batch_results1[0]["contactid"]!=null) ? Batch_results1[0]["contactid"].ToString() : "";
-                string ccs_classification, CategoryId;
+                string CategoryId;
                 if (!string.IsNullOrEmpty(Account))
                 {
                     Accountid = (Batch_results1[1]["eqs_accountid"] != null) ? Batch_results1[1]["eqs_accountid"].ToString() : "";
-                    ccs_classification = (Batch_results1[2]["ccs_classificationid"] != null) ? Batch_results1[2]["ccs_classificationid"].ToString() : "";
-                    CategoryId = (Batch_results1[3]["ccs_categoryid"] != null) ? Batch_results1[3]["ccs_categoryid"].ToString() : "";
+                    
+                    CategoryId = (Batch_results1[2]["ccs_categoryid"] != null) ? Batch_results1[2]["ccs_categoryid"].ToString() : "";
                 }
                 else
-                {
-                    ccs_classification = (Batch_results1[1]["ccs_classificationid"] != null) ? Batch_results1[1]["ccs_classificationid"].ToString() : "";
-                    CategoryId = (Batch_results1[2]["ccs_categoryid"] != null) ? Batch_results1[2]["ccs_categoryid"].ToString() : "";
+                {                   
+                    CategoryId = (Batch_results1[1]["ccs_categoryid"] != null) ? Batch_results1[1]["ccs_categoryid"].ToString() : "";
                 }
                     
              
+                var Sub_Category = await this.getSubCategoryId(SubCategory, CategoryId);
+                string SubCategoryId = Sub_Category[0]["ccs_subcategoryid"].ToString();
 
-                string SubCategoryId = await this.getSubCategoryId(SubCategory, CategoryId);
+                if (!string.IsNullOrEmpty(Sub_Category[0]["eqs_isduplicatecasesallowed"].ToString()) && Sub_Category[0]["eqs_isduplicatecasesallowed"].ToString()=="true")
+                {
+                    return false;
+                }
 
-                string query_url = $"incidents()?$select=incidentid,statuscode&$filter=_customerid_value eq '{customerid}' and _ccs_classification_value eq '{ccs_classification}' and _ccs_category_value eq '{CategoryId}' and _ccs_subcategory_value eq '{SubCategoryId}'";
+                string query_url = $"incidents()?$select=incidentid,statuscode&$filter=_customerid_value eq '{customerid}' and _ccs_subcategory_value eq '{SubCategoryId}'";
 
                 if (!string.IsNullOrEmpty(Accountid))
                 {
