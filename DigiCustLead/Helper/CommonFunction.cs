@@ -564,8 +564,8 @@
             try
             {
                 //string finalValue = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
-                string query_url = $"eqs_ddeindividualcustomers()?$filter=_eqs_accountapplicantid_value eq '{AccountNumber}'";
-                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string query_url = $"eqs_ddeindividualcustomers()?$filter=_eqs_accountapplicantid_value eq '{AccountNumber}' &$expand=eqs_AccountRelationship($select=eqs_key),eqs_leadcreatedby($select=fullname),eqs_nationalityId($select=eqs_countrycode),eqs_countryofbirthId($select=eqs_countrycode),eqs_subentitytypeId($select=eqs_key),eqs_sourcebranchId($select=eqs_branchidvalue),eqs_custpreferredbranchId($select=eqs_branchidvalue),eqs_countryId($select=eqs_countrycode),eqs_corporatecompanyid($select=eqs_corporatecode)";
+                var DDEdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var DDE_dtails = await this.getDataFromResponce(DDEdtails);
                 return DDE_dtails;
             }
@@ -669,11 +669,11 @@
                 string query_url;
                 if (type == "corp")
                 {
-                    query_url = $"eqs_leadaddresses()?$filter=_eqs_corporatedde_value eq '{DDEId}'";
+                    query_url = $"eqs_leadaddresses()?$filter=_eqs_corporatedde_value eq '{DDEId}' &$expand=eqs_cityid($select=eqs_key),eqs_stateid($select=eqs_statecode),eqs_countryid($select=eqs_countrycode)";
                 }
                 else
                 {
-                    query_url = $"eqs_leadaddresses()?$filter=_eqs_individualdde_value eq '{DDEId}'";
+                    query_url = $"eqs_leadaddresses()?$filter=_eqs_individualdde_value eq '{DDEId}' &$expand=eqs_cityid($select=eqs_citycode),eqs_stateid($select=eqs_statecode),eqs_countryid($select=eqs_countrycode)";
                 }
 
                 var Addressdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -776,7 +776,7 @@
         {
             try
             {
-                string query_url = $"eqs_leadaddresses()?$filter=_eqs_applicantfatca_value eq '{FatcaID}'";
+                string query_url = $"eqs_leadaddresses()?$filter=_eqs_applicantfatca_value eq '{FatcaID}' &$expand=eqs_cityid($select=eqs_citycode),eqs_stateid($select=eqs_statecode),eqs_countryid($select=eqs_countrycode)";
 
                 var adddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var add_dtails = await this.getDataFromResponce(adddtails);

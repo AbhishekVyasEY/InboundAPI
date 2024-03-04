@@ -332,16 +332,31 @@ namespace AccountLead
             try
             {
                 string accountapplicantid = await this.getIDfromMSDTable("eqs_accountapplicants", "eqs_accountapplicantid", "eqs_applicantid", ApplicantID);
-                //string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddeindividualcustomer", "eqs_dataentrystage", "Final");
-
-                string query_url = $"eqs_ddeindividualcustomers()?$select=eqs_ddeindividualcustomerid,eqs_readyforonboarding,eqs_onboardingvalidationmessage,_eqs_accountapplicantid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_shortname,eqs_mobilenumber,eqs_emailid,eqs_dob,eqs_mothermaidenname,_eqs_sourcebranchid_value,_eqs_subentitytypeid_value,_eqs_corporatecompanyid_value,eqs_gendercode,_eqs_leadaccountdde_value,_eqs_custpreferredbranchid_value,eqs_customeridcreated,eqs_aadharreference,eqs_internalpan,_eqs_leadid_value,eqs_educationcode,eqs_equitasstaffcode,eqs_isstaffcode,eqs_maritalstatuscode,eqs_professioncode&$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_corporatecompanyid($select=eqs_corporatecode),eqs_custpreferredbranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryId($select=eqs_countryalphacpde),eqs_nationalityId($select=eqs_countryalphacpde),eqs_titleId($select=eqs_name)";
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string query_url = $"eqs_ddeindividualcustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_corporatecompanyid($select=eqs_corporatecode),eqs_custpreferredbranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryId($select=eqs_countryalphacpde),eqs_nationalityId($select=eqs_countryalphacpde),eqs_relationshiptoprimaryholder($select=eqs_relationship),eqs_qualificationid($select=eqs_equivelentcbsid),eqs_occupationid($select=eqs_gcmid)";
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "",true);
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
             }
             catch (Exception ex)
             {
                 this._logger.LogError("getApplicentIndivDDE", ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task<string> getCRMCodeTransformation(string apiName, string attribute)
+        {
+            try
+            {
+                string query_url = $"eqs_crmcodetransformations()?$filter=eqs_fieldvalue eq '{attribute}' and eqs_apirequestname eq '{apiName}' and statecode eq 0";
+                var dtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                var data = await this.getDataFromResponce(dtails);
+                string value = data[0]["eqs_fieldcode"].ToString();
+                return value;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCRMCodeTransformation", ex.Message);
                 throw ex;
             }
         }
@@ -394,10 +409,10 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_individualdde_value eq '{individuaID}'";
+                string query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value,eqs_district&$filter=_eqs_individualdde_value eq '{individuaID}'";
                 if (type == "corp")
                 {
-                    query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value&$filter=_eqs_corporatedde_value eq '{individuaID}'";
+                    query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value,eqs_district&$filter=_eqs_corporatedde_value eq '{individuaID}'";
                 }
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);

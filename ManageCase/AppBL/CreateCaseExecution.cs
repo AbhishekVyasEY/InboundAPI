@@ -179,7 +179,7 @@ namespace ManageCase
                                 ldRtPrm.Message = $" {string.Join(", ", errors.ToArray())} are mandatory";
                             }
                         }
-                        else if (await this._commonFunc.checkDuplicate(CaseData.UCIC.ToString(), CaseData.AccountNumber.ToString(), CaseData.Category.ToString(), CaseData.SubCategory.ToString()))
+                        else if (await this._commonFunc.checkDuplicate(CaseData.UCIC?.ToString(), CaseData.AccountNumber?.ToString(), CaseData.Category?.ToString(), CaseData.SubCategory?.ToString()))
                         {
                             this._logger.LogInformation("ValidateCreateCase", "Case already exists in the system");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
@@ -398,7 +398,7 @@ namespace ManageCase
                 await this._commonFunc.getSourceId(CaseData.Source.ToString());
                 await this._commonFunc.getCustomer_Id(CaseData.UCIC?.ToString());
                 await this._commonFunc.getCategoryId(CaseData.Category?.ToString());
-                await this._commonFunc.getAccount_Id(CaseData.AccountNumber.ToString());
+                await this._commonFunc.getAccount_Id(CaseData.AccountNumber?.ToString());
                 await this._commonFunc.getclassificationId(CaseData.Classification.ToString());
 
                 var Batch_results1 = await this._queryParser.GetBatchResult();
@@ -417,7 +417,7 @@ namespace ManageCase
                 {
                     this._logger.LogInformation("CreateCase", "Channel not found.");
                     csRtPrm.ReturnCode = "CRM-ERROR-102";
-                    csRtPrm.Message = "Channel not found.";
+                    csRtPrm.Message = "Channel not found."; 
                     return csRtPrm;
                 }
 

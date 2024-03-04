@@ -21,7 +21,6 @@
 
     public class FhDgCustLeadExecution : IFhDgCustLeadExecution
     {
-
         private ILoggers _logger;
         private IQueryParser _queryParser;
         public string Bank_Code { set; get; }
@@ -251,100 +250,189 @@
                     Generalind general = new Generalind();
                     general.DDEId = DDEDetails[0].eqs_dataentryoperator.ToString();
                     await this._commonFunc.getAccountapplicantName(DDEDetails[0]._eqs_accountapplicantid_value.ToString());
-                    general.EntityType = await this._commonFunc.getEntityName(DDEDetails[0]._eqs_entitytypeid_value.ToString());
-                    await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
-                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchid_value.ToString());
-                    await this._commonFunc.getBranchText(DDEDetails[0]._eqs_custpreferredbranchid_value.ToString());
-                    await this._commonFunc.getAccRelationshipText(DDEDetails[0]._eqs_accountrelationship_value.ToString());
-                    await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
-                    await this._commonFunc.getLeadsourceName(DDEDetails[0]._eqs_leadsourceid_value.ToString());
-                    await this._commonFunc.getSystemuserName(DDEDetails[0]._eqs_leadcreatedby_value.ToString());
-                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_nationalityid_value.ToString());
-                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryofbirthid_value.ToString());
-                    await this._commonFunc.getCountryText(DDEDetails[0]._eqs_countryid_value.ToString());
-                    await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
-                    await this._commonFunc.getcorporatemasterText(DDEDetails[0]._eqs_corporatecompanyid_value.ToString());
-                    await this._commonFunc.getdesignationmasterText(DDEDetails[0]._eqs_designationid_value.ToString());
+                    general.EntityType = "Individual";
 
-                    var Batch_results1 = await this._queryParser.GetBatchResult();
-
-                    general.AccountApplicant = (Batch_results1[0]["eqs_name"] != null) ? Batch_results1[0]["eqs_name"].ToString() : "";
-                    general.SubEntityType = (Batch_results1[1]["eqs_key"] != null) ? Batch_results1[1]["eqs_key"].ToString() : "";
-
-                    general.IsPrimaryHolder = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isprimaryholder", DDEDetails[0].eqs_isprimaryholder.ToString());
-                    general.ResidencyType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_residencytypecode", DDEDetails[0].eqs_residencytypecode.ToString());
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_accountapplicantid_value.ToString()))
+                    {
+                        general.AccountApplicant = DDEDetails[0]["_eqs_accountapplicantid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_subentitytypeid_value.ToString()))
+                    {
+                        general.SubEntityType = DDEDetails[0]["eqs_subentitytypeId"]["eqs_key"].ToString();
+                    }
+                    if (DDEDetails[0]["eqs_isprimaryholder@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.IsPrimaryHolder = DDEDetails[0]["eqs_isprimaryholder@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_residencytypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.ResidencyType = DDEDetails[0]["eqs_residencytypecode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     general.LGCode = DDEDetails[0].eqs_lgcode.ToString();
                     general.LCCode = DDEDetails[0].eqs_lccode.ToString();
 
-                    general.SourceBranch = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : ""; 
-                    general.CustomerspreferredBranch = (Batch_results1[3]["eqs_branchidvalue"] != null) ? Batch_results1[3]["eqs_branchidvalue"].ToString() : "";
-
-                    general.RelationshiptoPrimaryHolder = await this._commonFunc.getRelationshipText(DDEDetails[0]._eqs_relationshiptoprimaryholder_value.ToString());
-                    general.AccountRelationship = (Batch_results1[4]["eqs_key"] != null) ? Batch_results1[4]["eqs_key"].ToString() : "";
-
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_sourcebranchid_value.ToString()))
+                    {
+                        general.SourceBranch = DDEDetails[0]["eqs_sourcebranchId"]["eqs_branchidvalue"].ToString();
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_custpreferredbranchid_value.ToString()))
+                    {
+                        general.CustomerspreferredBranch = DDEDetails[0]["eqs_custpreferredbranchId"]["eqs_branchidvalue"].ToString();
+                    }
+                    if (DDEDetails[0]["_eqs_relationshiptoprimaryholder_value@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.RelationshiptoPrimaryHolder = DDEDetails[0]["_eqs_relationshiptoprimaryholder_value@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_accountrelationship_value.ToString()))
+                    {
+                        general.AccountRelationship = DDEDetails[0]["eqs_AccountRelationship"]["eqs_key"].ToString();
+                    }
                     general.PhysicalAOFnumber = DDEDetails[0].eqs_physicalaornumber.ToString();
                     general.IsMFICustomer = DDEDetails[0].eqs_ismficustomer.ToString();
-                    general.IsDeferral = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_deferralcode", DDEDetails[0].eqs_deferralcode.ToString());
-                    general.PurposeofCreation = (Batch_results1[5]["eqs_name"] != null) ? Batch_results1[5]["eqs_name"].ToString() : "";
+                    if (DDEDetails[0]["eqs_deferralcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.IsDeferral = DDEDetails[0]["eqs_deferralcode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_purposeofcreationid_value.ToString()))
+                    {
+                        general.PurposeofCreation = DDEDetails[0]["_eqs_purposeofcreationid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                    }
                     general.InstaKitCustomerId = DDEDetails[0].eqs_instakitcustomerid.ToString();
-
-                    general.Deferral = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isdeferral", DDEDetails[0].eqs_isdeferral.ToString());
+                    if (DDEDetails[0]["eqs_isdeferral@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.Deferral = DDEDetails[0]["eqs_isdeferral@OData.Community.Display.V1.FormattedValue"];
+                    }
                     general.CustomerIdCreated = DDEDetails[0].eqs_customeridcreated.ToString();
-                    general.DataValidated = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_datavalidated", DDEDetails[0].eqs_datavalidated.ToString());
+                    if (DDEDetails[0]["eqs_datavalidated@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.DataValidated = DDEDetails[0]["eqs_datavalidated@OData.Community.Display.V1.FormattedValue"];
+                    }
                     general.LeadNumber = DDEDetails[0].eqs_leadnumber.ToString();
                     general.LeadChannel = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_sourcingchannelcode", DDEDetails[0].eqs_sourcingchannelcode.ToString());
-                    general.SourceofLead = (Batch_results1[6]["eqs_name"] != null) ? Batch_results1[6]["eqs_name"].ToString() : "";
+                    if (DDEDetails[0]["eqs_sourcingchannelcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        general.LeadChannel = DDEDetails[0]["eqs_sourcingchannelcode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_leadsourceid_value.ToString()))
+                    {
+                        general.SourceofLead = DDEDetails[0]["_eqs_leadsourceid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                    }
                     general.Leadcreatedon = DDEDetails[0].eqs_leadcreatedon.ToString();
-                    general.Leadcreatedby = (Batch_results1[7]["fullname"] != null) ? Batch_results1[7]["fullname"].ToString() : "";
 
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_leadcreatedby_value.ToString()))
+                    {
+                        general.Leadcreatedby = DDEDetails[0]["eqs_leadcreatedby"]["fullname"].ToString();
+                    }
 
                     csRtPrm.general = general;
 
                     /*********** Prospect Details *********/
                     ProspectDetails prospectDetails = new ProspectDetails();
 
-                    prospectDetails.Gender = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_gendercode", DDEDetails[0].eqs_gendercode.ToString());
+                    if (DDEDetails[0]["eqs_gendercode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.Gender = DDEDetails[0]["eqs_gendercode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     prospectDetails.ShortName = DDEDetails[0].eqs_shortname.ToString();
                     prospectDetails.EmailID = DDEDetails[0].eqs_emailid.ToString();
-                    prospectDetails.Nationality = (Batch_results1[8]["eqs_countrycode"] != null) ? Batch_results1[8]["eqs_countrycode"].ToString() : "";
-                    prospectDetails.Countryofbirth = (Batch_results1[9]["eqs_countrycode"] != null) ? Batch_results1[9]["eqs_countrycode"].ToString() : "";
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_nationalityid_value.ToString()))
+                    {
+                        prospectDetails.Nationality = DDEDetails[0]["eqs_nationalityId"]["eqs_countrycode"].ToString();
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_countryofbirthid_value.ToString()))
+                    {
+                        prospectDetails.Countryofbirth = DDEDetails[0]["eqs_countryofbirthId"]["eqs_countrycode"].ToString();
+                    }
 
                     prospectDetails.FathersName = DDEDetails[0].eqs_fathername.ToString();
                     prospectDetails.MothersMaidenName = DDEDetails[0].eqs_mothermaidenname.ToString();
                     prospectDetails.SpouseName = DDEDetails[0].eqs_spousename.ToString();
 
-                    prospectDetails.Country = (Batch_results1[10]["eqs_countrycode"] != null) ? Batch_results1[10]["eqs_countrycode"].ToString() : "";
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_countryid_value.ToString()))
+                    {
+                        prospectDetails.Country = DDEDetails[0]["eqs_countryId"]["eqs_countrycode"].ToString();
+                    }
                     prospectDetails.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
-                    prospectDetails.Program = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_programcode", DDEDetails[0].eqs_programcode.ToString());
-                    prospectDetails.Education = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_educationcode", DDEDetails[0].eqs_educationcode.ToString());
-                    prospectDetails.MaritalStatus = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_maritalstatuscode", DDEDetails[0].eqs_maritalstatuscode.ToString());
-                    prospectDetails.Profession = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_professioncode", DDEDetails[0].eqs_professioncode.ToString());
-                    prospectDetails.AnnualIncomeBand = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_annualincomebandcode", DDEDetails[0].eqs_annualincomebandcode.ToString());
-                    prospectDetails.EmployerType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_employertypecode", DDEDetails[0].eqs_employertypecode.ToString());
+                    if (DDEDetails[0]["eqs_programcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.Program = DDEDetails[0]["eqs_programcode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["_eqs_qualificationid_value"] != null)
+                    {
+                        prospectDetails.Education = DDEDetails[0]["_eqs_qualificationid_value@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_maritalstatuscode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.MaritalStatus = DDEDetails[0]["eqs_maritalstatuscode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["_eqs_occupationid_value"] != null)
+                    {
+                        prospectDetails.Profession = DDEDetails[0]["_eqs_occupationid_value@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_annualincomebandcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.AnnualIncomeBand = DDEDetails[0]["eqs_annualincomebandcode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_employertypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.EmployerType = DDEDetails[0]["eqs_employertypecode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     prospectDetails.EmployerName = DDEDetails[0].eqs_empname.ToString();
                     prospectDetails.OfficePhone = DDEDetails[0].eqs_officephone.ToString();
 
                     prospectDetails.EstimatedAgriculturalIncome = DDEDetails[0].eqs_agriculturalincome.ToString();
                     prospectDetails.EstimatedNonAgriculturalIncome = DDEDetails[0].eqs_nonagriculturalincome.ToString();
-                    prospectDetails.IsStaff = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isstaffcode", DDEDetails[0].eqs_isstaffcode.ToString());
+                    if (DDEDetails[0]["eqs_isstaffcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.IsStaff = DDEDetails[0]["eqs_isstaffcode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     prospectDetails.EquitasStaffCode = DDEDetails[0].eqs_equitasstaffcode.ToString();
-                    prospectDetails.Language = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_languagecode", DDEDetails[0].eqs_languagecode.ToString());
-                    prospectDetails.PolitcallyExposedPerson = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_ispep", DDEDetails[0].eqs_ispep.ToString());
-                    prospectDetails.LOBCode = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_lobcode", DDEDetails[0].eqs_lobcode.ToString());
-                    prospectDetails.AOBusinessOperation = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_aobocode", DDEDetails[0].eqs_aobocode.ToString());
-
-                    prospectDetails.Title = (Batch_results1[11]["eqs_name"] != null) ? Batch_results1[11]["eqs_name"].ToString() : "";
+                    if (DDEDetails[0]["eqs_languagecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.Language = DDEDetails[0]["eqs_languagecode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_ispep@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.PolitcallyExposedPerson = DDEDetails[0]["eqs_ispep@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_lobcode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.LOBCode = DDEDetails[0]["eqs_lobcode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_aobocode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.AOBusinessOperation = DDEDetails[0]["eqs_aobocode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_titleid_value.ToString()))
+                    {
+                        prospectDetails.Title = DDEDetails[0]["_eqs_titleid_value@OData.Community.Display.V1.FormattedValue"].ToString();
+                    }
                     prospectDetails.Firstname = DDEDetails[0].eqs_firstname.ToString();
                     prospectDetails.MiddleName = DDEDetails[0].eqs_middlename.ToString();
                     prospectDetails.LastName = DDEDetails[0].eqs_lastname.ToString();
                     prospectDetails.DateofBirth = DDEDetails[0].eqs_dob.ToString();
                     prospectDetails.Age = DDEDetails[0].eqs_age.ToString();
                     prospectDetails.MobileNumber = DDEDetails[0].eqs_mobilenumber.ToString();
-                    prospectDetails.IsPhysicallyChallenged = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_isphysicallychallenged", DDEDetails[0].eqs_isphysicallychallenged.ToString());
-                    prospectDetails.WorkPlaceAddress = (Batch_results1[11]["eqs_corporatecode"] != null) ? Batch_results1[11]["eqs_corporatecode"].ToString() : "";
-                    prospectDetails.Designation = (Batch_results1[12]["eqs_name"] != null) ? Batch_results1[12]["eqs_name"].ToString() : "";
-                    prospectDetails.LOBType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_lob", DDEDetails[0].eqs_lob.ToString());
-
+                    if (DDEDetails[0]["eqs_isphysicallychallenged@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.IsPhysicallyChallenged = DDEDetails[0]["eqs_isphysicallychallenged@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_corporatecompanyid_value.ToString()))
+                    {
+                        prospectDetails.WorkPlaceAddress = DDEDetails[0]["eqs_corporatecompanyid"]["eqs_corporatecode"].ToString();
+                    }
+                    //if (!string.IsNullOrEmpty(DDEDetails[0]._eqs_designationid_value.ToString()))
+                    //{
+                    //    prospectDetails.Designation = DDEDetails[0]["eqs_subentitytypeId"]["eqs_name"].ToString();
+                    //}
+                    if (DDEDetails[0]["_eqs_designationid_value@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.Designation = DDEDetails[0]["_eqs_designationid_value@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_lob@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        prospectDetails.LOBType = DDEDetails[0]["eqs_lob@OData.Community.Display.V1.FormattedValue"];
+                    }
                     csRtPrm.prospectDetails = prospectDetails;
 
 
@@ -353,10 +441,16 @@
 
                     identification.PassportNumber = DDEDetails[0].eqs_pannumber.ToString();
                     identification.CKYCreferenceNumber = DDEDetails[0].eqs_ckycreferencenumber.ToString();
-                    identification.KYCVerificationMode = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_kycverificationmodecode", DDEDetails[0].eqs_kycverificationmodecode.ToString());
+                    if (DDEDetails[0]["eqs_kycverificationmodecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        identification.KYCVerificationMode = DDEDetails[0]["eqs_kycverificationmodecode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     identification.VerificationDate = DDEDetails[0].eqs_verificationdate.ToString();
 
-                    identification.PanForm60 = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_panform60code", DDEDetails[0].eqs_panform60code.ToString());
+                    if (DDEDetails[0]["eqs_panform60code@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        identification.PanForm60 = DDEDetails[0]["eqs_panform60code@OData.Community.Display.V1.FormattedValue"];
+                    }
                     identification.PanNumber = DDEDetails[0].eqs_pannumber.ToString();
                     identification.AadharReference = DDEDetails[0].eqs_aadharreference.ToString();
                     identification.InternalPAN = DDEDetails[0].eqs_internalpan.ToString();
@@ -388,7 +482,10 @@
                         Address address = new Address();
                         address.AddressId = addressItem.eqs_name.ToString();
                         address.ApplicantAddress = addressItem.eqs_applicantaddressid.ToString();
-                        address.AddressType = await this._queryParser.getOptionSetValuToText("eqs_leadaddress", "eqs_addresstypecode", addressItem.eqs_addresstypecode.ToString());
+                        if (addressItem["eqs_addresstypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                        {
+                            address.AddressType = addressItem["eqs_addresstypecode@OData.Community.Display.V1.FormattedValue"];
+                        }
                         address.AddressLine1 = addressItem.eqs_addressline1.ToString();
                         address.AddressLine2 = addressItem.eqs_addressline2.ToString();
                         address.AddressLine3 = addressItem.eqs_addressline3.ToString();
@@ -397,26 +494,31 @@
                         address.FaxNumber = addressItem.eqs_faxnumber.ToString();
                         address.OverseasMobileNumber = addressItem.eqs_overseasmobilenumber.ToString();
 
-                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();                        
+                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();
                         address.District = addressItem.eqs_district.ToString();
 
-                        await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
-                        await this._commonFunc.getStateText(addressItem._eqs_stateid_value.ToString());
-                        await this._commonFunc.getCountryText(addressItem._eqs_countryid_value.ToString());
-
-                        var Batch_results2 = await this._queryParser.GetBatchResult();
-
-                        address.City = (Batch_results2[0]["eqs_citycode"] != null) ? Batch_results2[0]["eqs_citycode"].ToString() : "";
-                        address.State = (Batch_results2[1]["eqs_statecode"] != null) ? Batch_results2[1]["eqs_statecode"].ToString() : "";
-                        address.Country = (Batch_results2[2]["eqs_countrycode"] != null) ? Batch_results2[2]["eqs_countrycode"].ToString() : "";
+                        if (!string.IsNullOrEmpty(addressItem._eqs_cityid_value.ToString()))
+                        {
+                            address.City = addressItem["eqs_cityid"]["eqs_citycode"].ToString();
+                        }
+                        if (!string.IsNullOrEmpty(addressItem._eqs_stateid_value.ToString()))
+                        {
+                            address.State = addressItem["eqs_stateid"]["eqs_statecode"].ToString();
+                        }
+                        if (!string.IsNullOrEmpty(addressItem._eqs_countryid_value.ToString()))
+                        {
+                            address.Country = addressItem["eqs_countryid"]["eqs_countrycode"].ToString();
+                        }
 
                         address.PinCode = addressItem.eqs_zipcode.ToString();
                         address.POBox = addressItem.eqs_pobox.ToString();
                         address.Landmark = addressItem.eqs_landmark.ToString();
                         address.LandlineNumber = addressItem.eqs_landlinenumber.ToString();
                         address.AlternateMobileNumber = addressItem.eqs_alternatemobilenumber.ToString();
-                        address.LocalOverseas = await this._queryParser.getOptionSetValuToText("eqs_leadaddress", "eqs_localoverseas", addressItem.eqs_localoverseas.ToString());
-
+                        if (addressItem["eqs_localoverseas@OData.Community.Display.V1.FormattedValue"] != null)
+                        {
+                            address.LocalOverseas = addressItem["eqs_localoverseas@OData.Community.Display.V1.FormattedValue"];
+                        }
                         csRtPrm.address.Add(address);
                     }
 
@@ -434,15 +536,10 @@
 
                     /*********** FATCA *********/
                     FATCA fATCA = new FATCA();
-                    if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
+                    if (!string.IsNullOrEmpty(DDEDetails[0]["eqs_taxresident@OData.Community.Display.V1.FormattedValue"].ToString()))
                     {
-                        fATCA.TaxResident = "Tax Resident of India";
+                        fATCA.TaxResident = DDEDetails[0]["eqs_taxresident@OData.Community.Display.V1.FormattedValue"].ToString();
                     }
-                    else if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == true)
-                    {
-                        fATCA.TaxResident = "Tax Resident of India and other countries";
-                    }
-                    // fATCA.TaxResident =  DDEDetails[0].eqs_taxresident.ToString(); 
                     fATCA.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
 
                     FATCADetails fATCAobj = new FATCADetails();
@@ -450,32 +547,30 @@
                     foreach (var fatcaitem in fatcaDetail)
                     {
                         fATCAobj.FATCAID = fatcaitem.eqs_name.ToString();
-                        //fATCAobj.TaxResident = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_taxresident", DDEDetails[0].eqs_taxresident.ToString());
-                        if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == false)
+                        if (!string.IsNullOrEmpty(DDEDetails[0]["eqs_taxresident@OData.Community.Display.V1.FormattedValue"].ToString()))
                         {
-                            fATCA.TaxResident = "Tax Resident of India";
+                            fATCA.TaxResident = DDEDetails[0]["eqs_taxresident@OData.Community.Display.V1.FormattedValue"].ToString();
                         }
-                        else if (!string.IsNullOrEmpty(DDEDetails[0].eqs_taxresident.ToString()) && DDEDetails[0].eqs_taxresident == true)
-                        {
-                            fATCA.TaxResident = "Tax Resident of India and other countries";
-                        }
-                        fATCAobj.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
-                        fATCAobj.FATCADeclaration = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_fatcadeclaration", fatcaitem.eqs_fatcadeclaration.ToString());
 
+                        fATCAobj.CityofBirth = DDEDetails[0].eqs_cityofbirth.ToString();
+                        if (fatcaitem["eqs_fatcadeclaration@OData.Community.Display.V1.FormattedValue"] != null)
+                        {
+                            fATCAobj.FATCADeclaration = fatcaitem["eqs_fatcadeclaration@OData.Community.Display.V1.FormattedValue"];
+                        }
 
                         fATCAobj.Country = await this._commonFunc.getCountry_Text(fatcaDetail[0]._eqs_countryid_value.ToString());
                         fATCAobj.OtherIdentificationNumber = fatcaitem.eqs_otheridentificationnumber.ToString();
                         fATCAobj.TaxIdentificationNumber = fatcaitem.eqs_taxidentificationnumber.ToString();
-                        fATCAobj.AddressType = await this._queryParser.getOptionSetValuToText("eqs_customerfactcaother", "eqs_addresstype", fatcaitem.eqs_addresstype.ToString());
-
+                        if (fatcaitem["eqs_addresstype@OData.Community.Display.V1.FormattedValue"] != null)
+                        {
+                            fATCAobj.AddressType = fatcaitem["eqs_addresstype@OData.Community.Display.V1.FormattedValue"];
+                        }
                         addressDetail = await this._commonFunc.getFATCAAddress(fatcaitem.eqs_customerfactcaotherid.ToString());
 
                         if (addressDetail.Count > 0)
                         {
                             FATCAAddress fATCAAddress = new FATCAAddress();
                             fATCAAddress.FATCAAddressID = addressDetail[0].eqs_name.ToString();
-
-
                             fATCAAddress.AddressLine1 = addressDetail[0].eqs_addressline1.ToString();
                             fATCAAddress.AddressLine2 = addressDetail[0].eqs_addressline2.ToString();
                             fATCAAddress.AddressLine3 = addressDetail[0].eqs_addressline3.ToString();
@@ -484,27 +579,30 @@
                             fATCAAddress.FaxNumber = addressDetail[0].eqs_faxnumber.ToString();
                             fATCAAddress.OverseasMobileNumber = addressDetail[0].eqs_overseasmobilenumber.ToString();
 
-                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();                            
+                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();
                             fATCAAddress.District = addressDetail[0].eqs_district.ToString();
 
-                            await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
-                            await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
-                            await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
-
-                            var Batch_results3 = await this._queryParser.GetBatchResult();
-
-                            fATCAAddress.City = (Batch_results3[0]["eqs_citycode"] != null) ? Batch_results3[0]["eqs_citycode"].ToString() : "";
-                            fATCAAddress.State = (Batch_results3[1]["eqs_statecode"] != null) ? Batch_results3[1]["eqs_statecode"].ToString() : "";
-                            fATCAAddress.Country = (Batch_results3[2]["eqs_countrycode"] != null) ? Batch_results3[2]["eqs_countrycode"].ToString() : "";
-
-
+                            if (!string.IsNullOrEmpty(addressDetail[0]._eqs_cityid_value.ToString()))
+                            {
+                                fATCAAddress.City = addressDetail[0]["eqs_cityid"]["eqs_citycode"].ToString();
+                            }
+                            if (!string.IsNullOrEmpty(addressDetail[0]._eqs_stateid_value.ToString()))
+                            {
+                                fATCAAddress.State = addressDetail[0]["eqs_stateid"]["eqs_statecode"].ToString();
+                            }
+                            if (!string.IsNullOrEmpty(addressDetail[0]._eqs_countryid_value.ToString()))
+                            {
+                                fATCAAddress.Country = addressDetail[0]["eqs_countryid"]["eqs_countrycode"].ToString();
+                            }
                             fATCAAddress.PinCode = addressDetail[0].eqs_zipcode.ToString();
                             fATCAAddress.POBox = addressDetail[0].eqs_pobox.ToString();
                             fATCAAddress.Landmark = addressDetail[0].eqs_landmark.ToString();
                             fATCAAddress.LandlineNumber = addressDetail[0].eqs_landlinenumber.ToString();
                             fATCAAddress.AlternateMobileNumber = addressDetail[0].eqs_alternatemobilenumber.ToString();
-                            fATCAAddress.LocalOverseas = await this._queryParser.getOptionSetValuToText("eqs_leadaddress", "eqs_localoverseas", addressDetail[0].eqs_localoverseas.ToString());
-
+                            if (addressDetail[0]["eqs_localoverseas@OData.Community.Display.V1.FormattedValue"] != null)
+                            {
+                                fATCAAddress.LocalOverseas = addressDetail[0]["eqs_localoverseas@OData.Community.Display.V1.FormattedValue"];
+                            }
                             fATCAobj.Address = fATCAAddress;
                         }
 
@@ -516,12 +614,20 @@
                     /*********** NRI Details *********/
                     NRIDetails nRIDetails = new NRIDetails();
 
-                    nRIDetails.VisaType = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_visatypecode", DDEDetails[0].eqs_visatypecode.ToString());
+                    if (DDEDetails[0]["eqs_visatypecode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        nRIDetails.VisaType = DDEDetails[0]["eqs_visatypecode@OData.Community.Display.V1.FormattedValue"];
+                    }
                     nRIDetails.VisaIssuedDate = DDEDetails[0].eqs_visaissueddate.ToString();
                     nRIDetails.VisaExpiryDate = DDEDetails[0].eqs_visaexpirydate.ToString();
-                    nRIDetails.KYCMode = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_kycmode", DDEDetails[0].eqs_kycmode.ToString());
-
-                    nRIDetails.Seafarer = await this._queryParser.getOptionSetValuToText("eqs_ddeindividualcustomer", "eqs_seafarer", DDEDetails[0].eqs_seafarer.ToString());
+                    if (DDEDetails[0]["eqs_kycmode@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        nRIDetails.KYCMode = DDEDetails[0]["eqs_kycmode@OData.Community.Display.V1.FormattedValue"];
+                    }
+                    if (DDEDetails[0]["eqs_seafarer@OData.Community.Display.V1.FormattedValue"] != null)
+                    {
+                        nRIDetails.Seafarer = DDEDetails[0]["eqs_seafarer@OData.Community.Display.V1.FormattedValue"];
+                    }
                     nRIDetails.VISAOCICDCNumber = DDEDetails[0].eqs_visanumber.ToString();
                     nRIDetails.TaxIdentificationNumber = DDEDetails[0].eqs_taxidentificationnumber.ToString();
                     nRIDetails.ResidenceStatus = DDEDetails[0].eqs_residencestatuscode.ToString();
@@ -685,7 +791,7 @@
                         address.FaxNumber = addressItem.eqs_faxnumber.ToString();
                         address.OverseasMobileNumber = addressItem.eqs_overseasmobilenumber.ToString();
 
-                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();                       
+                        address.PinCodeMaster = addressItem.eqs_pincode.ToString();
                         address.District = addressItem.eqs_district.ToString();
 
                         await this._commonFunc.getCityText(addressItem._eqs_cityid_value.ToString());
@@ -782,9 +888,9 @@
                             fATCAAddress.FaxNumber = addressDetail[0].eqs_faxnumber.ToString();
                             fATCAAddress.OverseasMobileNumber = addressDetail[0].eqs_overseasmobilenumber.ToString();
 
-                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();                            
+                            fATCAAddress.PinCodeMaster = addressDetail[0].eqs_pincode.ToString();
                             fATCAAddress.District = addressDetail[0].eqs_district.ToString();
-                            
+
                             await this._commonFunc.getCityText(addressDetail[0]._eqs_cityid_value.ToString());
                             await this._commonFunc.getStateText(addressDetail[0]._eqs_stateid_value.ToString());
                             await this._commonFunc.getCountryText(addressDetail[0]._eqs_countryid_value.ToString());
@@ -1026,7 +1132,6 @@
                 string dd = dob.Day.ToString().PadLeft(2, '0');
                 fetchCustD0Return.CorporateEntry.DateOfIncorporation = dd + "/" + mm + "/" + yy;
             }
-
             return fetchCustD0Return;
         }
     }
