@@ -223,6 +223,10 @@
             return await this.getIDfromMSDTable("eqs_rmemployees", "eqs_rmemployeeid", "eqs_rmempidslot", Code);
         }
 
+        public async Task getBankName(string bankid)
+        {
+            await this.SetBatchForMSD("eqs_bankmasters", "eqs_name", "eqs_ddecorporatecustomerid", bankid);
+        }
         public async Task getBranchText(string BranchwId)
         {
             await this.SetBatchForMSD("eqs_branchs", "eqs_branchidvalue", "eqs_branchid", BranchwId);
@@ -269,7 +273,15 @@
         }
         public async Task getStateText(string StateID)
         {
-            await this.getIDfromMSDTable("eqs_states", "eqs_statecode", "eqs_stateid", StateID);
+            await this.SetBatchForMSD("eqs_states", "eqs_statecode", "eqs_stateid", StateID);
+        }
+        public async Task getBusinessTypeText(string businessTypeId)
+        {
+            await this.SetBatchForMSD("eqs_businesstypes", "eqs_name", "eqs_businesstypeid", businessTypeId);
+        }
+        public async Task getIndustryText(string industryId)
+        {
+            await this.SetBatchForMSD("eqs_businessnatures", "eqs_name", "eqs_businessnatureid", industryId);
         }
 
         public async Task<string> getTitleId(string Title)
@@ -435,18 +447,12 @@
         {
             return await this.getIDfromMSDTable("eqs_businesstypes", "eqs_businesstypeid", "eqs_name", businessTypeCode);
         }
-        public async Task<string> getBusinessTypeText(string businessTypeId)
-        {
-            return await this.getIDfromMSDTable("eqs_businesstypes", "eqs_name", "eqs_businesstypeid", businessTypeId);
-        }
+       
         public async Task<string> getIndustryId(string industryName)
         {
             return await this.getIDfromMSDTable("eqs_businessnatures", "eqs_businessnatureid", "eqs_name", industryName);
         }
-        public async Task<string> getIndustryText(string industryId)
-        {
-            return await this.getIDfromMSDTable("eqs_businessnatures", "eqs_name", "eqs_businessnatureid", industryId);
-        }
+       
         public async Task<string> getBOId(string BOid)
         {
             return await this.getIDfromMSDTable("eqs_customerbos", "eqs_customerboid", "eqs_boid", BOid);
@@ -485,10 +491,7 @@
             return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_leadsourceidvalue",  leadsourceid);
         }
         
-        public async Task<string> getBankName(string bankid)
-        {
-            return await this.getIDfromMSDTable("eqs_bankmasters", "eqs_name", "eqs_ddecorporatecustomerid", bankid);
-        }
+       
 
         public async Task<string> getKYCVerificationID(string DDEId, string type)
         {
