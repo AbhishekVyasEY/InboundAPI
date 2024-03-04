@@ -68,6 +68,7 @@ namespace ManageCase
         public string Channel { get; set; }
         public string Source { get; set; }
         public string Priority { get; set; }
+        public bool isdocumentsavailable { get; set; }
         public JObject AdditionalField { get; set; }
         public string ReturnCode { get; set; }               
         public string Message { get; set; }
@@ -95,6 +96,7 @@ namespace ManageCase
         public string Channel { get; set; }
         public string Source { get; set; }
         public string Priority { get; set; }
+        public bool isdocumentsavailable { get; set; }
         public JObject AdditionalField { get; set; }
 
     }
