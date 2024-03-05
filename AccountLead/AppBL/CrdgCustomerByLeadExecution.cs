@@ -247,7 +247,10 @@
                             {
                                 msgBdy.individualCustomer.relation = AccountDDE[0]["eqs_relationshiptoprimaryholder"]["eqs_relationship"].ToString();
                             }
-                            msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_emailid"]?.ToString()))
+                            {
+                                msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+                            }
                             firstName = AccountDDE[0]["eqs_firstname"].ToString();
                             msgBdy.individualCustomer.name.firstName = firstName;
                             lastName = AccountDDE[0]["eqs_lastname"].ToString();
@@ -438,7 +441,10 @@
                             string yy = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(6, 4);
                             msgBdy.corporateCustomer.dateOfBirthOrRegistration = yy + mm + dd;
                             msgBdy.corporateCustomer.customerMobilePhone = AccountDDE[0]["eqs_pocphonenumber"].ToString();
-                            msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_emailid"]?.ToString()))
+                            {
+                                msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
+                            }
 
                             msgBdy.corporateCustomers.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
 
