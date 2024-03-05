@@ -101,13 +101,13 @@
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
                     {
-                        var catId = await this._commonFunc.getDocumentDateConfig();
+                        var masterConfigurations = await this._commonFunc.getDocumentDateConfig();
                         if (RequestData.Document?.Count > 0)
                         {
                             foreach (var item in RequestData.Document)
                             {
                                 DocUpdateStatus updateDocument = new DocUpdateStatus();
-                                var Fieldvalidation = this.ValidateDocumentData(item, catId);
+                                var Fieldvalidation = this.ValidateDocumentData(item, masterConfigurations);
                                 if (Fieldvalidation == "ok")
                                 {
                                     if (!string.IsNullOrEmpty(item.CRMDocumentID.ToString()))
@@ -199,22 +199,23 @@
                 if (!string.IsNullOrEmpty(subcatId))
                 {
                     odatab.Add("eqs_docsubcategory@odata.bind", $"eqs_docsubcategories({subcatId})");
+                    string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString(), subcatId);
+                    if (!string.IsNullOrEmpty(doctype))
+                    {
+                        odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
+                    }
+                    else
+                    {
+                        error = 1;
+                        errorT.Add("Doctype");
+                    }
                 }
                 else
                 {
                     error = 1;
                     errorT.Add("Sub-Category");
                 }
-                string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString());
-                if (!string.IsNullOrEmpty(doctype))
-                {
-                    odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
-                }
-                else
-                {
-                    error = 1;
-                    errorT.Add("Doctype");
-                }
+                
 
                 if (error==1)
                 {
@@ -331,6 +332,16 @@
                     if (!string.IsNullOrEmpty(subcatId))
                     {
                         odatab.Add("eqs_docsubcategory@odata.bind", $"eqs_docsubcategories({subcatId})");
+                        string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString(), subcatId);
+                        if (!string.IsNullOrEmpty(doctype))
+                        {
+                            odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
+                        }
+                        else
+                        {
+                            error = 1;
+                            errorT.Add("Doctype");
+                        }
                     }
                     else
                     {
@@ -338,16 +349,7 @@
                         errorT.Add("Sub-Category");
                     }
 
-                    string doctype = await this._commonFunc.getDocTypeId(documentdtl.DocumentType.ToString());
-                    if (!string.IsNullOrEmpty(doctype))
-                    {
-                        odatab.Add("eqs_doctype@odata.bind", $"eqs_doctypes({doctype})");
-                    }
-                    else
-                    {
-                        error = 1;
-                        errorT.Add("Doctype");
-                    }
+                    
 
                     if (error == 1)
                     {
@@ -567,6 +569,38 @@
                 fields.Add("DocumentType");
                 ValidationError = 1;
             }
+            else
+            {
+                if (expirydateCategories.Contains(documentdtl.DocumentType.ToString()) || issuedateCategories.Contains(documentdtl.DocumentType.ToString()))
+                {
+                    if ((string.IsNullOrEmpty(documentdtl.ExpiryDate.ToString()) || (string.IsNullOrEmpty(documentdtl.IssueDate.ToString()))))
+                    {
+                        if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
+                        {
+                            fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.DocumentType.ToString()}");
+                            ValidationError = 1;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()))
+                            {
+                                fields.Add($"ExpiryDate cannot be empty for Sub Category {documentdtl.DocumentType.ToString()}");
+                                ValidationError = 1;
+                            }
+                            if (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))
+                            {
+                                fields.Add($"IssueDate cannot be empty for Sub Category {documentdtl.DocumentType.ToString()}");
+                                ValidationError = 1;
+                            }
+                        }
+                    }
+                    else if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
+                    {
+                        fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.DocumentType.ToString()}");
+                        ValidationError = 1;
+                    }
+                }
+            }
             if (string.IsNullOrEmpty(documentdtl.DmsDocumentID?.ToString()))
             {
                 fields.Add("DmsDocumentID");
@@ -582,38 +616,7 @@
                 fields.Add("SubcategoryCode");
                 ValidationError = 1;
             }
-            else
-            {
-                if (expirydateCategories.Contains(documentdtl.SubcategoryCode.ToString()) || issuedateCategories.Contains(documentdtl.SubcategoryCode.ToString()))
-                {
-                    if ((string.IsNullOrEmpty(documentdtl.ExpiryDate.ToString()) || (string.IsNullOrEmpty(documentdtl.IssueDate.ToString()))))
-                    {
-                        if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
-                        {
-                            fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
-                            ValidationError = 1;
-                        }
-                        else
-                        {
-                            if (string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()))
-                            {
-                                fields.Add($"ExpiryDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
-                                ValidationError = 1;
-                            }
-                            if (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))
-                            {
-                                fields.Add($"IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
-                                ValidationError = 1;
-                            }
-                        }
-                    }
-                    else if ((string.IsNullOrEmpty(documentdtl.ExpiryDate?.ToString()) && (string.IsNullOrEmpty(documentdtl.IssueDate?.ToString()))))
-                    {
-                        fields.Add($"ExpiryDate && IssueDate cannot be empty for Sub Category {documentdtl.SubcategoryCode.ToString()}");
-                        ValidationError = 1;
-                    }
-                }
-            }
+           
             
             if (ValidationError > 0)
             {
