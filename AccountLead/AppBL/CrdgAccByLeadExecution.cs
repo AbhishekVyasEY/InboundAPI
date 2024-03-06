@@ -154,7 +154,7 @@ namespace AccountLead
             {
 
                 string Token = await this._queryParser.getAccessToken();
-                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"WIZARDAUTH3\",\"token\":\"1001\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20161104\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"9834\",\"area\":\"91\",\"number\":\"916345343425\",\"extn\":\"2342\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\"},\"emailId\":\"sjfjg@hgsd.com\",\"name\":\"PAAVAI\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"916352673569\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\",\"line4\":\"string\",\"city\":\"Erode\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"638103\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Podiya\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMILNADU\",\"zip\":\"638103\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"137770003\",\"customerName\":\"IlangoSelvam\",\"relation\":\"SOW\"}],\"customerID\":\"137770003\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"transactionType\":\"A\",\"minorAcctStatus\":false,\"productCode\":2005,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"providerAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termMonths\":0}}}}";
+                string RequestTemplate = "{\"createAccountRequest\":{\"msgHdr\":{\"channelID\":\"FOS\",\"transactionType\":\"string\",\"transactionSubType\":\"string\",\"conversationID\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"externalReferenceId\":\"944dafbfe5904613bb9ef84d6ae59f42\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"WIZARDAUTH3\",\"token\":\"1001\"}},\"msgBdy\":{\"accountNo\":\"\",\"accountNominee\":{\"city\":\"Erode\",\"country\":\"IN\",\"dateOfBirth\":\"20161104\",\"isNomineeDisplay\":false,\"isNomineeBankCustomer\":false,\"nominee\":{\"phone\":{\"country\":\"91\",\"area\":\"91\",\"number\":\"916345343425\",\"extn\":\"2342\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\"},\"emailId\":\"sjfjg@hgsd.com\",\"name\":\"PAAVAI\"},\"guardian\":{\"phone\":{\"area\":\"293\",\"number\":\"916352673569\"},\"address\":{\"line1\":\"qsdv\",\"line2\":\"sdsvsdv\",\"line3\":\"dvxdx\",\"line4\":\"string\",\"city\":\"Erode\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"638103\"},\"emailId\":\"jnas@s1.com\",\"name\":\"Podiya\"},\"refGuardPhnCountry\":\"424\",\"refGuardPhnExtn\":\"334534\",\"relAcctHolder\":3,\"relationGuardian\":2,\"shareAmount\":100,\"sharePercentage\":100,\"state\":\"TAMILNADU\",\"zip\":\"638103\"},\"branchCode\":9999,\"customerAndRelation\":[{\"customerId\":\"137770003\",\"customerName\":\"IlangoSelvam\",\"relation\":\"SOW\"}],\"customerID\":\"137770003\",\"isJointHolder\":false,\"isRestrictAcct\":false,\"isSCWaive\":false,\"transactionType\":\"A\",\"tdValueDate\":\"2023-09-10\",\"minorAcctStatus\":false,\"productCode\":2005,\"tdaccountPayinRequest\":{\"depositAmount\":0,\"fromAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termDays\":0,\"termMonths\":0},\"rdaccountPayinRequest\":{\"installmentAmount\":0,\"payoutAccountNo\":\"\",\"providerAccountNo\":\"\",\"branchCodeGL\":\"\",\"referenceNoGL\":\"\",\"termMonths\":0}}}}";
                 dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                 dynamic msgHdr = Request_Template.createAccountRequest.msgHdr;
                 dynamic msgBdy = Request_Template.createAccountRequest.msgBdy;
@@ -284,6 +284,21 @@ namespace AccountLead
 
                                 if (Nominee.Count > 0)
                                 {
+                                    msgBdy.isRestrictAcct = false;
+                                    msgBdy.isSCWaive = false;
+                                    msgBdy.transactionType = "A";
+                                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fdvaluedate"].ToString()))
+                                    {
+                                        msgBdy.tdValueDate = AccountDDE[0]["eqs_fdvaluedate"].ToString();
+                                    }
+                                    
+
+                                    if (AccountDDE[0]["eqs_accountopeningbranchid"]!= null)
+                                    {
+                                        msgBdy.branchCode = AccountDDE[0]["eqs_accountopeningbranchid"]["eqs_branchidvalue"].ToString();
+                                    }
+                                    
+
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_city_value"].ToString()))
                                     {
                                         //  msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
@@ -291,18 +306,23 @@ namespace AccountLead
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_state_value"].ToString()))
                                     {
-                                        msgBdy.accountNominee.state = "TAMIL NADU";  //await this._commonFunc.getStateName(Nominee[0]["_eqs_state_value"].ToString());
+                                        msgBdy.accountNominee.state = await this._commonFunc.getStateName(Nominee[0]["_eqs_state_value"].ToString());  //"TAMIL NADU"; 
                                     }
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_country_value"].ToString()))
                                     {
-                                        msgBdy.accountNominee.country = "IN";    //await this._commonFunc.getCountryName(Nominee[0]["_eqs_country_value"].ToString());
+                                        msgBdy.accountNominee.country = await this._commonFunc.getCountryName(Nominee[0]["_eqs_country_value"].ToString());  //"IN"; 
                                     }
                                     DateTime nomineedob = (!string.IsNullOrEmpty(Nominee[0]["eqs_nomineedob"].ToString())) ? (DateTime)Nominee[0]["eqs_nomineedob"] : DateTime.MinValue;
                                     //string mm = Nominee[0]["eqs_nomineedob"].ToString().Substring(0, 2);
                                     //string dd = Nominee[0]["eqs_nomineedob"].ToString().Substring(3, 2);
                                     //string yy = Nominee[0]["eqs_nomineedob"].ToString().Substring(6, 4);
                                     msgBdy.accountNominee.dateOfBirth = nomineedob.ToString("yyyyMMdd");
+                                    msgBdy.accountNominee.isNomineeDisplay = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_isnomineedisplay", AccountDDE[0]["eqs_isnomineedisplay"].ToString());
+                                    msgBdy.accountNominee.refGuardPhnCountry = "9834";
+                                    msgBdy.accountNominee.refGuardPhnExtn = Nominee[0]["eqs_phoneextn"].ToString();
+                                  
+                                    msgBdy.accountNominee.relAcctHolder = Nominee[0]["eqs_guardianrelationshiptominor"]["eqs_name"].ToString();
                                     msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
 
                                     msgBdy.accountNominee.nominee.address.line1 = Nominee[0]["eqs_addressline1"].ToString();
@@ -311,6 +331,8 @@ namespace AccountLead
 
                                     msgBdy.accountNominee.nominee.emailId = Nominee[0]["eqs_emailid"].ToString();
                                     msgBdy.accountNominee.nominee.name = Nominee[0]["eqs_nomineename"].ToString();
+
+                                    msgBdy.accountNominee.nominee.phone.area = Nominee[0]["eqs_phonearea"].ToString();
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianname"].ToString()))
                                     {
@@ -328,12 +350,12 @@ namespace AccountLead
 
                                         if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardianstate_value"].ToString()))
                                         {
-                                            msgBdy.accountNominee.guardian.address.state = "TAMIL NADU"; //await this._commonFunc.getStateName(Nominee[0]["_eqs_guardianstate_value"].ToString());
+                                            msgBdy.accountNominee.guardian.address.state = await this._commonFunc.getStateName(Nominee[0]["_eqs_guardianstate_value"].ToString());  //"TAMIL NADU"; 
                                         }
 
                                         if (!string.IsNullOrEmpty(Nominee[0]["_eqs_guardiancountry_value"].ToString()))
                                         {
-                                            msgBdy.accountNominee.guardian.address.country = "IN";   //await this._commonFunc.getCountryName(Nominee[0]["_eqs_guardiancountry_value"].ToString());
+                                            msgBdy.accountNominee.guardian.address.country = await this._commonFunc.getCountryName(Nominee[0]["_eqs_guardiancountry_value"].ToString());  //"IN";  
                                         }
                                         msgBdy.accountNominee.guardian.address.zip = Nominee[0]["eqs_guardianpincode"].ToString();
                                     }
@@ -362,7 +384,7 @@ namespace AccountLead
                                             int age = GetAgeInYears(item["eqs_dob"].ToString());
                                             if (age < 18)
                                             {
-                                                if (productCode == "1048")
+                                                if (productCode == "1048" || productCode == "1047")
                                                 {
                                                     msgBdy.Remove("minorAcctStatus");
                                                 }
@@ -492,7 +514,7 @@ namespace AccountLead
                                 fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
                                 string postDataParametr = JsonConvert.SerializeObject(fieldInput);
                                 await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
-
+                                
 
                                 fieldInput = new Dictionary<string, string>();
                                 string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_onboardingstatus", "Completed");
