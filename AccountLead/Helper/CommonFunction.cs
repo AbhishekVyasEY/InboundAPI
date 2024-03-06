@@ -436,7 +436,7 @@ namespace AccountLead
         }
         public async Task<string> getCountryName(string CountryId)
         {
-            return await this.getIDfromMSDTable("eqs_countries", "eqs_name", "eqs_countryid", CountryId);
+            return await this.getIDfromMSDTable("eqs_countries", "eqs_countryalphacpde", "eqs_countryid", CountryId);
         }
 
         public async Task<string> getAccountRelation(string accRelationId)
