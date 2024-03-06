@@ -289,7 +289,8 @@ namespace AccountLead
                                     msgBdy.transactionType = "A";
                                     if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fdvaluedate"].ToString()))
                                     {
-                                        msgBdy.tdValueDate = AccountDDE[0]["eqs_fdvaluedate"].ToString();
+                                        DateTime tdValue_Date = (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fdvaluedate"].ToString())) ? (DateTime)AccountDDE[0]["eqs_fdvaluedate"] : DateTime.MinValue;
+                                        msgBdy.tdValueDate = tdValue_Date.ToString("yyyyMMdd");
                                     }
                                     
 
