@@ -337,6 +337,10 @@ namespace ManageCase
                                 {
                                     CSRtPrm.Channel = statusCodeId[0]["eqs_CaseChannel"]["eqs_channelid"];
                                 }
+                                if (!string.IsNullOrEmpty(statusCodeId["eqs_isdocumentsavailable"]?.ToString()))
+                                {
+                                    CSRtPrm.isdocumentsavailable = Convert.ToBoolean(statusCodeId["eqs_isdocumentsavailable"].ToString());
+                                }
                                 if (!string.IsNullOrEmpty(statusCodeId[0]["_eqs_casesource_value"]?.ToString()))
                                 {
                                     CSRtPrm.Source = statusCodeId[0]["eqs_CaseSource"]["eqs_sourceid"].ToString();
@@ -682,12 +686,12 @@ namespace ManageCase
                         if (custId==1)
                         {
                             string customerid = await this._commonFunc.getCustomerId(CaseData.CustomerID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,eqs_isdocumentsavailable,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_customerid_value eq '{customerid}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                         }
                         if (AccId == 1)
                         {
                             string Accountid = await this._commonFunc.getAccountId(CaseData.AccountID.ToString());
-                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'  &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
+                            query_url = $"incidents()?$top=50&$orderby=ticketnumber desc&$select=ticketnumber,statuscode,title,eqs_isdocumentsavailable,createdon,modifiedon,ccs_resolveddate,eqs_casecancellationdate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=_eqs_account_value eq '{Accountid}'  &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                         }
 
                         var caseresponsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -705,6 +709,10 @@ namespace ManageCase
                                 if (!string.IsNullOrEmpty(caseDetails["createdon"]?.ToString()))
                                 {
                                     case_details.openDate = TimeZoneInfo.ConvertTimeFromUtc((DateTime)caseDetails["createdon"], timeZoneInfo).ToString();
+                                }
+                                if (!string.IsNullOrEmpty(caseDetails["eqs_isdocumentsavailable"]?.ToString()))
+                                {
+                                    case_details.isdocumentsavailable = Convert.ToBoolean(caseDetails["eqs_isdocumentsavailable"].ToString());
                                 }
                                 if (!string.IsNullOrEmpty(caseDetails["modifiedon"]?.ToString()))
                                 {

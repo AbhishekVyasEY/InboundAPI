@@ -51,8 +51,8 @@ namespace DigiCustLead
         public Task getcorporatemasterText(string CorporateId);
         public Task<string> getdesignationmasterID(string DesignatioCode);
         public Task getdesignationmasterText(string DesignatioId);
-        public Task<string> getBusinessTypeText(string businessTypeId);
-        public Task<string> getIndustryText(string industryId);
+        public Task getBusinessTypeText(string businessTypeId);
+        public Task getIndustryText(string industryId);
         public Task getStateText(string StateID);
         public Task getCityText(string CityId);
         public Task<string> getNomineeText(string FatcaID);
@@ -68,7 +68,7 @@ namespace DigiCustLead
         public Task getLeadsourceName(string leadsourceid);
         public Task<string> getLeadsourceId(string leadsourcename);
         public Task getSystemuserName(string systemuserid);
-        public Task<string> getBankName(string bankid);
+        public Task getBankName(string bankid);
         public Task<JArray> getDDEFinalDocumentDetail(string DDEId, string type);
         public Task<JArray> getkycverificationDetail(string kycverificationId);
         public Task<string> getDocCategoryText(string doccatId);

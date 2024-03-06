@@ -673,21 +673,24 @@
                     general.Name = DDEDetails[0].eqs_dataentryoperator.ToString();
                     general.EntityType = await this._commonFunc.getEntityName(DDEDetails[0]._eqs_entitytypeid_value.ToString());
 
-                    await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());
-                    await this._commonFunc.getBankName(DDEDetails[0]._eqs_banknameid_value.ToString());
+                    await this._commonFunc.getSubentitytypeText(DDEDetails[0]._eqs_subentitytypeid_value.ToString());                   
                     await this._commonFunc.getBranchText(DDEDetails[0]._eqs_sourcebranchterritoryid_value.ToString());
                     await this._commonFunc.getBranchText(DDEDetails[0]._eqs_preferredhomebranchid_value.ToString());
                     await this._commonFunc.getPurposeText(DDEDetails[0]._eqs_purposeofcreationid_value.ToString());
                     await this._commonFunc.getTitleText(DDEDetails[0]._eqs_titleid_value.ToString());
                     await this._commonFunc.getBusinessTypeText(DDEDetails[0]._eqs_businesstypeid_value.ToString());
                     await this._commonFunc.getIndustryText(DDEDetails[0]._eqs_industryid_value.ToString());
+                    await this._commonFunc.getBankName(DDEDetails[0]._eqs_banknameid_value.ToString());
 
                     var Batch_results1 = await this._queryParser.GetBatchResult();
 
                     general.SubEntityType = (Batch_results1[0]["eqs_key"] != null) ? Batch_results1[0]["eqs_key"].ToString() : "";
-                    general.BankName = (Batch_results1[1]["eqs_name"] != null) ? Batch_results1[1]["eqs_name"].ToString() : "";
-                    general.SourceBranchTerritory = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : "";
-                    general.CustomerspreferredBranch = (Batch_results1[3]["eqs_branchidvalue"] != null) ? Batch_results1[3]["eqs_branchidvalue"].ToString() : "";
+                    if (Batch_results1.Count > 7)
+                    {
+                        general.BankName = (Batch_results1[7]["eqs_name"] != null) ? Batch_results1[7]["eqs_name"].ToString() : "";
+                    }                    
+                    general.SourceBranchTerritory = (Batch_results1[1]["eqs_branchidvalue"] != null) ? Batch_results1[1]["eqs_branchidvalue"].ToString() : "";
+                    general.CustomerspreferredBranch = (Batch_results1[2]["eqs_branchidvalue"] != null) ? Batch_results1[2]["eqs_branchidvalue"].ToString() : "";
 
 
                     general.LGCode = DDEDetails[0].eqs_lgcode.ToString();
@@ -697,7 +700,7 @@
                     general.IsPrimaryHolder = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_isprimaryholder", DDEDetails[0].eqs_isprimaryholder.ToString());
                     general.PhysicalAOFnumber = DDEDetails[0].eqs_aofnumber.ToString();
                     general.IsDeferral = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_isdeferral", DDEDetails[0].eqs_isdeferral.ToString());
-                    general.PurposeofCreation = (Batch_results1[4]["eqs_name"] != null) ? Batch_results1[4]["eqs_name"].ToString() : "";
+                    general.PurposeofCreation = (Batch_results1[3]["eqs_name"] != null) ? Batch_results1[3]["eqs_name"].ToString() : "";
                     general.CustomerIdCreated = DDEDetails[0].eqs_customeridcreated.ToString();
                     general.IsCommAddrRgstOfficeAddrSame = DDEDetails[0].eqs_ispermaddrandcurraddrsame.ToString();
 
@@ -708,7 +711,7 @@
 
                     prospectDetails.aboutprospect = new Aboutprospect();
 
-                    prospectDetails.aboutprospect.Title = (Batch_results1[5]["eqs_name"] != null) ? Batch_results1[5]["eqs_name"].ToString() : "";
+                    prospectDetails.aboutprospect.Title = (Batch_results1[4]["eqs_name"] != null) ? Batch_results1[4]["eqs_name"].ToString() : "";
                     prospectDetails.aboutprospect.CompanyName1 = DDEDetails[0].eqs_companyname1.ToString();
                     prospectDetails.aboutprospect.CompanyNamePart2 = DDEDetails[0].eqs_companyname2.ToString();
                     prospectDetails.aboutprospect.CompanyNamePart3 = DDEDetails[0].eqs_companyname3.ToString();
@@ -727,8 +730,8 @@
 
                     prospectDetails.aboutbusiness = new Aboutbusiness();
 
-                    prospectDetails.aboutbusiness.BusinessType = (Batch_results1[6]["eqs_name"] != null) ? Batch_results1[6]["eqs_name"].ToString() : "";
-                    prospectDetails.aboutbusiness.Industry = (Batch_results1[7]["eqs_name"] != null) ? Batch_results1[7]["eqs_name"].ToString() : "";
+                    prospectDetails.aboutbusiness.BusinessType = (Batch_results1[5]["eqs_name"] != null) ? Batch_results1[5]["eqs_name"].ToString() : "";
+                    prospectDetails.aboutbusiness.Industry = (Batch_results1[6]["eqs_name"] != null) ? Batch_results1[6]["eqs_name"].ToString() : "";
                     prospectDetails.aboutbusiness.IndustryOthers = DDEDetails[0].eqs_industryothers.ToString();
                     prospectDetails.aboutbusiness.CompanyTurnover = await this._queryParser.getOptionSetValuToText("eqs_ddecorporatecustomer", "eqs_companyturnovercode", DDEDetails[0].eqs_companyturnovercode.ToString());
                     prospectDetails.aboutbusiness.CompanyTurnoverValue = DDEDetails[0].eqs_companyturnovervalue.ToString();

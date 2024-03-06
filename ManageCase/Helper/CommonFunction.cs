@@ -302,7 +302,7 @@ namespace ManageCase
         {
             try
             {
-                string query_url = $"incidents()?$select=ticketnumber,statuscode,title,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
+                string query_url = $"incidents()?$select=ticketnumber,statuscode,title,eqs_isdocumentsavailable,createdon,modifiedon,ccs_resolveddate,eqs_casetype,_ccs_classification_value,_ccs_category_value,_ccs_subcategory_value,eqs_casepayload,description,eqs_casepriority,_eqs_casechannel_value,_eqs_casesource_value,_eqs_account_value,_customerid_value&$filter=ticketnumber eq '{CaseID}' &$expand=ccs_classification($select=ccs_name),ccs_category($select=ccs_name),ccs_subcategory($select=ccs_name),eqs_CaseChannel($select=eqs_channelid),eqs_CaseSource($select=eqs_sourceid),eqs_account($select=eqs_accountno)";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
                 return inputFields;
