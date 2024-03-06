@@ -302,7 +302,7 @@ namespace AccountLead
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_city_value"].ToString()))
                                     {
-                                        //  msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
+                                          msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
                                     }
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_state_value"].ToString()))
