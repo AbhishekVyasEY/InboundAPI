@@ -189,7 +189,7 @@
                             DateTime dob = DateTime.MinValue; string firstName = ""; string middleName = ""; string lastName = ""; string shortName = "";
                             var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddeindividualcustomerid"].ToString());
 
-                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"icType\":\"P\",\"riskCategory\":\"3\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"adhrNo\":\"\",\"incomeTaxNumber\":\"\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"isStaff\":\"Y\",\"maritalStatus\":\"1\",\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\"}}}}";
+                            string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"extCustomerID\":null,\"flgStatementOption\":\"M\",\"ckycNo\":null,\"individualCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"I\",\"cifType\":\"C\",\"icType\":\"P\",\"riskCategory\":\"3\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"phone\":\"919887899899\",\"relation\":null,\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"adhrNo\":\"\",\"incomeTaxNumber\":\"\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\",\"singleFullName\":\"\",\"formattedFullName\":\"\"},\"customerEducation\":\"5\",\"employeeId\":\"33454\",\"maritalStatus\":\"1\",\"noOfSpouses\":0,\"motherMaidenName\":\"KOMAL\",\"professionCode\":0,\"sex\":\"M\",\"nationalIdentificationCode\":\"1293\",\"nationality\":\"IN\",\"designation\":\"\",\"drivingLicense\":\"\",\"fatherName\":\"\",\"spouseName\":\"\",\"passportNumber\":\"\",\"voterID\":\"\",\"districtCommunication\":\"\",\"employerCode\":\"\",\"incomeCategory\":\"\"}}}}";
                             dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
                             dynamic msgHdr = Request_Template.createCustomerRequest.msgHdr;
                             dynamic msgBdy = Request_Template.createCustomerRequest.msgBdy;
@@ -222,7 +222,7 @@
                             msgBdy.individualCustomer.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
                             msgBdy.individualCustomer.customerEducation = AccountDDE[0]["eqs_qualificationid"]["eqs_equivelentcbsid"]?.ToString();
                             string subEntityType = string.Empty; string mobileNumber = "";
-                            if(!string.IsNullOrEmpty(AccountDDE[0]["_eqs_subentitytypeid_value"]?.ToString()))
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_subentitytypeid_value"]?.ToString()))
                             {
                                 subEntityType = AccountDDE[0]["eqs_subentitytypeId"]["eqs_name"].ToString();
                             }
@@ -230,7 +230,7 @@
                             {
                                 //if (AccountDDE[0]["eqs_mobilenumber"].ToString().Length == 10 && !AccountDDE[0]["eqs_mobilenumber"].ToString().StartsWith("91"))
                                 //{
-                                    mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
+                                mobileNumber = "91" + AccountDDE[0]["eqs_mobilenumber"].ToString();
                                 //}
                                 //else
                                 //{
@@ -251,6 +251,10 @@
                             {
                                 msgBdy.individualCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
                             }
+                            else
+                            {
+                                msgBdy.individualCustomer.emailId = null;
+                            }
                             firstName = AccountDDE[0]["eqs_firstname"].ToString();
                             msgBdy.individualCustomer.name.firstName = firstName;
                             lastName = AccountDDE[0]["eqs_lastname"].ToString();
@@ -269,32 +273,41 @@
                             msgBdy.individualCustomer.name.formattedFullName = string.Empty;
                             msgBdy.individualCustomer.name.prefix = AccountDDE[0]["_eqs_titleid_value@OData.Community.Display.V1.FormattedValue"].ToString();
                             msgBdy.individualCustomer.adhrNo = AccountDDE[0]["eqs_aadharreference"].ToString();
-                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_internalpan"].ToString();                            
-                            isStaff = (string)AccountDDE[0]["eqs_isstaffcode@OData.Community.Display.V1.FormattedValue"].ToString();
-                            if (!string.IsNullOrEmpty(isStaff) && isStaff == "Yes")
+                            msgBdy.individualCustomer.incomeTaxNumber = AccountDDE[0]["eqs_internalpan"].ToString();
+                            if (AccountDDE[0]["eqs_isstaffcode@OData.Community.Display.V1.FormattedValue"] != null)
                             {
-                                msgBdy.individualCustomer.isStaff = "Y";
-                                if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_equitasstaffcode"].ToString()))
+                                isStaff = (string)AccountDDE[0]["eqs_isstaffcode@OData.Community.Display.V1.FormattedValue"].ToString();
+                                if (!string.IsNullOrEmpty(isStaff) && isStaff == "Yes")
                                 {
-                                    msgBdy.individualCustomer.employeeId = AccountDDE[0]["eqs_equitasstaffcode"].ToString();
+                                    msgBdy.individualCustomer.isStaff = "Y";
+                                    if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_equitasstaffcode"].ToString()))
+                                    {
+                                        msgBdy.individualCustomer.employeeId = AccountDDE[0]["eqs_equitasstaffcode"].ToString();
+                                    }
+                                }
+                                else
+                                {
+                                    msgBdy.individualCustomer.isStaff = "N";
                                 }
                             }
-                            else
+                            if (AccountDDE[0]["eqs_maritalstatuscode@OData.Community.Display.V1.FormattedValue"] != null)
                             {
-                                msgBdy.individualCustomer.isStaff = "N";
-                            }
-                            maritalStatus = AccountDDE[0]["eqs_maritalstatuscode@OData.Community.Display.V1.FormattedValue"].ToString();
-                            msgBdy.individualCustomer.maritalStatus = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", maritalStatus);
-                            if (!string.IsNullOrEmpty(maritalStatus) && maritalStatus.ToLower() == "married")
-                            {
-                                msgBdy.individualCustomer.noOfSpouses = 1; //Hardcoded as per bug MCU-1322
+                                maritalStatus = AccountDDE[0]["eqs_maritalstatuscode@OData.Community.Display.V1.FormattedValue"].ToString();
+                                msgBdy.individualCustomer.maritalStatus = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", maritalStatus);
+                                if (!string.IsNullOrEmpty(maritalStatus) && maritalStatus.ToLower() == "married")
+                                {
+                                    msgBdy.individualCustomer.noOfSpouses = 1; //Hardcoded as per bug MCU-1322
+                                }
                             }
                             msgBdy.individualCustomer.riskCategory = "3";
                             msgBdy.individualCustomer.professionCode = AccountDDE[0]["eqs_occupationid"]["eqs_gcmid"].ToString();
                             msgBdy.individualCustomer.nationalIdentificationCode = applicantId;
                             msgBdy.individualCustomer.motherMaidenName = AccountDDE[0]["eqs_mothermaidenname"].ToString();
-                            gender = AccountDDE[0]["eqs_gendercode@OData.Community.Display.V1.FormattedValue"].ToString();
-                            msgBdy.individualCustomer.sex = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", gender);
+                            if (AccountDDE[0]["eqs_gendercode@OData.Community.Display.V1.FormattedValue"] != null)
+                            {
+                                gender = AccountDDE[0]["eqs_gendercode@OData.Community.Display.V1.FormattedValue"].ToString();
+                                msgBdy.individualCustomer.sex = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", gender);
+                            }
                             msgBdy.individualCustomer.designation = AccountDDE[0]["_eqs_designationid_value@OData.Community.Display.V1.FormattedValue"]?.ToString();
                             msgBdy.individualCustomer.drivingLicense = AccountDDE[0]["eqs_drivinglicensenumber"]?.ToString();
                             msgBdy.individualCustomer.fatherName = AccountDDE[0]["eqs_fathername"]?.ToString();
@@ -306,8 +319,11 @@
                             {
                                 msgBdy.individualCustomer.employerCode = AccountDDE[0]["eqs_corporatecompanyid"]["eqs_corporatecode"]?.ToString();
                             }
-                            incomecat = AccountDDE[0]["eqs_annualincomebandcode@OData.Community.Display.V1.FormattedValue"].ToString();
-                            msgBdy.individualCustomer.incomeCategory = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", incomecat);
+                            if (AccountDDE[0]["eqs_annualincomebandcode@OData.Community.Display.V1.FormattedValue"] != null)
+                            {
+                                incomecat = AccountDDE[0]["eqs_annualincomebandcode@OData.Community.Display.V1.FormattedValue"].ToString();
+                                msgBdy.individualCustomer.incomeCategory = await this._commonFunc.getCRMCodeTransformation("createCustomerReq_DDEIndividualCustomer", incomecat);
+                            }
                             if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_custpreferredbranchid_value"]?.ToString()))
                             {
                                 msgBdy.individualCustomer.homeBranchCode = AccountDDE[0]["eqs_custpreferredbranchId"]["eqs_branchidvalue"]?.ToString();
@@ -404,7 +420,7 @@
             {
                 string Token = await this._queryParser.getAccessToken();
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
-               var AccountDDE = await this._commonFunc.getApplicantCorpDDE(applicantId);
+                var AccountDDE = await this._commonFunc.getApplicantCorpDDE(applicantId);
 
                 if (AccountDDE.Count > 0)
                 {
@@ -414,7 +430,7 @@
                         {
                             dynamic responsD = "";
                             string Lead_details = "";
-                            
+
                             var address = await this._commonFunc.getAddressData(AccountDDE[0]["eqs_ddecorporatecustomerid"].ToString(), "corp");
                             string RequestTemplate = "{\"createCustomerRequest\":{\"msgHdr\":{\"channelID\":\"VFLOS\",\"transactionType\":\"create\",\"transactionSubType\":\"customer\",\"conversationID\":\"string\",\"externalReferenceId\":\"kjdcbskj9c123424\",\"isAsync\":false,\"authInfo\":{\"branchID\":\"1001\",\"userID\":\"IBUSER\",\"token\":\"1001\"}},\"msgBdy\":{\"misClass\":\"DIVISION\",\"misCode\":\"0\",\"corporateCustomer\":{\"address\":{\"line1\":\"TEST1\",\"line2\":\"TEST2\",\"line3\":\"TEST3\",\"line4\":\"TEST4\",\"city\":\"CHENNAI\",\"state\":\"TAMILNADU\",\"country\":\"IN\",\"zip\":\"565556\"},\"category\":\"C\",\"cifType\":\"C\",\"icType\":\"P\",\"riskCategory\":\"3\",\"countryOfResidence\":\"IN\",\"customerMobilePhone\":\"919887899899\",\"dateOfBirthOrRegistration\":\"20001205\",\"emailId\":\"emaill@e.com\",\"homeBranchCode\":9999,\"language\":\"ENG\",\"name\":{\"firstName\":\"sall\",\"lastName\":\"SWAMI\",\"midName\":\"\",\"prefix\":\"MR.\",\"shortName\":\"salllu\"},\"nationalIdentificationCode\":\"234325\",\"businessCode\":\"\",\"alternateEmailId\":\"\",\"annualTurnover\":\"\",\"businessRegistrationNumber\":\"\",\"businessType\":\"\",\"copyMailAddToPermAdd\":\"\",\"dateRegistered\":\"\",\"fax\":\"\",\"telexHandPhone\":\"\",\"riskCategoryChangeReason\":\"\",\"incomeTaxNumber\":\"\",\"gstNumber\":\"\",\"tan\":\"\",\"cinOrRegNo\":\"\",\"tin\":\"\",\"din\":\"\",\"nrega\":\"\",\"districtCommunication\":\"\",\"nationality\":\"IN\"}}}}";
                             dynamic Request_Template = JsonConvert.DeserializeObject(RequestTemplate);
@@ -445,6 +461,10 @@
                             {
                                 msgBdy.corporateCustomer.emailId = AccountDDE[0]["eqs_emailid"].ToString();
                             }
+                            else
+                            {
+                                msgBdy.corporateCustomer.emailId = null;
+                            }
 
                             msgBdy.corporateCustomers.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
 
@@ -455,7 +475,7 @@
                             msgBdy.corporateCustomer.name.midName = AccountDDE[0]["eqs_companyname2"].ToString();
                             msgBdy.corporateCustomer.name.shortName = AccountDDE[0]["eqs_companyname1"].ToString();
                             msgBdy.corporateCustomer.name.prefix = AccountDDE[0]["eqs_titleId"]["eqs_name"].ToString();
-                            msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;                            
+                            msgBdy.corporateCustomer.nationalIdentificationCode = applicantId;
                             if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_preferredhomebranchid_value"]?.ToString()))
                             {
                                 msgBdy.corporateCustomer.homeBranchCode = AccountDDE[0]["eqs_preferredhomebranchId"]["eqs_branchidvalue"]?.ToString();

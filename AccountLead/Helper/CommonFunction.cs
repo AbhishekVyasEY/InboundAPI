@@ -348,7 +348,7 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_crmcodetransformations()?$filter=eqs_fieldvalue eq '{attribute}' and eqs_apirequestname eq '{apiName}' and statecode eq 0";
+                string query_url = $"eqs_crmcodetransformations()?$select=eqs_fieldcode&$filter=eqs_fieldvalue eq '{attribute}' and eqs_apirequestname eq '{apiName}' and statecode eq 0";
                 var dtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var data = await this.getDataFromResponce(dtails);
                 string value = data[0]["eqs_fieldcode"].ToString();
