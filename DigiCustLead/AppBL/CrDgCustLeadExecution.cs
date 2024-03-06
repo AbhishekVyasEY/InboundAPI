@@ -358,35 +358,35 @@
                     CRMLeadmappingFields.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({EntityID})");
                     CRMLeadmappingFields.Add("eqs_subentitytypeid@odata.bind", $"eqs_subentitytypes({SubEntityID})");
 
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.AadharReference.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.AadharReference?.ToString()))
                     {
                         CRMLeadmappingFields.Add("eqs_aadhaarreference", CustLeadData.IndividualEntry.AadharReference.ToString());
                     }                    
 
                     CRMLeadmappingFields.Add("eqs_createdfrompartnerchannel", "true");
 
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Pincode.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Pincode?.ToString()))
                     {
                         custLeadElement.eqs_pincode = CustLeadData.IndividualEntry.Pincode;
                     }
                         
 
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Voterid.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Voterid?.ToString()))
                     {
                         custLeadElement.eqs_voterid = CustLeadData.IndividualEntry.Voterid;
                     }                        
 
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Drivinglicense.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Drivinglicense?.ToString()))
                     {
                         custLeadElement.eqs_dlnumber = CustLeadData.IndividualEntry.Drivinglicense;
                     }
                         
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Passport.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Passport?.ToString()))
                     {
                         custLeadElement.eqs_passportnumber = CustLeadData.IndividualEntry.Passport;
                     }                       
 
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.CKYCNumber.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.CKYCNumber?.ToString()))
                     {
                         custLeadElement.eqs_ckycnumber = CustLeadData.IndividualEntry.CKYCNumber;
                     }
@@ -406,7 +406,7 @@
                     }
 
                     string purpose = "";
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.PurposeOfCreation?.ToString()))
                     {
                         purpose = await this._commonFunc.getPurposeID(CustLeadData.IndividualEntry.PurposeOfCreation.ToString());
                     }
@@ -475,27 +475,27 @@
                             CRMCustomermappingFields.Add("eqs_panvalidationmode", "958570001");
                         }
                     }
-                    if (!string.IsNullOrEmpty(custLeadElement.middlename))
+                    if (!string.IsNullOrEmpty(custLeadElement.middlename?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_middlename", custLeadElement.middlename);
                     }
-                    if (!string.IsNullOrEmpty(custLeadElement.eqs_passportnumber))
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_passportnumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_passportnumber", custLeadElement.eqs_passportnumber);
                     }
-                    if (!string.IsNullOrEmpty(custLeadElement.eqs_voterid))
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_voterid?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_voterid", custLeadElement.eqs_voterid);
                     }
-                    if (!string.IsNullOrEmpty(custLeadElement.eqs_dlnumber))
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_dlnumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_dlnumber", custLeadElement.eqs_dlnumber);
                     }
-                    if (!string.IsNullOrEmpty(custLeadElement.eqs_ckycnumber))
+                    if (!string.IsNullOrEmpty(custLeadElement.eqs_ckycnumber?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_ckycnumber", custLeadElement.eqs_ckycnumber);
                     }
-                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.AadharReference.ToString()))
+                    if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.AadharReference?.ToString()))
                     {
                         CRMCustomermappingFields.Add("eqs_aadhaarreference", CustLeadData.IndividualEntry.AadharReference.ToString());
                     }

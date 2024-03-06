@@ -191,9 +191,12 @@ using System.Diagnostics.Metrics;
         {
             return await this.getIDfromMSDTable("eqs_docsubcategories", "eqs_docsubcategoryid", $"eqs_doccategorycode eq '{Cat_code}' and eqs_docsubcategorycode", docsubcategory);
         }
-        public async Task<string> getDocTypeId(string docsubcategory)
+        public async Task<string> getDocTypeId(string docType, string docsubcategory)
         {
-            return await this.getIDfromMSDTable("eqs_doctypes", "eqs_doctypeid", "eqs_name", docsubcategory);
+            string query_url = $"eqs_doctypes()?$select=eqs_doctypeid&$filter=eqs_name eq '{docType}' and _eqs_docsubcategoryid_value eq '{docsubcategory}' and statecode eq 0";
+            var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+            string Id = await this.getIDFromGetResponce("eqs_doctypeid", responsdtails);
+            return Id;
         }
         public async Task<string> getSystemuserId(string system_user)
         {
@@ -309,7 +312,7 @@ using System.Diagnostics.Metrics;
             try
             {
                 List<MasterConfiguration> masterConfiguration = new List<MasterConfiguration>();
-                string query_url = $"eqs_masterconfigurations()?$select=eqs_key,eqs_value&$filter=eqs_key eq 'docid_issue_expirydate' or eqs_key eq 'docid_issuedat'";
+                string query_url = $"eqs_masterconfigurations()?$select=eqs_key,eqs_value&$filter=eqs_key eq 'docid_issue_expirydate' or eqs_key eq 'docid_issuedat' and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var entities = await this._queryParser.getDataFromResponce(responsdtails);
 
