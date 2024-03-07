@@ -337,9 +337,9 @@ namespace ManageCase
                                 {
                                     CSRtPrm.Channel = statusCodeId[0]["eqs_CaseChannel"]["eqs_channelid"];
                                 }
-                                if (!string.IsNullOrEmpty(statusCodeId["eqs_isdocumentsavailable"]?.ToString()))
+                                if (!string.IsNullOrEmpty(statusCodeId[0]["eqs_isdocumentsavailable"]?.ToString()))
                                 {
-                                    CSRtPrm.isdocumentsavailable = Convert.ToBoolean(statusCodeId["eqs_isdocumentsavailable"].ToString());
+                                    CSRtPrm.isdocumentsavailable = Convert.ToBoolean(statusCodeId[0]["eqs_isdocumentsavailable"].ToString());
                                 }
                                 if (!string.IsNullOrEmpty(statusCodeId[0]["_eqs_casesource_value"]?.ToString()))
                                 {
