@@ -185,11 +185,11 @@ using System.Diagnostics.Metrics;
 
         public async Task<string> getDocCategoryId(string doccategory)
         {            
-            return await this.getIDfromMSDTable("eqs_doccategories", "eqs_doccategoryid", "eqs_doccategorycode", doccategory);
+            return await this.getIDfromMSDTable("eqs_doccategories", "eqs_doccategoryid", "statecode eq 0 and eqs_doccategorycode", doccategory);
         }
         public async Task<string> getDocSubentityId(string docsubcategory, string Cat_code)
         {
-            return await this.getIDfromMSDTable("eqs_docsubcategories", "eqs_docsubcategoryid", $"eqs_doccategorycode eq '{Cat_code}' and eqs_docsubcategorycode", docsubcategory);
+            return await this.getIDfromMSDTable("eqs_docsubcategories", "eqs_docsubcategoryid", $"statecode eq 0 and eqs_doccategorycode eq '{Cat_code}' and eqs_docsubcategorycode", docsubcategory);
         }
         public async Task<string> getDocTypeId(string docType, string docsubcategory)
         {
