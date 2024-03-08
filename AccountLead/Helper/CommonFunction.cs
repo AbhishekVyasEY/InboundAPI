@@ -283,7 +283,7 @@ namespace AccountLead
                 string leadaccount_id = await this.getIDfromMSDTable("eqs_leadaccounts", "eqs_leadaccountid", "eqs_crmleadaccountid", AccountID);
                 string Stage = await this._queryParser.getOptionSetTextToValue("eqs_ddeaccount", "eqs_dataentrystage", "Final");
                 string query_url = $"eqs_ddeaccounts()?$filter=_eqs_leadaccountid_value eq '{leadaccount_id}' and eqs_dataentrystage eq {Stage}&$expand=eqs_productid($select=eqs_compoundingfrequencytype,eqs_payoutfrequencytype,eqs_productcode),eqs_leadaccountid($select=eqs_crmleadaccountid),eqs_accountopeningbranchid($select=eqs_branchidvalue)";
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "",true);
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
             }
