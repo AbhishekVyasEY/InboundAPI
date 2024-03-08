@@ -322,10 +322,18 @@ namespace AccountLead
                                     }
                                     //msgBdy.accountNominee.isNomineeDisplay = await this._queryParser.getOptionSetValuToText("eqs_ddeaccount", "eqs_isnomineedisplay", AccountDDE[0]["eqs_isnomineedisplay"].ToString());
                                     msgBdy.accountNominee.refGuardPhnCountry = "9834";
-                                    msgBdy.accountNominee.refGuardPhnExtn = Nominee[0]["eqs_phoneextn"].ToString();
+
+                                    if (!string.IsNullOrEmpty(Nominee[0]["eqs_phoneextn"]?.ToString()))
+                                    {
+                                        msgBdy.accountNominee.refGuardPhnExtn = Nominee[0]["eqs_phoneextn"].ToString();
+                                    }
+                                    else
+                                    {
+                                        msgBdy.accountNominee.refGuardPhnExtn = "9134";
+                                    }
                                     if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianrelationshiptominor"].ToString()))
                                     {
-                                        msgBdy.accountNominee.relAcctHolder = Nominee[0]["eqs_guardianrelationshiptominor"]["eqs_name"].ToString();
+                                        msgBdy.accountNominee.relAcctHolder = Nominee[0]["eqs_guardianrelationshiptominor"]["eqs_relationship"].ToString();
                                     }
                                     msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
 
