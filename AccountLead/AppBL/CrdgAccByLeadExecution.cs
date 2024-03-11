@@ -281,7 +281,7 @@ namespace AccountLead
                                 var Nominee = await this._commonFunc.getAccountNominee(AccountDDE[0]["eqs_ddeaccountid"].ToString());
                                 var AccApplicent = await this._commonFunc.getAccountApplicd(AccountDDE[0]["_eqs_leadaccountid_value"].ToString());
 
-                                msgBdy.isRestrictAcct = false;
+								msgBdy.isRestrictAcct = false;
                                 msgBdy.isSCWaive = false;
                                 msgBdy.transactionType = "A";
                                 if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fdvaluedate"].ToString()))
@@ -295,10 +295,11 @@ namespace AccountLead
                                 }
 
                                 if (Nominee.Count > 0)
-                                {
+                                {                                                                       
+
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_city_value"].ToString()))
                                     {
-                                        msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
+                                          msgBdy.accountNominee.city = await this._commonFunc.getCityName(Nominee[0]["_eqs_city_value"].ToString());
                                     }
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["_eqs_state_value"].ToString()))
@@ -335,6 +336,8 @@ namespace AccountLead
                                     {
                                         msgBdy.accountNominee.relAcctHolder = Nominee[0]["eqs_guardianrelationshiptominor"]["eqs_relationship"].ToString();
                                     }
+                                   
+                                   
                                     msgBdy.accountNominee.nominee.phone.number = Nominee[0]["eqs_mobile"].ToString();
 
                                     msgBdy.accountNominee.nominee.address.line1 = Nominee[0]["eqs_addressline1"].ToString();
@@ -343,6 +346,7 @@ namespace AccountLead
 
                                     msgBdy.accountNominee.nominee.emailId = Nominee[0]["eqs_emailid"].ToString();
                                     msgBdy.accountNominee.nominee.name = Nominee[0]["eqs_nomineename"].ToString();
+
                                     if (!string.IsNullOrEmpty(Nominee[0]["eqs_phonearea"].ToString()))
                                     {
                                         msgBdy.accountNominee.nominee.phone.area = Nominee[0]["eqs_phonearea"].ToString();
@@ -350,7 +354,7 @@ namespace AccountLead
                                     else
                                     {
                                         msgBdy.accountNominee.nominee.phone.area = "91";
-                                    }
+                                    }                                    
 
                                     if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianname"].ToString()))
                                     {
@@ -385,7 +389,12 @@ namespace AccountLead
                                 {
                                     msgBdy.Remove("accountNominee");
                                 }
-                                string productCode = AccountDDE[0]["eqs_productid"]["eqs_productcode"].ToString();
+                                string productCode = "";
+                                if (AccountDDE[0]["eqs_productid"]!=null)
+                                {
+                                    productCode = AccountDDE[0]["eqs_productid"]["eqs_productcode"].ToString();
+                                }
+                                
                                 List<ApplicentRelation> relationList = new List<ApplicentRelation>();
                                 foreach (var item in AccApplicent)
                                 {
@@ -416,7 +425,7 @@ namespace AccountLead
                                     relationList.Add(applicentRelation);
                                 }
                                 string productCat = await this._commonFunc.getProductCategory(AccountDDE[0]["_eqs_productcategoryid_value"].ToString());
-
+                                
                                 msgBdy.customerAndRelation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(relationList));
                                 msgBdy.isJointHolder = (AccountDDE[0]["eqs_accountownershipcode"].ToString() == "615290001") ? true : false;
                                 //msgBdy.productCode = Convert.ToInt32(await this._commonFunc.getProductCode(AccountDDE[0]["_eqs_productid_value"].ToString()));
@@ -426,7 +435,9 @@ namespace AccountLead
                                 msgBdy.tdaccountPayinRequest.termDays = AccountDDE[0]["eqs_tenureindays"].ToString();
                                 msgBdy.tdaccountPayinRequest.termMonths = AccountDDE[0]["eqs_tenureinmonths"].ToString();
                                 if (!string.IsNullOrEmpty(AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString()))
+                                {
                                     msgBdy.tdaccountPayinRequest.fromAccountNo = AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString();
+                                }                                    
                                 else
                                 {
                                     msgBdy.tdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
@@ -532,7 +543,7 @@ namespace AccountLead
                                 fieldInput.Add("eqs_accountnocreated", accountLeadReturn.AccountNo);
                                 string postDataParametr = JsonConvert.SerializeObject(fieldInput);
                                 await this._queryParser.HttpApiCall($"eqs_ddeaccounts({AccountDDE[0]["eqs_ddeaccountid"].ToString()})", HttpMethod.Patch, postDataParametr);
-
+                                
 
                                 fieldInput = new Dictionary<string, string>();
                                 string OnboardingStatus = await this._queryParser.getOptionSetTextToValue("lead", "eqs_onboardingstatus", "Completed");
