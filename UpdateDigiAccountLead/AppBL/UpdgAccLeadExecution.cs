@@ -176,7 +176,7 @@
                     }
                     else
                     {
-                        if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                        if (RequestData.General?.InstaKit?.ToString() != "Non Insta Kit")
                         {
                             if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
                             {
@@ -425,7 +425,7 @@
                         }
                         else
                         {
-                            if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                            if (RequestData.General?.InstaKit?.ToString() != "Non Insta Kit")
                             {
                                 if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
                                 {
@@ -736,11 +736,11 @@
                 {
                     this.DDEId = LeadAccount[0]["eqs_ddefinalid"].ToString();
 
-                    var AccountDDE = await this._commonFunc.getAccountLeadData(DDEId);
-                    if (AccountDDE.Count > 0 && !string.IsNullOrEmpty(AccountDDE[0]["eqs_accountnocreated"].ToString()))
-                    {
-                        return "Lead cannot be onboarded because account has been already created for this Lead Account.";
-                    }
+                    //var AccountDDE = await this._commonFunc.getAccountLeadData(DDEId);
+                    //if (AccountDDE.Count > 0 && !string.IsNullOrEmpty(AccountDDE[0]["eqs_accountnocreated"].ToString()))
+                    //{
+                    //    return "Lead cannot be onboarded because account has been already created for this Lead Account.";
+                    //}
                 }
 
                 var leadDetails = await this._commonFunc.getLeadDetails(LeadAccount[0]["_eqs_lead_value"].ToString());
@@ -1170,10 +1170,6 @@
 
                 }
 
-                if (!string.IsNullOrEmpty(ddeData.Nominee?.NomineeDisplayName?.ToString()))
-                {
-                    odatab.Add("eqs_isnomineedisplay", "789030001");
-                }
                 odatab.Add("eqs_createdfrompartnerchannel", "true");
 
 
@@ -1398,7 +1394,7 @@
                     dd = ddeNominee?.DOB?.ToString()?.Substring(0, 2);
                     mm = ddeNominee?.DOB?.ToString()?.Substring(3, 2);
                     yyyy = ddeNominee?.DOB?.ToString()?.Substring(6, 4);
-
+                   
                     odatab.Add("eqs_nomineedob", yyyy + "-" + mm + "-" + dd);
                 }
 
@@ -1437,7 +1433,7 @@
                 }
 
 
-                if (ddeNominee?.Guardian != null)
+                if (ddeNominee?.Guardian?.Name != null)
                 {
                     odatab.Add("eqs_guardianname", ddeNominee?.Guardian?.Name?.ToString());
                     odatab.Add("eqs_guardianucic", ddeNominee?.Guardian?.GuardianUCIC?.ToString());
@@ -1471,7 +1467,13 @@
                     {
                         odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({GStateC})");
                     }
+
+
+
                 }
+
+
+
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 if (string.IsNullOrEmpty(nomineeID))
                 {
@@ -1481,6 +1483,9 @@
                 {
                     await this._queryParser.HttpApiCall($"eqs_ddeaccountnominees({nomineeID})", HttpMethod.Patch, postDataParametr);
                 }
+
+
+
                 return true;
             }
             catch (Exception ex)
@@ -1488,6 +1493,8 @@
                 return false;
             }
         }
+
+
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -1500,6 +1507,11 @@
                 return false;
             }
         }
+
+
+
+
+
 
         public async Task<string> EncriptRespons(string ResponsData)
         {
