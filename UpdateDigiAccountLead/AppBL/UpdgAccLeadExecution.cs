@@ -1170,9 +1170,12 @@
 
                 }
 
-                if (!string.IsNullOrEmpty(ddeData.Nominee?.NomineeDisplayName?.ToString()))
+                if (ddeData.Nominee != null)
                 {
-                    odatab.Add("eqs_isnomineedisplay", "789030001");
+                    if (!string.IsNullOrEmpty(ddeData.Nominee?.NomineeDisplayName?.ToString()))
+                    {
+                        odatab.Add("eqs_isnomineedisplay", "789030001");
+                    }
                 }
 
                 odatab.Add("eqs_createdfrompartnerchannel", "true");

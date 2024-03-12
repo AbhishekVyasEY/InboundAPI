@@ -248,7 +248,7 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_ddeaccountnominees()?$select=eqs_nomineename,eqs_emailid,eqs_mobile,eqs_nomineedob,eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_pincode,_eqs_city_value,_eqs_state_value,_eqs_country_value,eqs_guardianname,eqs_guardianmobile,eqs_guardianaddressline1,eqs_guardianaddressline2,eqs_guardianaddressline3,_eqs_guardiancity_value,_eqs_guardianstate_value,_eqs_guardiancountry_value,eqs_guardianpincode,eqs_phoneextn,eqs_phonearea&$filter=_eqs_leadaccountddeid_value eq '{ddeaccountid}' &$expand=eqs_guardianrelationshiptominor($select=eqs_name,eqs_relationship)";
+                string query_url = $"eqs_ddeaccountnominees()?$select=eqs_nomineename,eqs_emailid,eqs_mobile,eqs_nomineedob,eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_pincode,_eqs_city_value,_eqs_state_value,_eqs_country_value,eqs_guardianname,eqs_guardianmobile,eqs_guardianaddressline1,eqs_guardianaddressline2,eqs_guardianaddressline3,_eqs_guardiancity_value,_eqs_guardianstate_value,_eqs_guardiancountry_value,eqs_guardianpincode,eqs_phoneextn,eqs_phonearea&$filter=_eqs_leadaccountddeid_value eq '{ddeaccountid}' &$expand=eqs_guardianrelationshiptominor($select=eqs_name,eqs_relationship),eqs_country($select=eqs_countryalphacpde),eqs_guardiancountry($select=eqs_countryalphacpde)";
                 var Nomineedtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var Nominee_dtails = await this.getDataFromResponce(Nomineedtails);
                 return Nominee_dtails;
@@ -348,7 +348,7 @@ namespace AccountLead
         {
             try
             {
-                string query_url = $"eqs_crmcodetransformations()?$filter=eqs_fieldvalue eq '{attribute}' and eqs_apirequestname eq '{apiName}' and statecode eq 0";
+                string query_url = $"eqs_crmcodetransformations()?$select=eqs_fieldcode&$filter=eqs_fieldvalue eq '{attribute}' and eqs_apirequestname eq '{apiName}' and statecode eq 0";
                 var dtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var data = await this.getDataFromResponce(dtails);
                 string value = data[0]["eqs_fieldcode"].ToString();
@@ -414,7 +414,7 @@ namespace AccountLead
                 {
                     query_url = $"eqs_leadaddresses()?$select=eqs_addressline1,eqs_addressline2,eqs_addressline3,eqs_addressline4,eqs_pincode,_eqs_cityid_value,_eqs_stateid_value,_eqs_countryid_value,eqs_district&$filter=_eqs_corporatedde_value eq '{individuaID}'";
                 }
-                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "",true);
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;
             }
