@@ -142,7 +142,7 @@ namespace CreateLeads
                                 requredFields.Add("ProductCode");
                             }
                         }
-                        else if (string.Equals(LeadData.ChannelType.ToString(), "ChatBot"))
+                        else if (string.Equals(LeadData.ChannelType.ToString(), "Chatbot"))
                         {
                             if (LeadData.Email == null || string.IsNullOrEmpty(LeadData.Email.ToString()) || LeadData.Email.ToString() == "")
                             {
@@ -451,7 +451,7 @@ namespace CreateLeads
                         ldRtPrm.Message = OutputMSG.Incorrect_Input;
                     }
                 }
-                else if (string.Equals(LeadData.ChannelType.ToString(), "ChatBot"))
+                else if (string.Equals(LeadData.ChannelType.ToString(), "Chatbot"))
                 {
                     if (LeadData.FirstName != null && LeadData.FirstName.ToString() != "")
                         lead_Property.firstname = LeadData.FirstName;
@@ -581,7 +581,18 @@ namespace CreateLeads
 
                     if (LeadData.ProductCode != null && LeadData.ProductCode.ToString() != "")
                     {
+                        var productDetails = await this._commonFunc.getProductId(LeadData.ProductCode.ToString());
+                        ldProperty.ProductId = productDetails["ProductId"];
+                        ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
+                        ldProperty.Productcategoryid = productDetails["productcategory"];
+                        if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                        {
+                            lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                        }
 
+                        odatab.Add("eqs_productid@odata.bind", $"eqs_products({ldProperty.ProductId})");
+                        odatab.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({ldProperty.Productcategoryid})");
+                        odatab.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({ldProperty.Businesscategoryid})");
                     }
                     else
                     {
