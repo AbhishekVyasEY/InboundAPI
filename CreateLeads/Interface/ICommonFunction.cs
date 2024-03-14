@@ -10,7 +10,7 @@ namespace CreateLeads
         public Task<JArray> getCustomerDetail(string CustomerCode);
         public Task<string> getEntityTypeId(string EntityTypeCode);
         public Task<string> getLeadIdByApplicent(string Applicent);
-        public Task<string> getLeadId(string Lead);
+        public Task<string> getLeadLeadsourcesId(string Lead);
         public Task<string> getSubEntityTypeId(string subEntityTypeCode);
         public Task<string> MeargeJsonString(string json1, string json2);
         public Task<JArray> getRegexForLead();

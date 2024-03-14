@@ -168,6 +168,33 @@ namespace CreateLeads
                                 requredFields.Add("EmailBody");
                             }
                         }
+                        else if (string.Equals(LeadData.ChannelType.ToString(), "LOS"))
+                        {
+                            if (LeadData.CustomerID == null || string.IsNullOrEmpty(LeadData.CustomerID.ToString()) || LeadData.CustomerID.ToString() == "")
+                            {
+                                requredFields.Add("CustomerID");
+                            }
+                            if (LeadData.ProductCode == null || string.IsNullOrEmpty(LeadData.ProductCode.ToString()) || LeadData.ProductCode.ToString() == "")
+                            {
+                                requredFields.Add("ProductCode");
+                            }
+                            if (LeadData.ProductCategory == null || string.IsNullOrEmpty(LeadData.ProductCategory.ToString()) || LeadData.ProductCategory.ToString() == "")
+                            {
+                                requredFields.Add("ProductCategory");
+                            }
+                            if (LeadData.BranchCode == null || string.IsNullOrEmpty(LeadData.BranchCode.ToString()) || LeadData.BranchCode.ToString() == "")
+                            {
+                                requredFields.Add("BranchCode");
+                            }
+                            if (LeadData.SourceLeadID == null || string.IsNullOrEmpty(LeadData.SourceLeadID.ToString()) || LeadData.SourceLeadID.ToString() == "")
+                            {
+                                requredFields.Add("SourceLeadID");
+                            }
+                            if (LeadData.LeadStatus == null || string.IsNullOrEmpty(LeadData.LeadStatus.ToString()) || LeadData.LeadStatus.ToString() == "")
+                            {
+                                requredFields.Add("LeadStatus");
+                            }
+                        }
                         else
                         {
                             this._logger.LogInformation("ValidateLead", "Channel is incorrect");
@@ -694,6 +721,130 @@ namespace CreateLeads
                         ldRtPrm.Message = "Validation Result: " + errorMessage;
                         return ldRtPrm;
                     }
+                }
+                else if (string.Equals(LeadData.ChannelType.ToString(), "LOS"))
+                {
+                    List<string> errorFields = new List<string>();
+                    var productDetails = await this._commonFunc.getProductId(LeadData.ProductCode.ToString());
+                    if (!string.IsNullOrEmpty(productDetails["ProductId"])) { 
+                        ldProperty.ProductId = productDetails["ProductId"];
+                        ldProperty.Businesscategoryid = productDetails["businesscategoryid"];
+                        ldProperty.Productcategoryid = productDetails["productcategory"];
+                        if (!string.IsNullOrEmpty(productDetails["crmproductcategorycode"]))
+                        {
+                            lead_Property.eqs_crmproductcategorycode = productDetails["crmproductcategorycode"];
+                        }
+
+                        odatab.Add("eqs_productid@odata.bind", $"eqs_products({ldProperty.ProductId})");
+                        odatab.Add("eqs_productcategoryid@odata.bind", $"eqs_productcategories({ldProperty.Productcategoryid})");
+                        odatab.Add("eqs_businesscategoryid@odata.bind", $"eqs_businesscategories({ldProperty.Businesscategoryid})");
+                    }
+                    else
+                    {
+                        errorFields.Add("ProductCode");
+                    }
+
+                    ldProperty.BranchId = await this._commonFunc.getBranchId(LeadData.BranchCode.ToString());
+                    if (ldProperty.BranchId != null && ldProperty.BranchId != "")
+                    {
+                        odatab.Add("eqs_branchid@odata.bind", $"eqs_branchs({ldProperty.BranchId})");
+                    }
+                    else
+                    {
+                        errorFields.Add("BranchCode");
+                    }
+
+
+                    var Customer_Detail = await this._commonFunc.getCustomerDetail(LeadData.CustomerID.ToString());
+                    if (Customer_Detail.Count > 0)
+                    {
+                        ldProperty.ETBCustomerID = Customer_Detail[0]["contactid"];
+                        lead_Property.firstname = Customer_Detail[0]["firstname"];
+                        lead_Property.lastname = Customer_Detail[0]["lastname"];
+
+                        odatab.Add("eqs_titleid@odata.bind", $"eqs_titles({Customer_Detail[0]["_eqs_titleid_value"]})");
+                        if (!string.IsNullOrEmpty(Customer_Detail[0]["_eqs_businesstypeid_value"].ToString()))
+                        {
+                            odatab.Add("eqs_businesstypeid@odata.bind", $"eqs_businesstypes({Customer_Detail[0]["_eqs_businesstypeid_value"]})");
+                        }
+
+                        lead_Property.eqs_companynamepart1 = Customer_Detail[0]["eqs_companyname"];
+                        lead_Property.eqs_companynamepart2 = Customer_Detail[0]["eqs_companyname2"];
+                        lead_Property.eqs_companynamepart3 = Customer_Detail[0]["eqs_companyname3"];
+                        lead_Property.eqs_dateofincorporation = Customer_Detail[0]["eqs_dateofincorporation"];
+                        lead_Property.eqs_dob = Customer_Detail[0]["birthdate"];
+                        lead_Property.eqs_gendercode = Customer_Detail[0]["eqs_gender"];
+                        lead_Property.eqs_ucic = Customer_Detail[0]["eqs_customerid"];
+
+                        if (!string.IsNullOrEmpty(Customer_Detail[0]["mobilephone"].ToString()))
+                        {
+                            lead_Property.mobilephone = Customer_Detail[0]["mobilephone"];
+                        }
+                        if (!string.IsNullOrEmpty(Customer_Detail[0]["emailaddress1"].ToString()))
+                        {
+                            lead_Property.emailaddress1 = Customer_Detail[0]["emailaddress1"];
+                        }
+
+                        odatab.Add("eqs_etbcustomerid@odata.bind", $"contacts({ldProperty.ETBCustomerID})");
+
+                        odatab.Add("eqs_entitytypeid@odata.bind", $"eqs_entitytypes({Customer_Detail[0]["_eqs_entitytypeid_value"].ToString()})");
+                        odatab.Add("eqs_subentitytypeid@odata.bind", $"eqs_subentitytypes({Customer_Detail[0]["_eqs_subentitytypeid_value"].ToString()})");
+                    }
+                    else
+                    {
+                        errorFields.Add("CustomerID");
+                    }
+
+                    string SourceLead_ID = await this._commonFunc.getLeadLeadsourcesId(LeadData.SourceLeadID.ToString());
+                    if (!string.IsNullOrEmpty(SourceLead_ID))
+                    {
+                        odatab.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({SourceLead_ID})");
+                    }
+                    else
+                    {
+                        errorFields.Add("SourceLeadID");
+                    }
+
+                    string LeadStatus =  await this._queryParser.getOptionSetTextToValue("lead", "eqs_leadstatus", LeadData.LeadStatus.ToString());
+                    if (!string.IsNullOrEmpty(LeadStatus))
+                    {
+                        odatab.Add("eqs_leadstatus", LeadStatus);
+                    }
+                    else
+                    {
+                        errorFields.Add("LeadStatus");
+                    }
+
+                    if (errorFields.Count > 0)
+                    {
+                        ldRtPrm.Message = $"Invalid {string.Join(", ", errorFields.ToArray())}";
+                        ldRtPrm.ReturnCode = "CRM-ERROR-102";
+                        return ldRtPrm;
+                    }
+
+                    if (!string.IsNullOrEmpty(LeadData.AccountNumber.ToString()))
+                    {
+                        odatab.Add("eqs_accountnumberbylos", LeadData.AccountNumber.ToString());
+                    }
+                    
+                    odatab.Add("eqs_createdfromonline", "true");
+
+                    postDataParametr = JsonConvert.SerializeObject(lead_Property);
+                    postDataParametr1 = JsonConvert.SerializeObject(odatab);
+
+                    postDataParametr = await this._commonFunc.MeargeJsonString(postDataParametr, postDataParametr1);
+
+                    string errorMessage = await ValidateFields(lead_Property);
+
+                    if (string.IsNullOrEmpty(errorMessage))
+                        Lead_details = await this._queryParser.HttpApiCall("leads?$select=eqs_crmleadid", HttpMethod.Post, postDataParametr);
+                    else
+                    {
+                        ldRtPrm.ReturnCode = "CRM-ERROR-101";
+                        ldRtPrm.Message = "Validation Result: " + errorMessage;
+                        return ldRtPrm;
+                    }
+
                 }
 
                 if (Lead_details.Count > 0)
