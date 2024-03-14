@@ -206,9 +206,9 @@ namespace CreateLeads
             return await this.getIDfromMSDTable("eqs_accountapplicants", "_eqs_leadid_value", "eqs_applicantid", Applicent);
         }
 
-        public async Task<string> getLeadId(string Lead)
+        public async Task<string> getLeadLeadsourcesId(string Leadsources)
         {
-            return await this.getIDfromMSDTable("leads", "leadid", "eqs_crmleadid", Lead);
+            return await this.getIDfromMSDTable("eqs_leadsources", "eqs_leadsourceid", "eqs_leadsourceidvalue", Leadsources); 
         }
 
         public async Task<string> getBranchId(string BranchCode)
