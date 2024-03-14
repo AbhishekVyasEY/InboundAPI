@@ -163,7 +163,15 @@ using System.Diagnostics.Metrics;
                 string TableId;
                 if (!this.GetMvalue<string>(tablename + filtervalue, out Table_Id))
                 {
-                    string query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
+                    string query_url = "";
+                    if (tablename != "systemusers")
+                    {
+                         query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}' and statecode eq 0";
+                    }
+                    else
+                    {
+                        query_url = $"{tablename}()?$select={idfield}&$filter={filterkey} eq '{filtervalue}'";
+                    }
                     var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                     TableId = await this.getIDFromGetResponce(idfield, responsdtails);
 
