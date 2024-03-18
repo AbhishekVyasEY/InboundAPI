@@ -177,7 +177,8 @@
                         csRtPrm.individualDetails.middleName = ApplicantData.eqs_middlename;
                        //csRtPrm.individualDetails.shortName = LeadData.eqs_shortname;
                         csRtPrm.individualDetails.mobilePhone = ApplicantData.eqs_mobilenumber;
-                        csRtPrm.individualDetails.dob = ApplicantData.eqs_dob;
+                        DateTime tempDate = Convert.ToDateTime(ApplicantData.eqs_dob);
+                        csRtPrm.individualDetails.dob = tempDate.ToString("dd/MM/yyyy");
                         csRtPrm.individualDetails.aadhar = ApplicantData.eqs_aadhaarreference;                     
                         csRtPrm.individualDetails.PAN = ApplicantData.eqs_internalpan;
                         csRtPrm.individualDetails.motherMaidenName = ApplicantData.eqs_mothermaidenname;

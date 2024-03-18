@@ -176,7 +176,7 @@
                     }
                     else
                     {
-                        if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                        if (RequestData.General?.InstaKit?.ToString() != "Non Insta Kit")
                         {
                             if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
                             {
@@ -425,7 +425,7 @@
                         }
                         else
                         {
-                            if (RequestData.General?.InstaKit?.ToString() == "A/C No kit")
+                            if (RequestData.General?.InstaKit?.ToString() != "Non Insta Kit")
                             {
                                 if (string.IsNullOrEmpty(RequestData.General?.InstaKitAccountNumber?.ToString()))
                                 {
@@ -1170,10 +1170,14 @@
 
                 }
 
-                if (!string.IsNullOrEmpty(ddeData.Nominee?.NomineeDisplayName?.ToString()))
+                if (ddeData.Nominee != null)
                 {
-                    odatab.Add("eqs_isnomineedisplay", "789030001");
+                    if (!string.IsNullOrEmpty(ddeData.Nominee?.NomineeDisplayName?.ToString()))
+                    {
+                        odatab.Add("eqs_isnomineedisplay", "789030001");
+                    }
                 }
+
                 odatab.Add("eqs_createdfrompartnerchannel", "true");
 
 
@@ -1398,7 +1402,7 @@
                     dd = ddeNominee?.DOB?.ToString()?.Substring(0, 2);
                     mm = ddeNominee?.DOB?.ToString()?.Substring(3, 2);
                     yyyy = ddeNominee?.DOB?.ToString()?.Substring(6, 4);
-
+                   
                     odatab.Add("eqs_nomineedob", yyyy + "-" + mm + "-" + dd);
                 }
 
@@ -1471,7 +1475,13 @@
                     {
                         odatab.Add("eqs_guardianstate@odata.bind", $"eqs_states({GStateC})");
                     }
+
+
+
                 }
+
+
+
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 if (string.IsNullOrEmpty(nomineeID))
                 {
@@ -1481,6 +1491,9 @@
                 {
                     await this._queryParser.HttpApiCall($"eqs_ddeaccountnominees({nomineeID})", HttpMethod.Patch, postDataParametr);
                 }
+
+
+
                 return true;
             }
             catch (Exception ex)
@@ -1488,6 +1501,8 @@
                 return false;
             }
         }
+
+
 
         public bool checkappkey(string appkey, string APIKey)
         {
@@ -1500,6 +1515,11 @@
                 return false;
             }
         }
+
+
+
+
+
 
         public async Task<string> EncriptRespons(string ResponsData)
         {

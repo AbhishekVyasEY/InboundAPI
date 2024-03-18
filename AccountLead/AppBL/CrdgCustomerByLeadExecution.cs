@@ -447,8 +447,14 @@
                                 msgBdy.corporateCustomer.address.line3 = address[0]["eqs_addressline3"].ToString();
                                 msgBdy.corporateCustomer.address.line4 = address[0]["eqs_addressline4"].ToString();
                                 msgBdy.corporateCustomer.address.zip = address[0]["eqs_pincode"].ToString();
-                                msgBdy.corporateCustomer.address.city = await this._commonFunc.getCityName(address[0]["_eqs_cityid_value"].ToString());  //"CHENNAI";
-                                msgBdy.corporateCustomer.address.state = await this._commonFunc.getStateName(address[0]["_eqs_stateid_value"].ToString());  //"TAMILNADU";
+                                if (!string.IsNullOrEmpty(address[0]["_eqs_cityid_value"].ToString()))
+                                {
+                                    msgBdy.corporateCustomer.address.city = address[0]["_eqs_cityid_value@OData.Community.Display.V1.FormattedValue"].ToString();  //"CHENNAI";
+                                }
+                                if (!string.IsNullOrEmpty(address[0]["_eqs_stateid_value"].ToString()))
+                                {
+                                    msgBdy.corporateCustomer.address.state = address[0]["_eqs_stateid_value@OData.Community.Display.V1.FormattedValue"].ToString();  //"TAMILNADU";
+                                }
                                 msgBdy.corporateCustomer.address.country = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
                             }
 
