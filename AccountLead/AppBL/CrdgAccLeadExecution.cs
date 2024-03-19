@@ -264,7 +264,7 @@
                 if (!string.IsNullOrEmpty(appitem.gender))
                     odatab.Add("eqs_gendercode", appitem.gender);
 
-                odatab.Add("eqs_createdfromonline", "true");
+                odatab.Add("eqs_createdfrompartnerchannel", "true");
                 if (!string.IsNullOrEmpty(_accountLead.leadsource?.ToString()))
                 {
                     odatab.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({await this._commonFunc.getLeadSourceId(_accountLead.leadsource)})");
@@ -739,7 +739,11 @@
             _accountLead.fundsTobeDebitedFrom = AccountData.fundsTobeDebitedFrom;
             _accountLead.mopRemarks = AccountData.mopRemarks;
             _accountLead.fdAccOpeningDate = AccountData.fdAccOpeningDate;
-            _accountLead.sweepFacility = AccountData.sweepFacility;
+            if (!string.IsNullOrEmpty(AccountData.sweepFacility.ToString()))
+            {
+                _accountLead.sweepFacility = Convert.ToBoolean(AccountData.sweepFacility.ToString());
+            }
+
 
             if (ValidationError > 0)
             {
