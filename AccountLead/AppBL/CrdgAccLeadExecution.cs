@@ -265,6 +265,7 @@
                     odatab.Add("eqs_gendercode", appitem.gender);
 
                 odatab.Add("eqs_createdfrompartnerchannel", "true");
+                odatab.Add("eqs_createdfromonline", "true");
                 if (!string.IsNullOrEmpty(_accountLead.leadsource?.ToString()))
                 {
                     odatab.Add("eqs_leadsourceid@odata.bind", $"eqs_leadsources({await this._commonFunc.getLeadSourceId(_accountLead.leadsource)})");

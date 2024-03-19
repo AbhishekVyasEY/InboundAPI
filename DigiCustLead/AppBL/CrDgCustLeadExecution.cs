@@ -364,6 +364,7 @@
                     }                    
 
                     CRMLeadmappingFields.Add("eqs_createdfrompartnerchannel", "true");
+                    CRMLeadmappingFields.Add("eqs_createdfromonline", "true");
 
                     if (!string.IsNullOrEmpty(CustLeadData.IndividualEntry.Pincode?.ToString()))
                     {
