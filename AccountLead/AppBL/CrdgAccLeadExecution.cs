@@ -1,4 +1,4 @@
-﻿namespace AccountLead
+namespace AccountLead
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
@@ -264,7 +264,7 @@
                 if (!string.IsNullOrEmpty(appitem.gender))
                     odatab.Add("eqs_gendercode", appitem.gender);
 
-                odatab.Add("eqs_createdfrompartnerchannel", "true");
+				odatab.Add("eqs_createdfrompartnerchannel", "true");
                 odatab.Add("eqs_createdfromonline", "true");
                 if (!string.IsNullOrEmpty(_accountLead.leadsource?.ToString()))
                 {
@@ -594,7 +594,34 @@
                     }
                     else
                     {
-                        Errucic.Add(appitem.UCIC);
+                        string Appquery_url = $"eqs_accountapplicants()?$select=eqs_internalpan,eqs_mobilenumber,eqs_emailaddress,eqs_dob,eqs_gendercode,_eqs_entitytypeid_value,_eqs_subentity_value,_eqs_titleid_value,eqs_firstname,eqs_lastname,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3,eqs_dateofincorporation&$filter=eqs_customer eq '{appitem.UCIC}'";
+                        var AccApplicantdtails = await this._queryParser.HttpApiCall(Appquery_url, HttpMethod.Get, "");
+                        var AccApplicant_dtails = await this._commonFunc.getDataFromResponce(AccApplicantdtails);
+                        if (AccApplicant_dtails.Count>0)
+                        {
+                            appitem.pan = AccApplicant_dtails[0]["eqs_internalpan"].ToString();
+                            appitem.customerPhoneNumber = AccApplicant_dtails[0]["eqs_mobilenumber"].ToString();
+                            appitem.customerEmailID = AccApplicant_dtails[0]["eqs_emailaddress"].ToString();
+                            appitem.dob = AccApplicant_dtails[0]["eqs_dob"].ToString();
+                            appitem.gender = AccApplicant_dtails[0]["eqs_gendercode"].ToString();
+                            appitem.entityType = AccApplicant_dtails[0]["_eqs_entitytypeid_value"].ToString();
+                            appitem.subentityType = AccApplicant_dtails[0]["_eqs_subentity_value"].ToString();
+                           
+                            appitem.title = AccApplicant_dtails[0]["_eqs_titleid_value"].ToString();
+                            appitem.firstname = AccApplicant_dtails[0]["eqs_firstname"].ToString();
+                            appitem.lastname = AccApplicant_dtails[0]["eqs_lastname"].ToString();
+                            appitem.eqs_companynamepart1 = AccApplicant_dtails[0]["eqs_companynamepart1"].ToString();
+                            appitem.eqs_companynamepart2 = AccApplicant_dtails[0]["eqs_companynamepart2"].ToString();
+                            appitem.eqs_companynamepart3 = AccApplicant_dtails[0]["eqs_companynamepart3"].ToString();
+                            appitem.eqs_dateofincorporation = AccApplicant_dtails[0]["eqs_dateofincorporation"].ToString();
+
+                            accountApplicants1.Add(appitem);
+                        }
+                        else
+                        {
+                            Errucic.Add(appitem.UCIC);
+                        }
+                        
                     }
 
                 }
@@ -744,7 +771,7 @@
             {
                 _accountLead.sweepFacility = Convert.ToBoolean(AccountData.sweepFacility.ToString());
             }
-
+            
 
             if (ValidationError > 0)
             {

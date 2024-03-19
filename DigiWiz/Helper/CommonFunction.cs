@@ -235,24 +235,14 @@ using System.Diagnostics.Metrics;
             return contact_dtails;
         }
 
-        public async Task<JArray> getContactData(string contact_id)
+        public async Task getContactData(string contact_id)
         {
             try
-            {
-                JArray contact_dtails, contact_dtails1;
-                if (!this.GetMvalue<JArray>("CO" + contact_id, out contact_dtails1))
-                {
-                    string query_url = $"contacts({contact_id})?$select=createdon,_eqs_entitytypeid_value,_eqs_subentitytypeid_value,mobilephone,eqs_customerid";
-                    var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
-                    contact_dtails = await this.getDataFromResponce(Accountdtails);
-                    this.SetMvalue<JArray>("CO" + contact_id, 5, contact_dtails);
-                }
-                else
-                {
-                    contact_dtails = contact_dtails1;
-                }
-
-                return contact_dtails;
+            {           
+               
+                string query_url = $"contacts({contact_id})?$select=createdon,_eqs_entitytypeid_value,_eqs_subentitytypeid_value,mobilephone,eqs_customerid";
+                await this._queryParser.SetBatchCall(query_url, HttpMethod.Get, "");
+               
             }
             catch (Exception ex)
             {

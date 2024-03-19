@@ -151,30 +151,34 @@
 
                     if (AccountData.createdon.ToString().Length > 1)
                     {
-                        csRtPrm.accountCreatedOn = AccountData.createdon;
+                        DateTime createdon = Convert.ToDateTime(AccountData.createdon.ToString());
+                        csRtPrm.accountCreatedOn = createdon.ToString("dd-MM-yyyy");
                         csRtPrm.productVariant = AccountData.eqs_productcode;
-                        csRtPrm.accountTitle = AccountData.eqs_name;
+                        csRtPrm.accountTitle = AccountData.eqs_accountcustomertitle;
                         string product_Cat_Id = AccountData._eqs_productcategoryid_value;
                         csRtPrm.productCategory = await this._commonFunc.getProductCatName(product_Cat_Id);
 
                         var all_customers = await this._commonFunc.getAllCustomers(AccountData.eqs_accountid.ToString()); 
 
                         csRtPrm.customerInfo = new List<CustomerInfo>();
-                        
-                       
-                        
+
 
                         foreach (var cu_Data in all_customers)
                         {
-                            CustomerInfo customerInfo = new CustomerInfo();
-                            var Contact_data = await this._commonFunc.getContactData(cu_Data._eqs_customeridvalue_value.ToString());
-                            
-                            customerInfo.UCICCreatedOn = (Contact_data[0]["createdon"].ToString()==null)? "" : Contact_data[0]["createdon"].ToString();                                                     
-                            customerInfo.phoneNumber = (Contact_data[0]["mobilephone"].ToString() == null)? "" : Contact_data[0]["mobilephone"].ToString();
-                            customerInfo.ucic = (Contact_data[0]["eqs_customerid"].ToString() == null) ? "" : Contact_data[0]["eqs_customerid"].ToString();
+                            await this._commonFunc.getContactData(cu_Data._eqs_customeridvalue_value.ToString());
+                        }
+                        var Contact_datas = await this._queryParser.GetBatchResult();
 
-                            customerInfo.entityFlag = (Contact_data[0]["_eqs_entitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getEntityType(Contact_data[0]["_eqs_entitytypeid_value"].ToString());
-                            customerInfo.subentityFlag = (Contact_data[0]["_eqs_subentitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getSubEntityType(Contact_data[0]["_eqs_subentitytypeid_value"].ToString());
+                        foreach (var cu_Data in Contact_datas)
+                        {
+                            CustomerInfo customerInfo = new CustomerInfo();
+                            DateTime UCICcreatedon = Convert.ToDateTime(cu_Data["createdon"].ToString());
+                            customerInfo.UCICCreatedOn = (cu_Data["createdon"].ToString()==null)? "" : UCICcreatedon.ToString("dd-MM-yyyy");                                                     
+                            customerInfo.phoneNumber = (cu_Data["mobilephone"].ToString() == null)? "" : cu_Data["mobilephone"].ToString();
+                            customerInfo.ucic = (cu_Data["eqs_customerid"].ToString() == null) ? "" : cu_Data["eqs_customerid"].ToString();
+
+                            customerInfo.entityFlag = (cu_Data["_eqs_entitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getEntityType(cu_Data["_eqs_entitytypeid_value"].ToString());
+                            customerInfo.subentityFlag = (cu_Data["_eqs_subentitytypeid_value"].ToString() == null) ? "" : await this._commonFunc.getSubEntityType(cu_Data["_eqs_subentitytypeid_value"].ToString());
 
                             csRtPrm.customerInfo.Add(customerInfo);
                         }                        
