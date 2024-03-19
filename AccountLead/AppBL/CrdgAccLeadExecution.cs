@@ -739,7 +739,11 @@
             _accountLead.fundsTobeDebitedFrom = AccountData.fundsTobeDebitedFrom;
             _accountLead.mopRemarks = AccountData.mopRemarks;
             _accountLead.fdAccOpeningDate = AccountData.fdAccOpeningDate;
-            _accountLead.sweepFacility = AccountData.sweepFacility;
+            if (!string.IsNullOrEmpty(AccountData.sweepFacility.ToString()))
+            {
+                _accountLead.sweepFacility = Convert.ToBoolean(AccountData.sweepFacility.ToString());
+            }
+            
 
             if (ValidationError > 0)
             {

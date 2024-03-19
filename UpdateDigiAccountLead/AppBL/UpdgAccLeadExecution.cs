@@ -1312,7 +1312,12 @@
                 }
                 if (!string.IsNullOrEmpty(item["DebitCardID"].ToString()))
                 {
-                    inputItem.Add("eqs_debitcard@odata.bind", $"eqs_debitcards({await this._commonFunc.getDebitCardID(item["DebitCardID"].ToString())})");
+                    string debitcardID = await this._commonFunc.getDebitCardID(item["DebitCardID"].ToString());
+                    if (!string.IsNullOrEmpty(debitcardID))
+                    {
+                        inputItem.Add("eqs_debitcard@odata.bind", $"eqs_debitcards({debitcardID})");
+                    }
+                    
                 }
                 if (!string.IsNullOrEmpty(item["NameonCard"].ToString()))
                 {
