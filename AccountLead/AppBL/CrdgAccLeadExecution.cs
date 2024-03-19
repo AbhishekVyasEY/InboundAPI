@@ -1,4 +1,4 @@
-﻿namespace AccountLead
+namespace AccountLead
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Caching.Memory;
@@ -264,6 +264,7 @@
                 if (!string.IsNullOrEmpty(appitem.gender))
                     odatab.Add("eqs_gendercode", appitem.gender);
 
+				odatab.Add("eqs_createdfrompartnerchannel", "true");
                 odatab.Add("eqs_createdfromonline", "true");
                 if (!string.IsNullOrEmpty(_accountLead.leadsource?.ToString()))
                 {

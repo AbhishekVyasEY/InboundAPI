@@ -324,8 +324,8 @@ namespace AccountLead
                                     {
                                         msgBdy.accountNominee.nominee.phone.area = "91";
                                     }
-
-                                    if (!string.IsNullOrEmpty(Nominee[0]["eqs_guardianname"].ToString()))
+                                    int age = GetAgeInYears(Nominee[0]["eqs_nomineedob"].ToString());
+                                    if (age < 18)
                                     {
                                         msgBdy.accountNominee.guardian.name = Nominee[0]["eqs_guardianname"].ToString();
                                         msgBdy.accountNominee.guardian.phone.number = Nominee[0]["eqs_guardianmobile"].ToString();
@@ -345,6 +345,10 @@ namespace AccountLead
                                             msgBdy.accountNominee.guardian.address.country = Nominee[0]["eqs_guardiancountry"]["eqs_countryalphacpde"].ToString();  //"IN";  
                                         }
                                         msgBdy.accountNominee.guardian.address.zip = Nominee[0]["eqs_guardianpincode"].ToString();
+                                    }
+                                    else
+                                    {
+                                        msgBdy.accountNominee.guardian = null;
                                     }
                                     msgBdy.accountNominee.zip = Nominee[0]["eqs_pincode"].ToString();
                                 }
@@ -400,6 +404,7 @@ namespace AccountLead
                                 }
                                 else
                                 {
+                                    msgBdy.tdaccountPayinRequest.fromAccountNo = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                                     msgBdy.tdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
                                     msgBdy.tdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                                 }
@@ -457,6 +462,7 @@ namespace AccountLead
                                     msgBdy.rdaccountPayinRequest.providerAccountNo = AccountDDE[0]["eqs_fromesfbaccountnumber"].ToString();
                                 else
                                 {
+                                    msgBdy.rdaccountPayinRequest.providerAccountNo = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                                     msgBdy.rdaccountPayinRequest.branchCodeGL = AccountDDE[0]["eqs_branchcodegl"].ToString();
                                     msgBdy.rdaccountPayinRequest.referenceNoGL = AccountDDE[0]["eqs_fromesfbglaccount"].ToString();
                                 }

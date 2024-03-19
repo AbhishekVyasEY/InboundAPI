@@ -653,7 +653,7 @@
                         yyyy = CustIndvData.NRIDetails?.PassportIssuedDate?.ToString()?.Substring(6, 4);
                         CRMDDEmappingFields.Add("eqs_passportissuedate", yyyy + "-" + mm + "-" + dd);
                     }
-                    if (!string.IsNullOrEmpty(CustIndvData.IdentificationDetails?.PassportExpiryDate?.ToString()))
+                    if (!string.IsNullOrEmpty(CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()))
                     {
                         dd = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(0, 2);
                         mm = CustIndvData.NRIDetails?.PassportExpiryDate?.ToString()?.Substring(3, 2);
