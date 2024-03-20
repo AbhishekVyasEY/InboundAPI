@@ -1947,19 +1947,22 @@
                     {
                         CRMDDEmappingFields = new Dictionary<string, string>();
                         CRMDDEmappingFields.Add("eqs_name", CustCorpDataItem.BOName?.ToString());
-                        var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.BOUCIC?.ToString());
-                        if (CustCorpDataItem.BOUCIC.ToString() != "" && customer_Dtl.Count < 1)
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.BOUCIC?.ToString()))
                         {
-                            this._logger.LogInformation("createDigiCustLeadCorp", "BOUCIC is incorrect.");
-                            csRtPrm.ReturnCode = "CRM-ERROR-102";
-                            csRtPrm.Message = "BOUCIC is incorrect.";
-                            return csRtPrm;
-                        }
-                        else
-                        {
-                            CRMDDEmappingFields.Add("eqs_boexistingcustomer@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
-                            CRMDDEmappingFields.Add("eqs_boucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
-                            CRMDDEmappingFields["eqs_name"] = customer_Dtl[0]["fullname"]?.ToString();
+                            var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.BOUCIC?.ToString());
+                            if (CustCorpDataItem.BOUCIC.ToString() != "" && customer_Dtl.Count < 1)
+                            {
+                                this._logger.LogInformation("createDigiCustLeadCorp", "BOUCIC is incorrect.");
+                                csRtPrm.ReturnCode = "CRM-ERROR-102";
+                                csRtPrm.Message = "BOUCIC is incorrect.";
+                                return csRtPrm;
+                            }
+                            else
+                            {
+                                CRMDDEmappingFields.Add("eqs_boexistingcustomer@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
+                                CRMDDEmappingFields.Add("eqs_boucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
+                                CRMDDEmappingFields["eqs_name"] = customer_Dtl[0]["fullname"]?.ToString();
+                            }
                         }
 
                         CRMDDEmappingFields.Add("eqs_botypecode", await this._queryParser.getOptionSetTextToValue("eqs_customerbo", "eqs_botypecode", CustCorpDataItem.BOType?.ToString()));
@@ -1999,21 +2002,23 @@
                     {
                         CRMDDEmappingFields = new Dictionary<string, string>();
                         CRMDDEmappingFields.Add("eqs_name", CustCorpDataItem.NameofCP?.ToString());
-                        var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.CPUCIC?.ToString());
-                        if (CustCorpDataItem.CPUCIC?.ToString() != "" && customer_Dtl.Count < 1)
+                        if (!string.IsNullOrEmpty(CustCorpDataItem.CPUCIC?.ToString()))
                         {
-                            this._logger.LogInformation("createDigiCustLeadCorp", "CPUCIC is incorrect.");
-                            csRtPrm.ReturnCode = "CRM-ERROR-102";
-                            csRtPrm.Message = "CPUCIC is incorrect.";
-                            return csRtPrm;
+                            var customer_Dtl = await this._commonFunc.getContactData(CustCorpDataItem.CPUCIC?.ToString());
+                            if (CustCorpDataItem.CPUCIC?.ToString() != "" && customer_Dtl.Count < 1)
+                            {
+                                this._logger.LogInformation("createDigiCustLeadCorp", "CPUCIC is incorrect.");
+                                csRtPrm.ReturnCode = "CRM-ERROR-102";
+                                csRtPrm.Message = "CPUCIC is incorrect.";
+                                return csRtPrm;
+                            }
+                            else
+                            {
+                                CRMDDEmappingFields.Add("eqs_cpexistingcustomerid@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
+                                CRMDDEmappingFields.Add("eqs_cpucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
+                                CRMDDEmappingFields["eqs_name"] = customer_Dtl[0]["fullname"]?.ToString();
+                            }
                         }
-                        else
-                        {
-                            CRMDDEmappingFields.Add("eqs_cpexistingcustomerid@odata.bind", $"contacts({customer_Dtl[0]["contactid"]?.ToString()})");
-                            CRMDDEmappingFields.Add("eqs_cpucic", customer_Dtl[0]["eqs_customerid"]?.ToString());
-                            CRMDDEmappingFields["eqs_name"] = customer_Dtl[0]["fullname"]?.ToString();
-                        }
-
                         CRMDDEmappingFields.Add("eqs_holding", (Convert.ToInt32(CustCorpDataItem.Holding?.ToString()) > 100) ? "100" : CustCorpDataItem.Holding?.ToString());
                         CRMDDEmappingFields.Add("eqs_ddecorporatecustomerid@odata.bind", $"eqs_ddeindividualcustomers({this.DDEId})");
                         postDataParametr = JsonConvert.SerializeObject(CRMDDEmappingFields);
