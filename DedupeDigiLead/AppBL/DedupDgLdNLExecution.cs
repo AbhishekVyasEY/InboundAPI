@@ -150,7 +150,14 @@ namespace DedupeDigiLead
 
                     if (type == "NLTR")
                     {
-                        NLTR_data = await this._commonFunc.getNLTRData(LeadData.eqs_internalpan.ToString(), LeadData.eqs_aadhar.ToString(), LeadData.eqs_passportnumber.ToString(), LeadData.eqs_cinnumber.ToString());
+                        if (LeadData.eqs_entitytypeid.eqs_name.ToString() == "Individual")
+                        {
+                            NLTR_data = await this._commonFunc.getNLTRData("Individual", LeadData.eqs_internalpan.ToString(), LeadData.eqs_aadhar.ToString(), LeadData.eqs_passportnumber.ToString(), LeadData.eqs_cinnumber.ToString(), LeadData.eqs_firstname.ToString(), LeadData.eqs_middlename.ToString(), LeadData.eqs_lastname.ToString(), LeadData.eqs_dob.ToString());
+                        }
+                        else
+                        {
+                            NLTR_data = await this._commonFunc.getNLTRData("Corporate", LeadData.eqs_internalpan.ToString(), LeadData.eqs_aadhar.ToString(), LeadData.eqs_passportnumber.ToString(), LeadData.eqs_cinnumber.ToString(), LeadData.eqs_companynamepart1.ToString(), LeadData.eqs_companynamepart2.ToString(), LeadData.eqs_companynamepart3.ToString(), LeadData.eqs_dateofregistration.ToString());
+                        }   
                     }
                     else
                     {
