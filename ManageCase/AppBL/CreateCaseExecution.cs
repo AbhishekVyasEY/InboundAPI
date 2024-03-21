@@ -99,6 +99,7 @@ namespace ManageCase
             this.StatusCodes.Add("6", "Cancelled");
             this.StatusCodes.Add("615290000", "Auto Closed");
             this.StatusCodes.Add("615290001", "Rejected");
+            this.StatusCodes.Add("615290002", "Queued for Manual Processing");            
         }
 
 
