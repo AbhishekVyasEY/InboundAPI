@@ -219,7 +219,7 @@ namespace DedupeDigiLead
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$select=eqs_internalpan,eqs_aadhar,eqs_passportnumber,eqs_name,eqs_dob,eqs_cinnumber,eqs_dateofregistration,_eqs_entitytypeid_value&$filter=eqs_applicantid eq '{ApplicantId}'";
+                string query_url = $"eqs_accountapplicants()?$select=eqs_internalpan,eqs_aadhar,eqs_passportnumber,eqs_name,eqs_dob,eqs_cinnumber,eqs_dateofregistration,eqs_firstname,eqs_middlename,eqs_lastname,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3&$filter=eqs_applicantid eq '{ApplicantId}' &$expand=eqs_entitytypeid($select=eqs_name)";
                 var Leaddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Lead_dtails = await this.getDataFromResponce(Leaddtails);
                 return Lead_dtails;
@@ -231,53 +231,112 @@ namespace DedupeDigiLead
             }
         }
 
-        public async Task<JArray> getNLTRData(string Pan, string aadhar, string passport, string cin)
+        public async Task<JArray> getNLTRData(string Custype, string Pan, string aadhar, string passport, string cin, string firstname, string middlename, string lastname, string dob)
         {
             try
             {
                 int filter = 0;
-                string query_url = $"eqs_trnls()?$select=eqs_uid,eqs_passports,eqs_pan,eqs_aadhaar,eqs_cin,eqs_dob&$filter=";
+                string query_url = $"eqs_trnls()?$select=eqs_trnlid,eqs_uid&$filter=";
                 if (!string.IsNullOrEmpty(Pan))
                 {
                     query_url += $"eqs_pan eq '{Pan}' ";
                     filter++;
                 }
-                if (!string.IsNullOrEmpty(aadhar))
+                if (Custype == "Individual")
                 {
-                    if (filter > 0)
+                    if (!string.IsNullOrEmpty(aadhar))
                     {
-                        query_url += $"or eqs_aadhaar eq '{aadhar}' ";
+                        if (filter > 0)
+                        {
+                            query_url += $"or eqs_aadhaar eq '{aadhar}' ";
+                        }
+                        else
+                        {
+                            query_url += $"eqs_aadhaar eq '{aadhar}' ";
+                        }
+                        filter++;
                     }
-                    else
+                    if (!string.IsNullOrEmpty(passport))
                     {
-                        query_url += $"eqs_aadhaar eq '{aadhar}' ";
+                        if (filter > 0)
+                        {
+                            query_url += $"or eqs_passports eq '{passport}' ";
+                        }
+                        else
+                        {
+                            query_url += $"eqs_passports eq '{passport}' ";
+                        }
+                        filter++;
                     }
-                    filter++;
+                    if (!string.IsNullOrEmpty(firstname))
+                    {
+                        if (filter > 0)
+                        {
+                            query_url += $"or eqs_fullname eq '{firstname + middlename + lastname}' or eqs_aliases eq '{firstname + " " + middlename + " " + lastname}' ";
+                        }
+                        else
+                        {
+                            query_url += $"eqs_fullname eq '{firstname + middlename + lastname}' or eqs_aliases eq '{firstname + " " + middlename + " " + lastname}' ";
+                        }
+                        filter++;
+                    }
+                    if (!string.IsNullOrEmpty(firstname) && !string.IsNullOrEmpty(lastname) && !string.IsNullOrEmpty(dob))
+                    {
+                        DateTime DOBdateTime = Convert.ToDateTime(dob);
+                        string dobS = DOBdateTime.ToString("yyyyMMdd");
+                        if (filter > 0)
+                        {
+                            query_url += $"or contains(eqs_firstname, '{firstname}') or contains(eqs_lastname, '{firstname}') or contains(eqs_aliases, '{firstname}')  or contains(eqs_alternativespelling, '{firstname}') or contains(eqs_firstname, '{lastname}') or contains(eqs_lastname, '{lastname}') or contains(eqs_aliases, '{lastname}')  or contains(eqs_alternativespelling, '{lastname}') and contains(eqs_dobs, '{dobS}') "; 
+                        }
+                        else
+                        {
+                            query_url += $"contains(eqs_firstname, '{firstname}') or contains(eqs_lastname, '{firstname}') or contains(eqs_aliases, '{firstname}')  or contains(eqs_alternativespelling, '{firstname}') or contains(eqs_firstname, '{lastname}') or contains(eqs_lastname, '{lastname}') or contains(eqs_aliases, '{lastname}')  or contains(eqs_alternativespelling, '{lastname}') and contains(eqs_dobs, '{dobS}') ";
+                        }
+                        filter++;
+                    }
                 }
-                if (!string.IsNullOrEmpty(passport))
+                else if (Custype == "Corporate")
                 {
-                    if (filter > 0)
+                    if (!string.IsNullOrEmpty(cin))
                     {
-                        query_url += $"or eqs_passports eq '{passport}' ";
+                        if (filter > 0)
+                        {
+                            query_url += $"or eqs_cin eq '{cin}' ";
+                        }
+                        else
+                        {
+                            query_url += $"eqs_cin eq '{cin}' ";
+                        }
+                        filter++;
                     }
-                    else
+                    if (!string.IsNullOrEmpty(firstname))
                     {
-                        query_url += $"eqs_passports eq '{passport}' ";
+                        if (filter > 0)
+                        {
+                            query_url += $"or eqs_fullname eq '{firstname + middlename + lastname}' ";
+                        }
+                        else
+                        {
+                            query_url += $"eqs_fullname eq '{firstname + middlename + lastname}' ";
+                        }
+                        filter++;
                     }
-                    filter++;
+                    if (!string.IsNullOrEmpty(firstname) && !string.IsNullOrEmpty(dob))
+                    {
+                        DateTime DOBdateTime = Convert.ToDateTime(dob);
+                        string dobS = DOBdateTime.ToString("yyyyMMdd");
+                        if (filter > 0)
+                        {
+                            query_url += $"or contains(eqs_fullname, '{firstname}') or contains(eqs_companiesad, '{firstname}') or contains(eqs_aliasesad, '{firstname}')  or contains(eqs_alternativespelling, '{firstname}') and contains(eqs_dobs, '{dobS}') ";
+                        }
+                        else
+                        {
+                            query_url += $"contains(eqs_fullname, '{firstname}') or contains(eqs_companiesad, '{firstname}') or contains(eqs_aliasesad, '{firstname}')  or contains(eqs_alternativespelling, '{firstname}') and contains(eqs_dobs, '{dobS}') ";
+                        }
+                        filter++;
+                    }
                 }
-                if (!string.IsNullOrEmpty(cin))
-                {
-                    if (filter > 0)
-                    {
-                        query_url += $"or eqs_cin eq '{cin}' ";
-                    }
-                    else
-                    {
-                        query_url += $"eqs_cin eq '{cin}' ";
-                    }
-                    filter++;
-                }
+                
                 if (filter > 0)
                 {
                     var NLTRdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
@@ -302,7 +361,7 @@ namespace DedupeDigiLead
             try
             {
                 int filter = 0;
-                string query_url = $"eqs_nls()?$select=eqs_recordid,eqs_passport,eqs_pan,eqs_aadhaar,eqs_cin,eqs_doiordob&$filter=";
+                string query_url = $"eqs_nls()?$select=eqs_nlid,eqs_recordid&$filter=";
                 if (!string.IsNullOrEmpty(Pan))
                 {
                     query_url += $"eqs_pan eq '{Pan}' ";
@@ -324,11 +383,11 @@ namespace DedupeDigiLead
                 {
                     if (filter > 0)
                     {
-                        query_url += $"or eqs_passport eq '{passport}' ";
+                        query_url += $"or contains(eqs_passport, '{passport}') ";
                     }
                     else
                     {
-                        query_url += $"eqs_passport eq '{passport}' ";
+                        query_url += $"contains(eqs_passport, '{passport}') ";
                     }
                     filter++;
                 }
@@ -344,6 +403,7 @@ namespace DedupeDigiLead
                     }
                     filter++;
                 }
+                
                 if (filter > 0)
                 {
                     var NLTRdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");

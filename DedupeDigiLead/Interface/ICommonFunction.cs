@@ -5,7 +5,7 @@ namespace DedupeDigiLead
     public interface ICommonFunction
     {
         public Task<JArray> getLeadData(string ApplicantId);
-        public Task<JArray> getNLTRData(string Pan,string aadhar, string passport, string cin);
+        public Task<JArray> getNLTRData(string Custype, string Pan,string aadhar, string passport, string cin, string firstname, string middlename, string lastname, string dob);
         public Task<JArray> getNLData(string Pan, string aadhar, string passport, string cin);
         public Task<List<string>> getLeadAccData(string LeadAccId);
 
