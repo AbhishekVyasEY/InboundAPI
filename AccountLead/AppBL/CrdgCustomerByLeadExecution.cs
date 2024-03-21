@@ -478,7 +478,7 @@
                             {
                                 string nationality = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
 
-                                msgBdy.corporateCustomers.nationality = nationality;
+                                msgBdy.corporateCustomer.nationality = nationality;
                                 msgBdy.corporateCustomer.countryOfResidence = nationality;
                             }
 
