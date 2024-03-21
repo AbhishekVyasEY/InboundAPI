@@ -455,7 +455,10 @@
                                 {
                                     msgBdy.corporateCustomer.address.state = address[0]["_eqs_stateid_value@OData.Community.Display.V1.FormattedValue"].ToString();  //"TAMILNADU";
                                 }
-                                msgBdy.corporateCustomer.address.country = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
+                                if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_countryofincorporationid_value"].ToString()))
+                                {
+                                    msgBdy.corporateCustomer.address.country = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
+                                }
                             }
 
                             string dd = AccountDDE[0]["eqs_dateofincorporation"].ToString().Substring(0, 2);
@@ -471,10 +474,13 @@
                             {
                                 msgBdy.corporateCustomer.emailId = null;
                             }
+                            if (!string.IsNullOrEmpty(AccountDDE[0]["_eqs_countryofincorporationid_value"].ToString()))
+                            {
+                                string nationality = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
 
-                            msgBdy.corporateCustomers.nationality = AccountDDE[0]["eqs_nationalityId"]["eqs_countryalphacpde"]?.ToString();
-
-                            msgBdy.corporateCustomer.countryOfResidence = AccountDDE[0]["eqs_countryofincorporationId"]["eqs_countryalphacpde"]?.ToString();
+                                msgBdy.corporateCustomer.nationality = nationality;
+                                msgBdy.corporateCustomer.countryOfResidence = nationality;
+                            }
 
                             msgBdy.corporateCustomer.name.firstName = AccountDDE[0]["eqs_companyname1"].ToString();
                             msgBdy.corporateCustomer.name.lastName = AccountDDE[0]["eqs_companyname3"].ToString();

@@ -29,6 +29,7 @@ namespace CustomerLead
         public string Companynamepart2 { get; set; }
         public string Companynamepart3 { get; set; }
         public string TAN { get; set; }
+        public string DateOfIncorporation { get; set; }
 
     }
 
@@ -40,8 +41,7 @@ namespace CustomerLead
         public string middlename { get; set; }
         public string lastname { get; set; }      
         public string pan { get; set; }
-       
-
+        public string dateOfBirth { get; set; }
     }
 
 
