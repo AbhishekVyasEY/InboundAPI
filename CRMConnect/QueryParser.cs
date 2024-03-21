@@ -419,9 +419,13 @@
             {
                 if (!this.GetMvalue<string>("wso2token", out Token_Id))
                 {
-                    Token_Id = this._keyVaultService.ReadSecret("CBSToken");
+                    //Token_Id = this._keyVaultService.ReadSecret("CBSToken");
+                    string query_url = "RetrieveEnvironmentVariableValue(DefinitionSchemaName='eqs_WSO2StaticToken')";
+                    var AccessTokenData = await this.HttpApiCall(query_url, HttpMethod.Get, "", true);
+                    var AccessToken = await this.getDataFromResponce(AccessTokenData);
+                    Token_Id = AccessToken[0]["Value"].ToString();
 
-                    this.SetMvalue<string>("wso2token", 1440, Token_Id);
+                    this.SetMvalue<string>("wso2token", 60, Token_Id);
                 }
             }
             catch (Exception ex)
