@@ -165,7 +165,7 @@
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$select=_eqs_customerid_value,_eqs_entitytypeid_value,_eqs_leadid_value,eqs_customertypecode,_eqs_titleid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_dob,eqs_internalpan,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3,eqs_dateofincorporation,eqs_tannumber,eqs_internalpan,eqs_aadhaarreference,eqs_passportnumber,eqs_voterid&$filter=eqs_applicantid eq '{ApplicantId}'";
+                string query_url = $"eqs_accountapplicants()?$select=_eqs_customerid_value,_eqs_entitytypeid_value,_eqs_leadid_value,eqs_customertypecode,_eqs_titleid_value,eqs_firstname,eqs_middlename,eqs_lastname,eqs_dob,eqs_internalpan,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3,eqs_dateofincorporation,eqs_tannumber,eqs_internalpan,eqs_aadhaarreference,eqs_passportnumber,eqs_nameonpancard,eqs_voterid&$filter=eqs_applicantid eq '{ApplicantId}'";
                 var custDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var cust_dtails = await this._queryParser.getDataFromResponce(custDtl);
                 return cust_dtails;
@@ -182,8 +182,8 @@
         {
             try
             {
-                string query_url = $"contacts({CustId})?$select=_eqs_entitytypeid_value,_eqs_titleid_value,firstname,middlename,lastname,eqs_pan,eqs_companyname,eqs_companyname2,eqs_companyname3,eqs_tannumber";
-                var custDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                string query_url = $"contacts({CustId})?$select=_eqs_entitytypeid_value,_eqs_titleid_value,firstname,middlename,lastname,eqs_pan,eqs_companyname,eqs_companyname2,eqs_companyname3,eqs_tannumber,birthdate,eqs_dateofincorporation";
+                var custDtl = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "", true);
                 var cust_dtails = await this._queryParser.getDataFromResponce(custDtl);
                 return cust_dtails;
             }
