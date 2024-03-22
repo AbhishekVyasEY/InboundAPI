@@ -219,7 +219,7 @@ namespace DedupeDigiLead
         {
             try
             {
-                string query_url = $"eqs_accountapplicants()?$select=eqs_internalpan,eqs_aadhar,eqs_passportnumber,eqs_name,eqs_dob,eqs_cinnumber,eqs_dateofregistration,eqs_firstname,eqs_middlename,eqs_lastname,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3&$filter=eqs_applicantid eq '{ApplicantId}' &$expand=eqs_entitytypeid($select=eqs_name)";
+                string query_url = $"eqs_accountapplicants()?$select=eqs_internalpan,eqs_aadhar,eqs_passportnumber,eqs_name,eqs_dob,eqs_cinnumber,eqs_dateofincorporation,eqs_firstname,eqs_middlename,eqs_lastname,eqs_companynamepart1,eqs_companynamepart2,eqs_companynamepart3&$filter=eqs_applicantid eq '{ApplicantId}' &$expand=eqs_entitytypeid($select=eqs_name)";
                 var Leaddtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Lead_dtails = await this.getDataFromResponce(Leaddtails);
                 return Lead_dtails;
