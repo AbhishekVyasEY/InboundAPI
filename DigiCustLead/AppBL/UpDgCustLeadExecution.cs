@@ -1494,6 +1494,18 @@
                             CRMDDEmappingFields.Add("eqs_pocphonenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
                         }
                     }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(CustCorpData.PointOfContact?.ContactPersonName?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_contactpersonname", CustCorpData.PointOfContact?.ContactPersonName?.ToString());
+                        }
+                        if (!string.IsNullOrEmpty(CustCorpData.PointOfContact?.ContactMobilePhone?.ToString()))
+                        {
+                            CRMDDEmappingFields.Add("eqs_contactmobilenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                            CRMDDEmappingFields.Add("eqs_pocphonenumber", CustCorpData.PointOfContact?.ContactMobilePhone?.ToString());
+                        }
+                    }
                 }
 
                 /*********** FATCA *********/
