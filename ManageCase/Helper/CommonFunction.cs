@@ -270,7 +270,7 @@ namespace ManageCase
         {
             try
             {
-                string query_url = $"eqs_fieldvisibilitymetadataconfigurations()?$select=eqs_showfield&$filter=_eqs_subcategory_value eq '{subCategoryCode}'  and statecode eq 0";
+                string query_url = $"eqs_fieldvisibilitymetadataconfigurations()?$select=eqs_apiadditionalfields&$filter=_eqs_subcategory_value eq '{subCategoryCode}'  and statecode eq 0";
                 var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
                 return inputFields;
