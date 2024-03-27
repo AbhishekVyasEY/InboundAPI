@@ -254,9 +254,28 @@ namespace ManageCase
                         var statusCodeId = await this._commonFunc.getCaseStatus(CaseData.CaseID.ToString());
                         
                         if (statusCodeId == null || statusCodeId.Count<1)
-                        {                          
-                            CSRtPrm.Message = "Case status not found.";
-                            CSRtPrm.ReturnCode = "CRM-ERROR-102";
+                        {
+                            statusCodeId = await this._commonFunc.getSRwizard(CaseData.CaseID.ToString());
+                            if(statusCodeId != null || statusCodeId.Count > 0) 
+                            {
+                                CSRtPrm.CaseID = CaseData.CaseID.ToString();
+                                CSRtPrm.CaseStatus = this.StatusCodes[statusCodeId[0]["eqs_statusdesc"].ToString()];
+                                CSRtPrm.Description = statusCodeId[0]["eqs_srdescription"].ToString();
+                                CSRtPrm.customerid = statusCodeId[0]["eqs_asscoiatedcustomer"]["eqs_customerid"].ToString();
+                                CSRtPrm.Accountid = statusCodeId[0]["eqs_AssociatedAccount"]["eqs_accountno"].ToString();
+                                CSRtPrm.Classification = statusCodeId[0]["eqs_srcategory"].ToString();
+                                CSRtPrm.category = statusCodeId[0]["eqs_srsubcategory"].ToString();
+                                CSRtPrm.subcategory = statusCodeId[0]["eqs_srsubsubcategory"].ToString();
+                                CSRtPrm.Subject = statusCodeId[0]["eqs_srsubject"].ToString();
+
+                                CSRtPrm.ReturnCode = "CRM-SUCCESS";
+                            }
+                            else
+                            {
+                                CSRtPrm.Message = "Case status not found.";
+                                CSRtPrm.ReturnCode = "CRM-ERROR-102";
+                            }
+                           
                         }
                         else
                         {
@@ -800,6 +819,37 @@ namespace ManageCase
 
                             CSRtPrm.AllCases.Add(case_details);
                         }
+
+                        if (custId == 1)
+                        {
+                            string customerid = await this._commonFunc.getCustomerId(CaseData.CustomerID.ToString());
+                            query_url = $"eqs_srs()?$select=eqs_srtext,eqs_statusdesc,eqs_srdescription,eqs_srcategory,eqs_srsubcategory,eqs_srsubsubcategory,eqs_srsubject&$filter=_eqs_asscoiatedcustomer_value eq '{customerid}' &$expand=eqs_AssociatedAccount($select=eqs_accountno),eqs_asscoiatedcustomer($select=eqs_customerid)";
+                        }
+                        if (AccId == 1)
+                        {
+                            string Accountid = await this._commonFunc.getAccountId(CaseData.AccountID.ToString());
+                            query_url = $"eqs_srs()?$select=eqs_srtext,eqs_statusdesc,eqs_srdescription,eqs_srcategory,eqs_srsubcategory,eqs_srsubsubcategory,eqs_srsubject&$filter=_eqs_associatedaccount_value eq '{Accountid}' &$expand=eqs_AssociatedAccount($select=eqs_accountno),eqs_asscoiatedcustomer($select=eqs_customerid)";
+                        }
+
+                        caseresponsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                        CaseList = await this._queryParser.getDataFromResponce(caseresponsdtails);
+                        foreach (var caseDetails in CaseList)
+                        {
+                            CaseDetails case_details = new CaseDetails();
+                            case_details.CaseID = caseDetails["eqs_srtext"].ToString();
+                            case_details.CaseStatus = this.StatusCodes[caseDetails["eqs_statusdesc"].ToString()];
+                            case_details.Description = caseDetails["eqs_srdescription"].ToString();
+                            case_details.customerid = caseDetails["eqs_asscoiatedcustomer"]["eqs_customerid"].ToString();
+                            case_details.Accountid = caseDetails["eqs_AssociatedAccount"]["eqs_accountno"].ToString();
+                            case_details.Classification = caseDetails["eqs_srcategory"].ToString();
+                            case_details.category = caseDetails["eqs_srsubcategory"].ToString();
+                            case_details.subcategory = caseDetails["eqs_srsubsubcategory"].ToString();
+                            case_details.Subject = caseDetails["eqs_srsubject"].ToString();
+
+                            CSRtPrm.AllCases.Add(case_details);
+                        }
+
+
                         CSRtPrm.ReturnCode = "CRM-SUCCESS";
                     }
                 }
