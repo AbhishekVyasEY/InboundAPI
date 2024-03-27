@@ -87,7 +87,6 @@
 
             try
             { 
-
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetDigiCustomerLeadappkey"))
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
@@ -139,7 +138,6 @@
                     if (typeofcustomer == "I")
                     {
                         AccountApplicantIndv accountApplicantIndv = new AccountApplicantIndv();
-
                         accountApplicantIndv.title = await this._commonFunc.getTitle(Customerdtl[0]["_eqs_titleid_value"].ToString());
                         accountApplicantIndv.firstname = Customerdtl[0]["eqs_firstname"].ToString();
                         accountApplicantIndv.middlename = Customerdtl[0]["eqs_middlename"].ToString();
@@ -162,7 +160,8 @@
                         accountApplicantCorp.Companynamepart1 = Customerdtl[0]["eqs_companynamepart1"].ToString();
                         accountApplicantCorp.Companynamepart2 = Customerdtl[0]["eqs_companynamepart2"].ToString();
                         accountApplicantCorp.Companynamepart3 = Customerdtl[0]["eqs_companynamepart3"].ToString();
-                        accountApplicantCorp.TAN = Customerdtl[0]["eqs_tannumber"].ToString();
+                        accountApplicantCorp.TAN = Customerdtl[0]["eqs_internalpan"].ToString();
+                        accountApplicantCorp.PAN = Customerdtl[0]["eqs_tannumber"].ToString();
                         if (!string.IsNullOrEmpty(Customerdtl[0]["eqs_dateofincorporation"].ToString()))
                         {
                             DateTime doi = (DateTime)Customerdtl[0]["eqs_dateofincorporation"];
@@ -181,7 +180,6 @@
                     string CustomerId = Customerdtl[0]["_eqs_customerid_value"].ToString();
                     if (!string.IsNullOrEmpty(CustomerId))
                     {
-
                         var customerDetail = await this._commonFunc.getCustomerDetails(CustomerId);
                         string typeofcustomer = await this._commonFunc.getCustomerType(customerDetail[0]["_eqs_entitytypeid_value"].ToString());
                         if (typeofcustomer == "I")
@@ -208,6 +206,7 @@
                             accountApplicantCorp.Companynamepart1 = customerDetail[0]["eqs_companyname"].ToString();
                             accountApplicantCorp.Companynamepart2 = customerDetail[0]["eqs_companyname2"].ToString();
                             accountApplicantCorp.Companynamepart3 = customerDetail[0]["eqs_companyname3"].ToString();
+                            accountApplicantCorp.PAN = customerDetail[0]["eqs_pan"].ToString();
                             accountApplicantCorp.TAN = customerDetail[0]["eqs_tannumber"].ToString();
                             if (!string.IsNullOrEmpty(customerDetail[0]["eqs_dateofincorporation"].ToString()))
                             {

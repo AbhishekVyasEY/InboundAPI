@@ -3,18 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace CustomerLead
 {
-       
-   
-    
     public class CustomerLeadReturn
-    {   
+    {
         public Applicent AccountApplicants { get; set; }
-      
-        public string ReturnCode { get; set; } 
+        public string ReturnCode { get; set; }
         public string Message { get; set; }
         public string TransactionID { get; set; }
         public string ExecutionTime { get; set; }
-
     }
 
     public class Applicent
@@ -29,21 +24,19 @@ namespace CustomerLead
         public string Companynamepart2 { get; set; }
         public string Companynamepart3 { get; set; }
         public string TAN { get; set; }
+        public string PAN { get; set; }
         public string DateOfIncorporation { get; set; }
-
     }
 
     public class AccountApplicantIndv : Applicent
     {
-      
         public string title { get; set; }
         public string firstname { get; set; }
         public string middlename { get; set; }
-        public string lastname { get; set; }      
+        public string lastname { get; set; }
         public string pan { get; set; }
         public string dateOfBirth { get; set; }
     }
-
 
     public class DedupeDigiCustomerReturn
     {
@@ -104,7 +97,4 @@ namespace CustomerLead
     {
         public List<Individual> ORGANISATION_MATCHES { get; set; }
     }
-
-
-
 }
