@@ -5,7 +5,8 @@ namespace ManageCase
     public interface ICommonFunction
     {
        
-        public Task<JArray> getCaseStatus(string CityCode);
+        public Task<JArray> getCaseStatus(string CaseID);
+        public Task<JArray> getSRwizard(string CaseID);
         public Task<JArray> getCaseAdditionalDetails(string CaseID, string idfield);
         public Task<string> getAccountId(string BranchCode);
         public Task getAccount_Id(string AccountNumber);
