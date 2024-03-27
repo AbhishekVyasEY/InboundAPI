@@ -369,7 +369,7 @@ namespace AccountLead
                 string DataEntryStage = await this._queryParser.getOptionSetTextToValue("eqs_ddecorporatecustomer", "eqs_dataentrystage", "Final");
 
                 //string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002";
-                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_preferredhomebranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryofincorporationId($select=eqs_countryalphacpde),eqs_titleId($select=eqs_name),eqs_nationalityId($select=eqs_countryalphacpde)";
+                string query_url = $"eqs_ddecorporatecustomers()?$filter=_eqs_accountapplicantid_value eq '{accountapplicantid}' and eqs_dataentrystage eq 615290002 &$expand=eqs_preferredhomebranchId($select=eqs_branchidvalue),eqs_subentitytypeId($select=eqs_name,eqs_key),eqs_countryofincorporationId($select=eqs_countryalphacpde),eqs_titleId($select=eqs_name)";
                 var Accountdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
                 var Account_dtails = await this.getDataFromResponce(Accountdtails);
                 return Account_dtails;

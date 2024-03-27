@@ -314,6 +314,22 @@ namespace ManageCase
             }
         }
 
+        public async Task<JArray> getSRwizard(string CaseID)
+        {
+            try
+            {
+                string query_url = $"eqs_srs()?$select=eqs_statusdesc,eqs_srdescription,eqs_srcategory,eqs_srsubcategory,eqs_srsubsubcategory,eqs_srsubject&$filter=eqs_srtext eq '{CaseID}' &$expand=eqs_AssociatedAccount($select=eqs_accountno),eqs_asscoiatedcustomer($select=eqs_customerid)";
+                var responsdtails = await this._queryParser.HttpApiCall(query_url, HttpMethod.Get, "");
+                var inputFields = await this._queryParser.getDataFromResponce(responsdtails);
+                return inputFields;
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError("getCaseStatus", ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task<JArray> getExistingCase(string CaseID)
         {
             try

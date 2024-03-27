@@ -60,29 +60,18 @@
         }
 
         private readonly IKeyVaultService _keyVaultService;
-
         private string Leadid, LeadAccountid, DDEId;
-
-        private List<string> applicents = new List<string>();
-       
-
-   
+        private List<string> applicents = new List<string>();     
 
         private ICommonFunction _commonFunc;
 
         public CusLeadExecution(ILoggers logger, IQueryParser queryParser, IKeyVaultService keyVaultService, ICommonFunction commonFunction)
-        {
-                    
-            this._logger = logger;
-            
+        {                    
+            this._logger = logger;            
             this._keyVaultService = keyVaultService;
             this._queryParser = queryParser;
-            this._commonFunc = commonFunction;
-
-           
-
+            this._commonFunc = commonFunction;         
         }
-
 
         public async Task<CustomerLeadReturn> ValidateInput(dynamic RequestData)
         {
@@ -98,23 +87,20 @@
 
             try
             { 
-
                 if (!string.IsNullOrEmpty(appkey) && appkey != "" && checkappkey(appkey, "GetDigiCustomerLeadappkey"))
                 {
                     if (!string.IsNullOrEmpty(Transaction_ID) && !string.IsNullOrEmpty(Channel_ID))
-                    {
-                        
+                    {                        
                         if (!string.IsNullOrEmpty(RequestData.customerLeadID.ToString()))
                         {
-                            ldRtPrm = await this.getCustomerLead(RequestData.customerLeadID.ToString());
+                            ldRtPrm = await this.getCustomerLead(RequestData.customerLeadID.ToString(), RequestData.nameOnCard.ToString());
                         }
                         else
                         {
                             this._logger.LogInformation("ValidateInput", "customerLeadID is incorrect");
                             ldRtPrm.ReturnCode = "CRM-ERROR-102";
                             ldRtPrm.Message = "customerLeadID is incorrect";
-                        }
-                        
+                        }                        
                     }
                     else
                     {
@@ -136,15 +122,12 @@
             {
                 this._logger.LogError("ValidateInput", ex.Message);
                 throw ex;
-            }
-            
+            }            
         }
 
-
-        private async Task<CustomerLeadReturn> getCustomerLead(string customerLeadID)
+        private async Task<CustomerLeadReturn> getCustomerLead(string customerLeadID, string nameOnCard)
         {
             CustomerLeadReturn accountLeadReturn = new CustomerLeadReturn();
-
             var Customerdtl  = await this._commonFunc.getApplicentDetail(customerLeadID);
 
             if (Customerdtl.Count>0)
@@ -155,13 +138,19 @@
                     if (typeofcustomer == "I")
                     {
                         AccountApplicantIndv accountApplicantIndv = new AccountApplicantIndv();
-
                         accountApplicantIndv.title = await this._commonFunc.getTitle(Customerdtl[0]["_eqs_titleid_value"].ToString());
                         accountApplicantIndv.firstname = Customerdtl[0]["eqs_firstname"].ToString();
                         accountApplicantIndv.middlename = Customerdtl[0]["eqs_middlename"].ToString();
                         accountApplicantIndv.lastname = Customerdtl[0]["eqs_lastname"].ToString();
                         accountApplicantIndv.pan = Customerdtl[0]["eqs_internalpan"].ToString();
-
+                        if (!string.IsNullOrEmpty(Customerdtl[0]["eqs_dob"].ToString()))
+                        {
+                            DateTime dob = (DateTime)Customerdtl[0]["eqs_dob"];
+                            string yy = dob.Year.ToString().PadLeft(2, '0');
+                            string mm = dob.Month.ToString().PadLeft(2, '0');
+                            string dd = dob.Day.ToString().PadLeft(2, '0');
+                            accountApplicantIndv.dateOfBirth = dd + "/" + mm + "/" + yy;
+                        }
                         accountLeadReturn.AccountApplicants = accountApplicantIndv;
                     }
                     else
@@ -171,8 +160,16 @@
                         accountApplicantCorp.Companynamepart1 = Customerdtl[0]["eqs_companynamepart1"].ToString();
                         accountApplicantCorp.Companynamepart2 = Customerdtl[0]["eqs_companynamepart2"].ToString();
                         accountApplicantCorp.Companynamepart3 = Customerdtl[0]["eqs_companynamepart3"].ToString();
-                        accountApplicantCorp.TAN = Customerdtl[0]["eqs_tannumber"].ToString();
-
+                        accountApplicantCorp.TAN = Customerdtl[0]["eqs_internalpan"].ToString();
+                        accountApplicantCorp.PAN = Customerdtl[0]["eqs_tannumber"].ToString();
+                        if (!string.IsNullOrEmpty(Customerdtl[0]["eqs_dateofincorporation"].ToString()))
+                        {
+                            DateTime doi = (DateTime)Customerdtl[0]["eqs_dateofincorporation"];
+                            string yy = doi.Year.ToString().PadLeft(2, '0');
+                            string mm = doi.Month.ToString().PadLeft(2, '0');
+                            string dd = doi.Day.ToString().PadLeft(2, '0');
+                            accountApplicantCorp.DateOfIncorporation = dd + "/" + mm + "/" + yy;
+                        }
                         accountLeadReturn.AccountApplicants = accountApplicantCorp;
                     }
                     accountLeadReturn.ReturnCode = "CRM-SUCCESS";
@@ -183,19 +180,24 @@
                     string CustomerId = Customerdtl[0]["_eqs_customerid_value"].ToString();
                     if (!string.IsNullOrEmpty(CustomerId))
                     {
-
                         var customerDetail = await this._commonFunc.getCustomerDetails(CustomerId);
                         string typeofcustomer = await this._commonFunc.getCustomerType(customerDetail[0]["_eqs_entitytypeid_value"].ToString());
                         if (typeofcustomer == "I")
                         {
                             AccountApplicantIndv accountApplicantIndv = new AccountApplicantIndv();
-
                             accountApplicantIndv.title = await this._commonFunc.getTitle(customerDetail[0]["_eqs_titleid_value"].ToString());
                             accountApplicantIndv.firstname = customerDetail[0]["firstname"].ToString();
                             accountApplicantIndv.middlename = customerDetail[0]["middlename"].ToString();
                             accountApplicantIndv.lastname = customerDetail[0]["lastname"].ToString();
                             accountApplicantIndv.pan = customerDetail[0]["eqs_pan"].ToString();
-
+                            if (!string.IsNullOrEmpty(customerDetail[0]["birthdate"].ToString()))
+                            {
+                                DateTime dob = (DateTime)customerDetail[0]["birthdate"];
+                                string yy = dob.Year.ToString().PadLeft(2, '0');
+                                string mm = dob.Month.ToString().PadLeft(2, '0');
+                                string dd = dob.Day.ToString().PadLeft(2, '0');
+                                accountApplicantIndv.dateOfBirth = dd + "/" + mm + "/" + yy;
+                            }
                             accountLeadReturn.AccountApplicants = accountApplicantIndv;
                         }
                         else
@@ -204,20 +206,32 @@
                             accountApplicantCorp.Companynamepart1 = customerDetail[0]["eqs_companyname"].ToString();
                             accountApplicantCorp.Companynamepart2 = customerDetail[0]["eqs_companyname2"].ToString();
                             accountApplicantCorp.Companynamepart3 = customerDetail[0]["eqs_companyname3"].ToString();
+                            accountApplicantCorp.PAN = customerDetail[0]["eqs_pan"].ToString();
                             accountApplicantCorp.TAN = customerDetail[0]["eqs_tannumber"].ToString();
-
+                            if (!string.IsNullOrEmpty(customerDetail[0]["eqs_dateofincorporation"].ToString()))
+                            {
+                                DateTime doi = (DateTime)customerDetail[0]["eqs_dateofincorporation"];
+                                string yy = doi.Year.ToString().PadLeft(2, '0');
+                                string mm = doi.Month.ToString().PadLeft(2, '0');
+                                string dd = doi.Day.ToString().PadLeft(2, '0');
+                                accountApplicantCorp.DateOfIncorporation = dd + "/" + mm + "/" + yy;
+                            }
                             accountLeadReturn.AccountApplicants = accountApplicantCorp;
                         }
+                        Dictionary<string, string> odatabCust = new Dictionary<string, string>();
+                        odatabCust.Add("eqs_nameonpancard", nameOnCard);
+                        string postDataParameter = JsonConvert.SerializeObject(odatabCust);
+                        var respCust = await this._queryParser.HttpApiCall($"contacts({Customerdtl[0]["_eqs_customerid_value"].ToString()})", HttpMethod.Patch, postDataParameter);
+
                         accountLeadReturn.ReturnCode = "CRM-SUCCESS";
                         accountLeadReturn.Message = OutputMSG.Case_Success;
-
-
                     }
                 }
 
                 //Set PAN Validation Mode = "System"
                 Dictionary<string, string> odatab = new Dictionary<string, string>();
                 odatab.Add("eqs_panvalidationmode", "958570001");
+                odatab.Add("eqs_nameonpancard", nameOnCard);
                 string postDataParametr = JsonConvert.SerializeObject(odatab);
                 var resp = await this._queryParser.HttpApiCall($"eqs_accountapplicants({Customerdtl[0]["eqs_accountapplicantid"].ToString()})", HttpMethod.Patch, postDataParametr);
             }            
